@@ -18,17 +18,35 @@ Bu yaklaşım:
 - Compile-deploy döngüsünü ortadan kaldırır
 - Geliştirme süresini önemli ölçüde kısaltır
 
-## Anahtar Yetenekler
+## inSCADA ile Ne Yapabilirsiniz?
 
-| Yetenek | Açıklama |
-|---------|----------|
-| **Çoklu Protokol** | Modbus TCP/RTU, BACnet, KNX, OPC-UA, DNP3, IEC 104, REST ve daha fazlası |
-| **SVG Animasyon** | Figma veya herhangi bir vektör editöründen SVG import edin, nesnelere canlı veri bağlayın |
-| **Script Engine** | Nashorn tabanlı ECMAScript 5 ile otomasyon scriptleri yazın, zamanlayın ve çalıştırın |
-| **REST API** | 1100+ endpoint ile tüm platform fonksiyonlarına programatik erişim |
-| **Alarm Yönetimi** | Analog/dijital alarm tanımlama, gruplama, bildirim ve geçmiş analizi |
-| **Web Erişim** | Kurulum gerektirmez — herhangi bir cihazdan tarayıcı ile erişin |
-| **AI Araçları** | AI Asistan ve MCP Server ile doğal dilde sorgulama ve geliştirme |
+### SCADA / HMI
+
+Saha cihazlarından canlı veri toplayın ve operatörlere görsel ekranlar sunun. SVG tabanlı mimik ekranlar, Figma gibi tasarım araçlarından doğrudan import edilebilir. Her SVG nesnesine (text, rectangle, path vb.) animasyon tipi ve canlı veri bağlanabilir — renk değişimi, hareket, döndürme, değer gösterimi gibi.
+
+### Veri Toplama ve Haberleşme
+
+Modbus TCP/RTU, BACnet, KNX, OPC-UA, DNP3, IEC 60870-5-104 ve REST API dahil geniş bir protokol yelpazesini destekler. Aynı projede farklı protokollerden gelen verileri birleştirip tek noktadan izleyebilirsiniz. Network redundancy ile birden fazla haberleşme kanalı yönetilir — bir kanal kesildiğinde otomatik geçiş yapılır.
+
+### Alarm ve Olay Yönetimi
+
+Analog ve dijital alarm tanımları, alarm grupları, öncelik seviyeleri ve bildirim mekanizmaları. Alarm geçmişi kayıt altına alınır ve denetim izine dahil edilir. Alarm durumları canlı ekranlarda anlık olarak gösterilir.
+
+### Script ve Otomasyon
+
+Nashorn tabanlı ECMAScript 5 script engine ile sunucu tarafında çalışan otomasyonlar yazın. Scriptler zamanlı (cron) veya tetiklemeli olarak çalıştırılabilir. REST API çağrıları, veri işleme, raporlama ve harici sistem entegrasyonları script üzerinden yapılabilir.
+
+### Tarihsel Veri ve Raporlama
+
+Değişken değerleri yapılandırılabilir aralıklarla loglanır. Trend grafikleri, tablo görünümü ve istatistiksel analiz araçları ile tarihsel veriler incelenir. Veriler Excel (.xlsx) olarak dışa aktarılabilir.
+
+### REST API ve Entegrasyon
+
+1100+ endpoint ile platformun tüm fonksiyonlarına programatik erişim sağlanır. Değişken okuma/yazma, proje yönetimi, alarm sorgulama, script çalıştırma — hepsi REST üzerinden yapılabilir. Üçüncü parti sistemlerle (ERP, MES, bulut servisleri) entegrasyon bu API aracılığıyla kurulur.
+
+### AI Destekli Geliştirme
+
+AI Asistan (masaüstü uygulaması) veya MCP Server (Claude Desktop extension) ile doğal dilde inSCADA verilerinizi sorgulayın, script yazın, alarm analizi yapın ve grafik oluşturun. 37 araç ile platform fonksiyonlarına AI üzerinden erişin.
 
 ## Platform Mimarisi
 
@@ -40,17 +58,21 @@ Space (Çalışma alanı)
     ├── Connection (Protokol bağlantısı)
     │   └── Device (Cihaz)
     │       └── Frame (Veri çerçevesi)
-    │           └── Variable (Değişken — temel veri noktası)
-    ├── Script (Otomasyon scripti)
+    │           └── Variable (Değişken)
+    ├── Script (Otomasyon)
     └── Alarm Group
         └── Alarm Definition
 ```
 
-- **Space**: Çoklu çalışma alanı ile kiracı (tenant) izolasyonu
-- **Variable**: Platformun temel yapı taşı — loglama, ölçekleme, alarm ve animasyon bağlantılarının tümü değişken üzerinden yapılır
-- **Script**: Sunucu tarafında çalışan JavaScript otomasyonları — zamanlı veya tetiklemeli
-- **Connection**: Her biri farklı bir protokol ve saha cihazını temsil eder
+**Space** çoklu çalışma alanı ile kiracı izolasyonu sağlar. **Variable** platformun temel yapı taşıdır — loglama, ölçekleme, alarm ve animasyon bağlantılarının tümü değişken üzerinden yapılır.
 
-## Sonraki Adım
+## Başlangıç Adımları
 
-Platformu kurmak ve ilk projenizi oluşturmak için [Kurulum](/docs/tr/getting-started/installation/) sayfasına geçin.
+inSCADA ile çalışmaya başlamak dört adımda özetlenebilir:
+
+1. **Kur** — inSCADA'yı Windows sunucunuza kurun, tarayıcıdan yönetim arayüzüne erişin
+2. **Proje oluştur** — Space ve proje tanımlayın, çalışma ortamınızı hazırlayın
+3. **Bağlantı ekle** — Saha cihazlarınızla protokol bağlantısı kurun, değişkenleri tanımlayın
+4. **İzlemeye başla** — SVG ekranlar tasarlayın, alarm kuralları belirleyin, sistemi canlıya alın
+
+Detaylı kurulum adımları için [Sistem Gereksinimleri](/docs/tr/getting-started/system-requirements/) sayfasına geçin.
