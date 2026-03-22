@@ -7,12 +7,6 @@ sidebar:
 
 **inSCADA** is a web-based SCADA/IIoT platform built for monitoring, controlling and collecting data from industrial facilities. Built on Java (JDK 11), it is accessible via any browser from the moment of installation — no client software required.
 
-## Who is it for?
-
-- **System integrators** — Companies developing SCADA applications for clients across different industries
-- **Facility owners** — Businesses wanting to remotely monitor and manage production, energy, water treatment and other facilities
-- **OEM manufacturers** — Machine builders looking to integrate embedded HMI/SCADA solutions into their equipment
-
 ## Key Differentiator: Runtime = Development
 
 In traditional SCADA software, the development environment and runtime environment are separate: a project is developed, compiled, tested, and deployed to production.
