@@ -1,63 +1,55 @@
-/* inSCADA Docs — Force Light Theme */
+/* inSCADA Docs — Force Light Theme
+   Starlight'ın light modunda renk skalası TERStir:
+   --sl-color-white = koyu (metin), --sl-color-black = açık (arka plan)
+*/
 
-/* Override both light AND dark states with identical light colors */
 :root,
 :root[data-theme='light'],
 :root[data-theme='dark'] {
 	color-scheme: light !important;
 
+	/* Starlight light mode: white=koyu, black=açık (ters mantık) */
+	--sl-color-white: hsl(224, 10%, 10%) !important;
+	--sl-color-gray-1: hsl(224, 14%, 16%) !important;
+	--sl-color-gray-2: hsl(224, 10%, 23%) !important;
+	--sl-color-gray-3: hsl(224, 7%, 36%) !important;
+	--sl-color-gray-4: hsl(224, 6%, 56%) !important;
+	--sl-color-gray-5: hsl(224, 6%, 77%) !important;
+	--sl-color-gray-6: hsl(224, 20%, 94%) !important;
+	--sl-color-gray-7: hsl(224, 19%, 97%) !important;
+	--sl-color-black: hsl(0, 0%, 100%) !important;
+
 	/* Accent — inSCADA mavi */
-	--sl-color-accent-low: #dbeafe !important;
-	--sl-color-accent: #0066cc !important;
-	--sl-color-accent-high: #1e3a5f !important;
+	--sl-color-accent-high: hsl(211, 80%, 30%) !important;
+	--sl-color-accent: hsl(211, 90%, 40%) !important;
+	--sl-color-accent-low: hsl(211, 88%, 92%) !important;
 
-	/* Backgrounds */
-	--sl-color-bg: #ffffff !important;
-	--sl-color-bg-nav: #f8fafc !important;
-	--sl-color-bg-sidebar: #f8fafc !important;
-	--sl-color-bg-inline-code: #f1f5f9 !important;
+	/* Semantic colors */
+	--sl-color-text: var(--sl-color-gray-2) !important;
+	--sl-color-text-accent: var(--sl-color-accent) !important;
+	--sl-color-text-invert: var(--sl-color-black) !important;
 
-	/* Borders */
-	--sl-color-hairline: #e2e8f0 !important;
-	--sl-color-hairline-light: #f1f5f9 !important;
-	--sl-color-hairline-shade: #cbd5e1 !important;
+	--sl-color-bg: var(--sl-color-black) !important;
+	--sl-color-bg-nav: var(--sl-color-gray-7) !important;
+	--sl-color-bg-sidebar: var(--sl-color-black) !important;
+	--sl-color-bg-inline-code: var(--sl-color-gray-6) !important;
+	--sl-color-bg-accent: var(--sl-color-accent) !important;
 
-	/* Gray scale — light */
-	--sl-color-white: #ffffff !important;
-	--sl-color-gray-1: #f8fafc !important;
-	--sl-color-gray-2: #e2e8f0 !important;
-	--sl-color-gray-3: #94a3b8 !important;
-	--sl-color-gray-4: #475569 !important;
-	--sl-color-gray-5: #1e293b !important;
-	--sl-color-gray-6: #0f172a !important;
-	--sl-color-gray-7: #020617 !important;
-	--sl-color-black: #0a0e17 !important;
+	--sl-color-hairline-light: var(--sl-color-gray-6) !important;
+	--sl-color-hairline: var(--sl-color-gray-6) !important;
+	--sl-color-hairline-shade: var(--sl-color-gray-6) !important;
 
-	/* Text */
-	--sl-color-text: #334155 !important;
-	--sl-color-text-accent: #0066cc !important;
+	--sl-color-backdrop-overlay: hsla(225, 9%, 36%, 0.66) !important;
+
+	/* Shadows (light) */
+	--sl-shadow-sm: 0px 1px 1px hsla(0, 0%, 0%, 0.06), 0px 2px 1px hsla(0, 0%, 0%, 0.06) !important;
+	--sl-shadow-md: 0px 8px 4px hsla(0, 0%, 0%, 0.03), 0px 5px 2px hsla(0, 0%, 0%, 0.03), 0px 3px 2px hsla(0, 0%, 0%, 0.06), 0px 1px 1px hsla(0, 0%, 0%, 0.06) !important;
+	--sl-shadow-lg: 0px 25px 7px rgba(0, 0, 0, 0.01), 0px 16px 6px hsla(0, 0%, 0%, 0.03), 0px 9px 5px hsla(223, 13%, 10%, 0.08), 0px 4px 4px hsla(0, 0%, 0%, 0.16), 0px 4px 2px hsla(0, 0%, 0%, 0.04) !important;
 }
 
 /* Dark mode toggle gizle */
 starlight-theme-select {
 	display: none !important;
-}
-
-/* Sidebar grup başlıkları koyu */
-.sidebar-content summary,
-.sidebar-content details > summary > div > span,
-nav.sidebar summary {
-	color: #1e293b !important;
-	font-weight: 600 !important;
-}
-
-/* Sidebar linkleri */
-nav.sidebar a {
-	color: #475569 !important;
-}
-
-nav.sidebar a:hover {
-	color: #0066cc !important;
 }
 
 /* Logo */
