@@ -43,6 +43,23 @@ starlight-theme-select {
 	display: none !important;
 }
 
+/* Sidebar grup başlıkları koyu */
+.sidebar-content summary,
+.sidebar-content details > summary > div > span,
+nav.sidebar summary {
+	color: #1e293b !important;
+	font-weight: 600 !important;
+}
+
+/* Sidebar linkleri */
+nav.sidebar a {
+	color: #475569 !important;
+}
+
+nav.sidebar a:hover {
+	color: #0066cc !important;
+}
+
 /* Logo */
 .site-title img {
 	max-height: 1.75rem;
