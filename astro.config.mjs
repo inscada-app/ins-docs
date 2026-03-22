@@ -24,6 +24,7 @@ export default defineConfig({
 			components: {
 				ThemeProvider: './src/components/ThemeProvider.astro',
 				Head: './src/components/Head.astro',
+				SiteTitle: './src/components/SiteTitle.astro',
 			},
 			sidebar: [
 				{
