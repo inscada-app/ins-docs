@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-**inSCADA** is a web-based SCADA/IIoT platform built for monitoring, controlling and collecting data from industrial facilities. Built on Java (JDK 11), it is accessible via any browser from the moment of installation — no client software required.
+**inSCADA** is a web-based platform designed for developing SCADA, HMI and IIoT applications across all areas of industry. Built on Java (JDK 11), all development activities — project creation, connection configuration, screen design, script development — are carried out through the web interface. Any browser can be used, and for a streamlined operator experience the **inSCADA Viewer** desktop application is also available.
 
 ## Key Differentiator: Runtime = Development
 

@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-**inSCADA**, endüstriyel tesisleri izlemek, kontrol etmek ve veri toplamak için geliştirilmiş web tabanlı bir SCADA/IIoT platformudur. Java (JDK 11) üzerine inşa edilmiştir; kurulumdan itibaren tarayıcı üzerinden erişilir, istemci yazılımı gerektirmez.
+**inSCADA**, endüstrinin tüm alanlarında SCADA, HMI ve IIoT uygulamaları geliştirmek için tasarlanmış web tabanlı bir platformdur. Java (JDK 11) üzerine inşa edilmiştir. Proje oluşturma, bağlantı yapılandırma, ekran tasarımı, script geliştirme — tüm geliştirme faaliyetleri web arayüzünden gerçekleştirilir. Bunun için herhangi bir tarayıcı kullanılabildiği gibi, daha sade bir operatör deneyimi için **inSCADA Viewer** masaüstü uygulaması da mevcuttur.
 
 ## Temel Fark: Runtime = Development
 
