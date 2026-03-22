@@ -1,0 +1,31 @@
+---
+title: inSCADA Documentation
+description: Technical documentation for inSCADA SCADA/IIoT platform
+template: splash
+hero:
+  tagline: Comprehensive technical documentation for the web-based SCADA/IIoT development platform.
+  actions:
+    - text: Getting Started
+      link: /docs/en/getting-started/what-is-inscada/
+      icon: right-arrow
+    - text: API Reference
+      link: /docs/en/api/overview/
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+  <Card title="Quick Start" icon="rocket">
+    Installation, system requirements and creating your first project.
+  </Card>
+  <Card title="Platform Guide" icon="laptop">
+    Project, connection, variable, alarm and script management.
+  </Card>
+  <Card title="Protocols" icon="setting">
+    Modbus, BACnet, KNX, OPC-UA, DNP3 and more.
+  </Card>
+  <Card title="REST API" icon="open-book">
+    inSCADA REST API reference with 1100+ endpoints.
+  </Card>
+</CardGrid>
