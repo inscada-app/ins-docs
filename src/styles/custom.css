@@ -1,24 +1,72 @@
-/* inSCADA Docs — Custom Theme */
+/* inSCADA Docs — Light Theme (inscada.com uyumlu) */
+
+/* Force light theme */
 :root {
+	color-scheme: light;
+}
+
+/* Starlight dark mode toggle'ı gizle */
+starlight-theme-select {
+	display: none !important;
+}
+
+:root,
+:root[data-theme='dark'] {
 	--sl-color-accent-low: #e0f2fe;
 	--sl-color-accent: #0066cc;
 	--sl-color-accent-high: #004182;
+
 	--sl-color-white: #ffffff;
 	--sl-color-gray-1: #f8fafc;
-	--sl-color-gray-2: #e2e8f0;
-	--sl-color-gray-3: #94a3b8;
-	--sl-color-gray-4: #475569;
+	--sl-color-gray-2: #e5e7eb;
+	--sl-color-gray-3: #9ca3af;
+	--sl-color-gray-4: #4b5563;
 	--sl-color-gray-5: #1e293b;
 	--sl-color-gray-6: #0f172a;
 	--sl-color-black: #0a0e17;
+
+	--sl-color-bg: #ffffff;
+	--sl-color-bg-nav: #f8fafc;
+	--sl-color-bg-sidebar: #f8fafc;
+	--sl-color-bg-inline-code: #f1f5f9;
+	--sl-color-hairline: #e2e8f0;
+	--sl-color-hairline-light: #f1f5f9;
+
+	--sl-color-text: #334155;
+	--sl-color-text-accent: #0066cc;
+
+	--sl-nav-height: 3.5rem;
 }
 
-:root[data-theme='dark'] {
-	--sl-color-accent-low: #0c2d4a;
-	--sl-color-accent: #38bdf8;
-	--sl-color-accent-high: #bae6fd;
+/* Sidebar */
+.sidebar-content {
+	background: var(--sl-color-bg-sidebar);
 }
 
-img.light\:sl-hidden {
-	max-height: 2rem;
+/* Header bar */
+header.header {
+	background: rgba(255, 255, 255, 0.95) !important;
+	backdrop-filter: blur(12px);
+	border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+/* Logo sizing */
+img.light\:sl-hidden,
+.site-title img {
+	max-height: 1.75rem;
+}
+
+/* Links */
+a {
+	color: var(--sl-color-accent);
+}
+
+/* Code blocks */
+pre {
+	border: 1px solid var(--sl-color-hairline) !important;
+}
+
+/* Cards on splash page */
+.card {
+	border-color: var(--sl-color-hairline);
 }
