@@ -1,72 +1,140 @@
-/* inSCADA Docs — Light Theme (inscada.com uyumlu) */
+/* inSCADA Docs — Light Only Theme */
 
-/* Force light theme */
-:root {
-	color-scheme: light;
-}
+/* Her zaman light tema zorla */
+html,
+html[data-theme='dark'],
+html[data-theme='light'] {
+	color-scheme: light !important;
+	--sl-hue-accent: 211;
 
-/* Starlight dark mode toggle'ı gizle */
-starlight-theme-select {
-	display: none !important;
-}
-
-:root,
-:root[data-theme='dark'] {
-	--sl-color-accent-low: #e0f2fe;
-	--sl-color-accent: #0066cc;
-	--sl-color-accent-high: #004182;
-
-	--sl-color-white: #ffffff;
-	--sl-color-gray-1: #f8fafc;
-	--sl-color-gray-2: #e5e7eb;
-	--sl-color-gray-3: #9ca3af;
-	--sl-color-gray-4: #4b5563;
-	--sl-color-gray-5: #1e293b;
-	--sl-color-gray-6: #0f172a;
-	--sl-color-black: #0a0e17;
-
+	/* Arka planlar */
 	--sl-color-bg: #ffffff;
 	--sl-color-bg-nav: #f8fafc;
 	--sl-color-bg-sidebar: #f8fafc;
 	--sl-color-bg-inline-code: #f1f5f9;
+
+	/* Çizgiler */
 	--sl-color-hairline: #e2e8f0;
 	--sl-color-hairline-light: #f1f5f9;
+	--sl-color-hairline-shade: #cbd5e1;
 
+	/* Gri skalası — açıktan koyuya */
+	--sl-color-gray-1: #f8fafc;
+	--sl-color-gray-2: #e2e8f0;
+	--sl-color-gray-3: #94a3b8;
+	--sl-color-gray-4: #475569;
+	--sl-color-gray-5: #1e293b;
+	--sl-color-gray-6: #0f172a;
+	--sl-color-gray-7: #020617;
+
+	/* Ana renkler */
+	--sl-color-white: #ffffff;
+	--sl-color-black: #0f172a;
 	--sl-color-text: #334155;
 	--sl-color-text-accent: #0066cc;
 
-	--sl-nav-height: 3.5rem;
+	/* Accent — inSCADA mavi */
+	--sl-color-accent-low: #dbeafe;
+	--sl-color-accent: #0066cc;
+	--sl-color-accent-high: #1e3a5f;
+
+	/* Banner ve badge */
+	--sl-color-banner-text: #1e293b;
+
+	/* Tablo ve border */
+	--sl-color-table-header: #f1f5f9;
 }
 
-/* Sidebar */
-.sidebar-content {
-	background: var(--sl-color-bg-sidebar);
+/* Dark mode toggle gizle */
+starlight-theme-select,
+[data-select-theme] {
+	display: none !important;
 }
 
-/* Header bar */
-header.header {
-	background: rgba(255, 255, 255, 0.95) !important;
-	backdrop-filter: blur(12px);
-	border-bottom: 1px solid var(--sl-color-hairline);
+/* Header — beyaz, border alt çizgi */
+header.header,
+.header {
+	background: rgba(255, 255, 255, 0.97) !important;
+	backdrop-filter: blur(12px) !important;
+	border-bottom: 1px solid #e2e8f0 !important;
 }
 
-/* Logo sizing */
-img.light\:sl-hidden,
+/* Sidebar — açık gri arka plan */
+nav.sidebar,
+.sidebar-pane {
+	background: #f8fafc !important;
+	border-right: 1px solid #e2e8f0 !important;
+}
+
+/* Sidebar aktif link */
+[aria-current='page'],
+[aria-current='page'] a {
+	color: #0066cc !important;
+	font-weight: 600 !important;
+}
+
+/* İçerik alanı */
+.content-panel,
+.main-pane {
+	background: #ffffff !important;
+}
+
+/* Code block */
+pre {
+	background: #f8fafc !important;
+	border: 1px solid #e2e8f0 !important;
+	color: #1e293b !important;
+}
+
+code {
+	background: #f1f5f9 !important;
+	color: #0f172a !important;
+}
+
+pre code {
+	background: transparent !important;
+}
+
+/* Mobile menu */
+.mobile-menu-toggle {
+	color: #334155 !important;
+}
+
+/* Logo */
 .site-title img {
 	max-height: 1.75rem;
 }
 
-/* Links */
-a {
-	color: var(--sl-color-accent);
+/* Hero splash */
+.hero {
+	border-bottom: 1px solid #e2e8f0;
 }
 
-/* Code blocks */
-pre {
-	border: 1px solid var(--sl-color-hairline) !important;
+/* Tablolar */
+table {
+	border-color: #e2e8f0 !important;
 }
 
-/* Cards on splash page */
-.card {
-	border-color: var(--sl-color-hairline);
+th {
+	background: #f1f5f9 !important;
+	color: #1e293b !important;
+}
+
+td {
+	border-color: #f1f5f9 !important;
+}
+
+/* Aside/callout */
+.starlight-aside {
+	border-color: #e2e8f0;
+	background: #f8fafc;
+}
+
+/* Pagination links */
+.pagination-links a {
+	border-color: #e2e8f0 !important;
+}
+
+.pagination-links a:hover {
+	border-color: #0066cc !important;
 }
