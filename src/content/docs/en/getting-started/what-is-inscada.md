@@ -62,6 +62,8 @@ Query your inSCADA data in natural language, write scripts, analyse alarms and g
 
 ## Platform Architecture
 
+### Data Hierarchy
+
 Data in inSCADA is organized in a hierarchical structure:
 
 ```
@@ -77,6 +79,58 @@ Space (Workspace)
 ```
 
 **Space** provides multi-workspace tenant isolation. **Variable** is the platform's fundamental building block — logging, scaling, alarms and animation bindings all work through variables.
+
+### Three-Layer Data Architecture
+
+inSCADA stores different types of data in different database technologies. This separation is critical for performance and scalability:
+
+| Layer | Purpose | Stored Data |
+|-------|---------|-------------|
+| **Relational Database (RDB)** | Configuration and metadata | Project, connection, device, variable definitions, users, roles, alarm rules, script definitions, licence information |
+| **Time Series Database (TSDB)** | Historical measurement data (Historian) | Variable values, timestamps, quality flags. Configurable retention period, downsampling for ageing |
+| **In-Memory Cache** | Real-time access | Instant variable values (<1ms access), session information, rate-limit counters |
+
+### Data Flow Architecture
+
+A measurement value coming from a field device passes through these stages in the platform:
+
+```
+Field Device (Sensor/Transmitter)
+        │
+        │ Protocol (Modbus, OPC UA, IEC 104...)
+        ▼
+┌─────────────────────────────┐
+│   Protocol Driver            │
+│   (Connector)               │
+└────────────┬────────────────┘
+             │
+             ▼
+┌─────────────────────────────┐
+│   Value Processing Pipeline  │
+│                              │
+│   1. Scaling                 │
+│      (raw → engineering)     │
+│   2. Time adjustment         │
+│   3. Expression evaluation   │
+│      (JavaScript expression) │
+│   4. Pulse generation        │
+└────────────┬────────────────┘
+             │
+     ┌───────┴───────┐
+     ▼               ▼
+ ┌────────┐    ┌──────────┐
+ │ Cache  │    │ Historian │
+ │(instant│    │ (based on │
+ │ value) │    │  logging  │
+ │        │    │  rules)   │
+ │ → Web  │    └──────────┘
+ │  push  │
+ └────────┘
+```
+
+### High Availability
+
+inSCADA supports redundant operation with an Active-Active cluster architecture. Two or more nodes run simultaneously; when the leader node fails, the standby node takes over automatically. Configuration changes, files and historical data are synchronised between nodes.
 
 ## Getting Started Steps
 

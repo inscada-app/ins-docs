@@ -62,6 +62,8 @@ AI Asistan (masaüstü uygulaması) veya MCP Server (Claude Desktop extension) i
 
 ## Platform Mimarisi
 
+### Veri Hiyerarşisi
+
 inSCADA'da veriler hiyerarşik bir yapıda organize edilir:
 
 ```
@@ -77,6 +79,57 @@ Space (Çalışma alanı)
 ```
 
 **Space** çoklu çalışma alanı ile kiracı izolasyonu sağlar. **Variable** platformun temel yapı taşıdır — loglama, ölçekleme, alarm ve animasyon bağlantılarının tümü değişken üzerinden yapılır.
+
+### Üç Katmanlı Veri Mimarisi
+
+inSCADA, farklı veri türlerini farklı veritabanı teknolojilerinde saklar. Bu ayrım performans ve ölçeklenebilirlik için kritiktir:
+
+| Katman | Amaç | Saklanan Veri |
+|--------|-------|---------------|
+| **İlişkisel Veritabanı (RDB)** | Yapılandırma ve metadata | Proje, bağlantı, cihaz, değişken tanımları, kullanıcılar, roller, alarm kuralları, script tanımları, lisans bilgileri |
+| **Zaman Serisi Veritabanı (TSDB)** | Tarihsel ölçüm verileri (Historian) | Değişken değerleri, zaman damgaları, kalite bayrakları. Yapılandırılabilir saklama süresi, downsampling ile yaşlandırma |
+| **Bellek İçi Önbellek (In-Memory Cache)** | Gerçek zamanlı erişim | Anlık değişken değerleri (<1ms erişim), oturum bilgileri, rate-limit sayaçları |
+
+### Veri Akış Mimarisi
+
+Saha cihazından gelen bir ölçüm değeri platformda şu aşamalardan geçer:
+
+```
+Saha Cihazı (Sensör/Transmitter)
+        │
+        │ Protokol (Modbus, OPC UA, IEC 104...)
+        ▼
+┌─────────────────────────────┐
+│   Protokol Sürücüsü         │
+│   (Connector)               │
+└────────────┬────────────────┘
+             │
+             ▼
+┌─────────────────────────────┐
+│   Değer İşleme Hattı        │
+│                              │
+│   1. Ölçekleme               │
+│      (ham → mühendislik)     │
+│   2. Zaman ayarlama          │
+│   3. İfade değerlendirme     │
+│      (JavaScript expression) │
+│   4. Pulse üretimi           │
+└────────────┬────────────────┘
+             │
+     ┌───────┴───────┐
+     ▼               ▼
+ ┌────────┐    ┌──────────┐
+ │ Cache  │    │ Historian │
+ │ (anlık)│    │ (kayıt    │
+ │        │    │  koşuluna │
+ │ → Web  │    │  göre)    │
+ │  yayın │    └──────────┘
+ └────────┘
+```
+
+### Yüksek Erişilebilirlik
+
+inSCADA, Active-Active cluster mimarisi ile yedekli çalışmayı destekler. İki veya daha fazla node eş zamanlı çalışır; lider node arızalandığında yedek node otomatik olarak devralır. Yapılandırma değişiklikleri, dosyalar ve tarihsel veriler node'lar arasında senkronize edilir.
 
 ## Başlangıç Adımları
 
