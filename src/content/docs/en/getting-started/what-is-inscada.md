@@ -76,7 +76,7 @@ Space (Workspace)
 
 The platform uses a three-layer data architecture: a relational database (RDB) for configuration data, a time series database (TSDB) for historical measurements, and an in-memory cache for real-time access. It supports redundant operation with an Active-Active cluster architecture.
 
-For detailed architecture information, see [Platform Architecture](/docs/en/platform/projects/).
+For detailed architecture information, see [Platform Architecture](/docs/en/platform/architecture/).
 
 ## Getting Started Steps
 

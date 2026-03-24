@@ -76,7 +76,7 @@ Space (Çalışma alanı)
 
 Platform, yapılandırma verileri için ilişkisel veritabanı (RDB), tarihsel ölçümler için zaman serisi veritabanı (TSDB) ve gerçek zamanlı erişim için bellek içi önbellek (In-Memory Cache) olmak üzere üç katmanlı bir veri mimarisi kullanır. Active-Active cluster mimarisi ile yedekli çalışmayı destekler.
 
-Detaylı mimari bilgi için [Platform Mimarisi](/docs/tr/platform/projects/) sayfasına bakın.
+Detaylı mimari bilgi için [Platform Mimarisi](/docs/tr/platform/architecture/) sayfasına bakın.
 
 ## Başlangıç Adımları
 
