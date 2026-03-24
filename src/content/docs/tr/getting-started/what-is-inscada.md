@@ -5,19 +5,9 @@ sidebar:
   order: 1
 ---
 
-**inSCADA**, endüstrinin tüm alanlarında SCADA, HMI ve IIoT uygulamaları geliştirmek için tasarlanmış web tabanlı bir platformdur. Tamamen RESTful bir mimariye sahiptir — platform üzerindeki her işlem REST API üzerinden gerçekleştirilebilir. Multi-tenant yapısı sayesinde birden fazla çalışma alanı (Space) ve proje aynı anda, birbirinden izole şekilde yönetilir. Çok kullanıcılı erişim ile farklı roller ve yetkiler tanımlanarak ekipler paralel çalışabilir.
+**inSCADA**, endüstrinin tüm alanlarında SCADA, HMI ve IIoT uygulamaları geliştirmek için tasarlanmış web tabanlı bir platformdur. Proje oluşturma, bağlantı yapılandırma, alarm tanımlama, trend ayarları, bildirim kuralları ve daha fazlası — SCADA alanında ihtiyaç duyulan geliştirme ve yapılandırma faaliyetlerinin %95'i web arayüzünden gerçekleştirilir. Bunun için herhangi bir tarayıcı kullanılabildiği gibi, daha sade bir kullanıcı deneyimi için **inSCADA Viewer** masaüstü uygulaması da mevcuttur.
 
-Proje oluşturma, bağlantı yapılandırma, alarm tanımlama, trend ayarları, bildirim kuralları ve daha fazlası — SCADA alanında ihtiyaç duyulan geliştirme ve yapılandırma faaliyetlerinin %95'i web arayüzünden gerçekleştirilir. Bunun için herhangi bir tarayıcı kullanılabildiği gibi, daha sade bir kullanıcı deneyimi için **inSCADA Viewer** masaüstü uygulaması da mevcuttur.
-
-### Ekran Tasarımı: İki Farklı Yaklaşım
-
-inSCADA, kullanıcı arayüzü geliştirmek için iki farklı yöntem sunar:
-
-**Geleneksel Yöntem — SVG Animasyon:** Klasik SCADA yazılımlarındaki gibi görsel nesnelere canlı veri ve animasyon bağlama yaklaşımıdır. inSCADA bu yöntemi SVG tabanlı olarak sunar. Herhangi bir SVG editörden (Figma, Illustrator, Inkscape vb.) alınan çıktılar doğrudan platforma import edilir. SVG içindeki her nesneye (text, rectangle, path, circle vb.) animasyon tipi atanabilir — renk değişimi, hareket, döndürme, değer gösterimi, opaklık ve daha fazlası.
-
-**Modern Yöntem — HTML/JS/CSS Uygulama Geliştirme:** Custom Menu özelliği ile HTML, JavaScript ve CSS kullanarak tamamen özel arayüzler geliştirebilirsiniz. Bu yöntem, standart web teknolojileri ile sınırsız esneklikte dashboard, kontrol paneli veya raporlama ekranları oluşturmanızı sağlar.
-
-Her iki yöntem aynı projede bir arada kullanılabilir — **hibrit arayüzler** oluşturabilirsiniz. Örneğin bir SVG mimik ekranın yanında HTML tabanlı bir trend grafiği veya kontrol paneli yer alabilir.
+Tamamen RESTful bir mimariye sahiptir — platform üzerindeki her işlem REST API üzerinden gerçekleştirilebilir. Multi-tenant yapısı sayesinde birden fazla çalışma alanı (Space) ve proje aynı anda, birbirinden izole şekilde yönetilir. Çok kullanıcılı erişim ile farklı roller ve yetkiler tanımlanarak ekipler paralel çalışabilir.
 
 ## Temel Fark: Runtime = Development
 
@@ -34,7 +24,13 @@ Bu yaklaşım:
 
 ### SCADA / HMI
 
-Saha cihazlarından canlı veri toplayın ve kullanıcılara görsel ekranlar sunun. Yukarıda açıklanan SVG ve HTML/JS/CSS yöntemleri ile tesisinize özel arayüzler tasarlayın. Canlı değerler, trend grafikleri, alarm göstergeleri ve kontrol butonları tek bir ekranda birleştirilebilir.
+Saha cihazlarından canlı veri toplayın ve kullanıcılara görsel ekranlar sunun. inSCADA, arayüz geliştirmek için iki farklı yöntem sunar:
+
+**Geleneksel Yöntem — SVG Animasyon:** Klasik SCADA yazılımlarındaki gibi görsel nesnelere canlı veri ve animasyon bağlama yaklaşımıdır. inSCADA bu yöntemi SVG tabanlı olarak sunar. Herhangi bir SVG editörden (Figma, Illustrator, Inkscape vb.) alınan çıktılar doğrudan platforma import edilir. SVG içindeki her nesneye animasyon tipi atanabilir — renk değişimi, hareket, döndürme, değer gösterimi, opaklık ve daha fazlası.
+
+**Modern Yöntem — HTML/JS/CSS Uygulama Geliştirme:** Custom Menu özelliği ile HTML, JavaScript ve CSS kullanarak tamamen özel arayüzler geliştirebilirsiniz. Dashboard, kontrol paneli veya raporlama ekranları standart web teknolojileri ile oluşturulur.
+
+Her iki yöntem aynı projede bir arada kullanılabilir — **hibrit arayüzler** oluşturabilirsiniz. Örneğin bir SVG mimik ekranın yanında HTML tabanlı bir trend grafiği veya kontrol paneli yer alabilir.
 
 ### Veri Toplama ve Haberleşme
 
@@ -46,7 +42,7 @@ Analog ve dijital alarm tanımları, alarm grupları, öncelik seviyeleri ve bil
 
 ### Script ve Otomasyon
 
-Nashorn tabanlı ECMAScript 5 script engine ile sunucu tarafında çalışan otomasyonlar yazın. Scriptler zamanlı (cron) veya tetiklemeli olarak çalıştırılabilir. REST API çağrıları, veri işleme, raporlama ve harici sistem entegrasyonları script üzerinden yapılabilir.
+JavaScript tabanlı script engine ile sunucu tarafında çalışan otomasyonlar yazın. Scriptler zamanlı (cron) veya tetiklemeli olarak çalıştırılabilir. REST API çağrıları, veri işleme, raporlama ve harici sistem entegrasyonları script üzerinden yapılabilir.
 
 ### Tarihsel Veri ve Raporlama
 
@@ -61,8 +57,6 @@ Değişken değerleri yapılandırılabilir aralıklarla loglanır. Trend grafik
 AI Asistan (masaüstü uygulaması) veya MCP Server (Claude Desktop extension) ile doğal dilde inSCADA verilerinizi sorgulayın, script yazın, alarm analizi yapın ve grafik oluşturun. 37 araç ile platform fonksiyonlarına AI üzerinden erişin.
 
 ## Platform Mimarisi
-
-### Veri Hiyerarşisi
 
 inSCADA'da veriler hiyerarşik bir yapıda organize edilir:
 
@@ -80,64 +74,17 @@ Space (Çalışma alanı)
 
 **Space** çoklu çalışma alanı ile kiracı izolasyonu sağlar. **Variable** platformun temel yapı taşıdır — loglama, ölçekleme, alarm ve animasyon bağlantılarının tümü değişken üzerinden yapılır.
 
-### Üç Katmanlı Veri Mimarisi
+Platform, yapılandırma verileri için ilişkisel veritabanı (RDB), tarihsel ölçümler için zaman serisi veritabanı (TSDB) ve gerçek zamanlı erişim için bellek içi önbellek (In-Memory Cache) olmak üzere üç katmanlı bir veri mimarisi kullanır. Active-Active cluster mimarisi ile yedekli çalışmayı destekler.
 
-inSCADA, farklı veri türlerini farklı veritabanı teknolojilerinde saklar. Bu ayrım performans ve ölçeklenebilirlik için kritiktir:
-
-| Katman | Amaç | Saklanan Veri |
-|--------|-------|---------------|
-| **İlişkisel Veritabanı (RDB)** | Yapılandırma ve metadata | Proje, bağlantı, cihaz, değişken tanımları, kullanıcılar, roller, alarm kuralları, script tanımları, lisans bilgileri |
-| **Zaman Serisi Veritabanı (TSDB)** | Tarihsel ölçüm verileri (Historian) | Değişken değerleri, zaman damgaları, kalite bayrakları. Yapılandırılabilir saklama süresi, downsampling ile yaşlandırma |
-| **Bellek İçi Önbellek (In-Memory Cache)** | Gerçek zamanlı erişim | Anlık değişken değerleri (<1ms erişim), oturum bilgileri, rate-limit sayaçları |
-
-### Veri Akış Mimarisi
-
-Saha cihazından gelen bir ölçüm değeri platformda şu aşamalardan geçer:
-
-```
-Saha Cihazı (Sensör/Transmitter)
-        │
-        │ Protokol (Modbus, OPC UA, IEC 104...)
-        ▼
-┌─────────────────────────────┐
-│   Protokol Sürücüsü         │
-│   (Connector)               │
-└────────────┬────────────────┘
-             │
-             ▼
-┌─────────────────────────────┐
-│   Değer İşleme Hattı        │
-│                              │
-│   1. Ölçekleme               │
-│      (ham → mühendislik)     │
-│   2. Zaman ayarlama          │
-│   3. İfade değerlendirme     │
-│      (JavaScript expression) │
-│   4. Pulse üretimi           │
-└────────────┬────────────────┘
-             │
-     ┌───────┴───────┐
-     ▼               ▼
- ┌────────┐    ┌──────────┐
- │ Cache  │    │ Historian │
- │ (anlık)│    │ (kayıt    │
- │        │    │  koşuluna │
- │ → Web  │    │  göre)    │
- │  yayın │    └──────────┘
- └────────┘
-```
-
-### Yüksek Erişilebilirlik
-
-inSCADA, Active-Active cluster mimarisi ile yedekli çalışmayı destekler. İki veya daha fazla node eş zamanlı çalışır; lider node arızalandığında yedek node otomatik olarak devralır. Yapılandırma değişiklikleri, dosyalar ve tarihsel veriler node'lar arasında senkronize edilir.
+Detaylı mimari bilgi için [Platform Mimarisi](/docs/tr/platform/projects/) sayfasına bakın.
 
 ## Başlangıç Adımları
 
 inSCADA ile çalışmaya başlamak dört adımda özetlenebilir:
 
-1. **Kur** — inSCADA'yı Windows sunucunuza kurun, tarayıcıdan yönetim arayüzüne erişin
+1. **Kur** — inSCADA'yı sunucunuza kurun, tarayıcıdan yönetim arayüzüne erişin
 2. **Proje oluştur** — Space ve proje tanımlayın, çalışma ortamınızı hazırlayın
 3. **Bağlantı ekle** — Saha cihazlarınızla protokol bağlantısı kurun, değişkenleri tanımlayın
-4. **İzlemeye başla** — SVG ekranlar tasarlayın, alarm kuralları belirleyin, sistemi canlıya alın
+4. **İzlemeye başla** — Ekranlar tasarlayın, alarm kuralları belirleyin, sistemi canlıya alın
 
 Detaylı kurulum adımları için [Sistem Gereksinimleri](/docs/tr/getting-started/system-requirements/) sayfasına geçin.
