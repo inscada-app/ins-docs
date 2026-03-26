@@ -1,5 +1,5 @@
 ---
-title: "Modbus UDP"
+title: "MODBUS UDP"
 description: "Modbus UDP Client and Slave connection configuration"
 sidebar:
   order: 3

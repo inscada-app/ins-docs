@@ -1,5 +1,5 @@
 ---
-title: "Modbus TCP Client / Server"
+title: "MODBUS TCP Client / Server"
 description: "Modbus TCP Client and Server connection configuration"
 sidebar:
   order: 1

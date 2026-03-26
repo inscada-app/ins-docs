@@ -1,5 +1,5 @@
 ---
-title: "Modbus RTU over TCP"
+title: "MODBUS RTU over TCP"
 description: "Modbus RTU over TCP Master ve Slave bağlantı yapılandırması"
 sidebar:
   order: 2
