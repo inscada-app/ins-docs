@@ -241,9 +241,81 @@ MQTT script'leri içinde kullanılabilecek temel `ins` API fonksiyonları:
 | `ins.setVariableValues({name: {value: X}, ...})` | Birden fazla variable'a toplu yaz |
 | `ins.mapVariableValue(src, dest)` | Bir variable'ın değerini başka birine kopyala |
 | `ins.toggleVariableValue(name)` | Boolean variable'ı toggle et |
+| `ins.sparkplugDecode(payload)` | Sparkplug B Protobuf payload'ını decode et |
+| `ins.sparkplugEncode(metrics)` | Sparkplug B Protobuf payload'ı oluştur |
 
 :::tip
 `ins.getVariableValue()` dönen nesne `{value, date}` yapısındadır. Değere erişmek için `.value` kullanın: `ins.getVariableValue('temp').value`
+:::
+
+## Sparkplug B Desteği
+
+[Sparkplug B](https://www.eclipse.org/tahu/), MQTT üzerinde endüstriyel SCADA verisi taşımak için Eclipse Foundation tarafından standartlaştırılmış bir payload spesifikasyonudur. Standart MQTT'nin üzerine şunları ekler:
+
+- **Standart topic yapısı:** `spBv1.0/{group}/{message_type}/{edge_node}/{device}` formatında sabit hiyerarşi
+- **Birth/Death sertifikaları:** Cihaz bağlandığında NBIRTH, ayrıldığında NDEATH mesajı — SCADA tarafı cihazın çevrimiçi/çevrimdışı olduğunu anında bilir
+- **Auto-discovery:** Cihaz, değişken listesini ve veri tiplerini BIRTH mesajıyla gönderir — manuel tag tanımı gerekmez
+- **Report by exception:** Yalnızca değişen değerler gönderilir — bant genişliği optimize edilir
+- **Endüstriyel veri tipleri:** Integer, Float, Boolean, DateTime, String, Dataset, Template
+
+Sparkplug B mesajları **Protobuf (Protocol Buffers)** formatında kodlanır — binary formattadır, JSON gibi düz metin değildir. inSCADA, `ins.sparkplugDecode()` ve `ins.sparkplugEncode()` API fonksiyonları ile Sparkplug B Protobuf mesajlarını doğrudan script içinde decode/encode edebilir.
+
+### Subscribe — Sparkplug B Decode
+
+```javascript
+// Sparkplug B mesajını decode et
+var decoded = ins.sparkplugDecode(message.payload);
+var result = {};
+
+// metrics: [{name, value, dataType, timestamp}, ...]
+var metrics = decoded.metrics;
+for (var i = 0; i < metrics.length; i++) {
+    result[metrics[i].name] = metrics[i].value;
+}
+
+return result;
+```
+
+Bu script, Sparkplug B DDATA veya DBIRTH mesajındaki tüm metric'leri parse edip ilgili variable'lara yazar.
+
+### Publish — Sparkplug B Encode
+
+```javascript
+// Variable değerlerinden Sparkplug B payload oluştur
+var metrics = [];
+for (var i = 0; i < setValueRequests.length; i++) {
+    var req = setValueRequests[i];
+    metrics.push({
+        name: req.variable.name,
+        value: req.value
+    });
+}
+
+return ins.sparkplugEncode(metrics);
+```
+
+### Sparkplug B Topic Yapısı
+
+| Topic | Mesaj Tipi | Açıklama |
+|-------|-----------|----------|
+| `spBv1.0/group/NBIRTH/edge_node` | Node Birth | Edge node çevrimiçi oldu |
+| `spBv1.0/group/NDEATH/edge_node` | Node Death | Edge node çevrimdışı oldu |
+| `spBv1.0/group/DBIRTH/edge_node/device` | Device Birth | Cihaz çevrimiçi + metric listesi |
+| `spBv1.0/group/DDATA/edge_node/device` | Device Data | Canlı veri (değişen metric'ler) |
+| `spBv1.0/group/DCMD/edge_node/device` | Device Command | Cihaza komut gönderme |
+
+### Yapılandırma Örneği
+
+Sparkplug B kullanan bir MQTT Frame yapılandırması:
+
+| Parametre | Değer |
+|-----------|-------|
+| **Topic** | `spBv1.0/factory/DDATA/gateway-01/plc-01` |
+| **QoS** | 0 |
+| **Subscribe Expression** | Yukarıdaki decode scripti |
+
+:::tip
+Sparkplug B'de DBIRTH mesajı cihazın tüm metric tanımlarını içerir. Yeni bir cihaz entegre ederken önce DBIRTH mesajını inceleyerek hangi metric'lerin geleceğini ve veri tiplerini öğrenin, ardından inSCADA variable'larını buna göre oluşturun.
 :::
 
 ## Tipik Kullanım Senaryoları
