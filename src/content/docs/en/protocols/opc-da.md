@@ -7,7 +7,7 @@ sidebar:
 
 OPC DA (Data Access), OPC Classic standartlarının en yaygın kullanılan bileşenidir. Windows COM/DCOM teknolojisi üzerine inşa edilmiştir ve gerçek zamanlı veri erişimi sağlar. OPC UA'dan önce endüstriyel otomasyonda fiili standart olarak kullanılmıştır.
 
-inSCADA, OPC DA protokolünü yalnızca **Client** rolünde destekler. JEasyOPC kütüphanesi ile implementasyon sağlanmıştır.
+inSCADA, OPC DA protokolünü yalnızca **Client** rolünde destekler.
 
 :::note
 OPC DA, Windows COM/DCOM tabanlıdır. Bu nedenle **yalnızca Windows** üzerinde çalışır. Platform bağımsız çözüm için [OPC UA](/docs/tr/protocols/opc-ua/) tercih edilmelidir.

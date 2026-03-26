@@ -8,7 +8,7 @@ sidebar:
 
 OPC UA (Open Platform Communications Unified Architecture), endüstriyel otomasyonda platform bağımsız, güvenli ve güvenilir veri alışverişi için geliştirilmiş bir haberleşme standardıdır. OPC Foundation tarafından yönetilir ve eski OPC Classic (DA, HDA, A&E) standartlarının yerini alan modern bir mimaridir.
 
-inSCADA, OPC UA protokolünü hem **Client** hem de **Server** rolünde destekler. Eclipse Milo SDK kullanılarak implementasyon sağlanmıştır.
+inSCADA, OPC UA protokolünü hem **Client** hem de **Server** rolünde destekler.
 
 ## Temel Kavramlar
 
