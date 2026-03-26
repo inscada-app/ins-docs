@@ -110,7 +110,7 @@ Küçük ve orta ölçekli sistemlerde setup tüm bileşenleri tek bilgisayara o
 | 8086 | Zaman Serisi Veritabanı | Dahili |
 | 6379 | Bellek İçi Önbellek | Dahili |
 | 7800 | Cluster Haberleşme | Dahili (node arası) |
-| 5672 | Mesaj Kuyruğu (Cluster) | Dahili (node arası) |
+| 61616 | Mesaj Kuyruğu (Cluster) | Dahili (node arası) |
 | 502 | Modbus TCP | Giden |
 | 2404 | IEC 60870-5-104 | Giden/Gelen |
 | 102 | IEC 61850 MMS | Giden |

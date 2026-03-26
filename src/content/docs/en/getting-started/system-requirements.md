@@ -110,7 +110,7 @@ For small and medium systems, the setup installs all components on a single serv
 | 8086 | Time Series Database | Internal |
 | 6379 | In-Memory Cache | Internal |
 | 7800 | Cluster Communication | Internal (inter-node) |
-| 5672 | Message Queue (Cluster) | Internal (inter-node) |
+| 61616 | Message Queue (Cluster) | Internal (inter-node) |
 | 502 | Modbus TCP | Outbound |
 | 2404 | IEC 60870-5-104 | Outbound/Inbound |
 | 102 | IEC 61850 MMS | Outbound |

@@ -34,7 +34,7 @@ Her iki yöntem aynı projede bir arada kullanılabilir — **hibrit arayüzler*
 
 ### Veri Toplama ve Haberleşme
 
-Modbus TCP/RTU, BACnet, KNX, OPC-UA, DNP3, IEC 60870-5-104 ve REST API dahil geniş bir protokol yelpazesini destekler. Aynı projede farklı protokollerden gelen verileri birleştirip tek noktadan izleyebilirsiniz. Network redundancy ile birden fazla haberleşme kanalı yönetilir — bir kanal kesildiğinde otomatik geçiş yapılır.
+Modbus TCP/RTU/UDP, OPC UA, OPC DA, IEC 61850, IEC 60870-5-104, DNP3, Siemens S7, MQTT, EtherNet/IP ve Fatek dahil geniş bir protokol yelpazesini destekler. Aynı projede farklı protokollerden gelen verileri birleştirip tek noktadan izleyebilirsiniz. Network redundancy ile birden fazla haberleşme kanalı yönetilir — bir kanal kesildiğinde otomatik geçiş yapılır. BACnet ve KNX gibi ek protokoller, gateway uygulamaları aracılığıyla entegre edilebilir.
 
 ### Alarm ve Olay Yönetimi
 

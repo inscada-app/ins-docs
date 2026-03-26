@@ -34,7 +34,7 @@ Both methods can be used together in the same project — you can create **hybri
 
 ### Data Collection and Communication
 
-Supports a wide range of protocols including Modbus TCP/RTU, BACnet, KNX, OPC-UA, DNP3, IEC 60870-5-104 and REST API. Combine data from different protocols in the same project and monitor from a single point. Network redundancy manages multiple communication channels — automatic failover when a channel drops.
+Supports a wide range of protocols including Modbus TCP/RTU/UDP, OPC UA, OPC DA, IEC 61850, IEC 60870-5-104, DNP3, Siemens S7, MQTT, EtherNet/IP and Fatek. Combine data from different protocols in the same project and monitor from a single point. Network redundancy manages multiple communication channels — automatic failover when a channel drops. Additional protocols such as BACnet and KNX can be integrated through gateway applications.
 
 ### Alarm and Event Management
 
