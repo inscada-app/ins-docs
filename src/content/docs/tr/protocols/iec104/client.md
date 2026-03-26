@@ -80,6 +80,35 @@ IEC 104 değişkenleri IOA (Information Object Address) ile tanımlanır:
 **Use IOA Addresses = false** durumunda basit `Read Address` / `Write Address` kullanılır. **true** durumunda 3 byte'lık IOA adresleri ayrı ayrı girilir (IOA Field Length = 3 byte ise).
 :::
 
+### Read ve Write Adresi Kullanım Yaklaşımı
+
+inSCADA'da bir IEC 104 variable'ına hem **Read Address** hem de **Write Address** girilebilir. Bu iki adresin doğru kullanımı, verimli bir yapılandırma için kritiktir.
+
+**Temel kural:** Bir variable'a yalnızca Write Address girerseniz, yazılan değeri inSCADA ekranlarında **göremezsiniz** — çünkü okuma adresi tanımlı değildir. Bu durum özellikle kontrol komutlarında karşılaşılan yaygın bir yapılandırma hatasıdır.
+
+**Önerilen yaklaşım:**
+
+RTU veya PLC tarafında IEC 104 yapılandırması yaparken, yazılabilir her adres için aynı değerin okunabileceği bir read adresi de oluşturun. Bu sayede inSCADA'da tek bir variable tanımıyla hem okuma hem yazma yapılabilir:
+
+- **Read Address:** Cihazdan okunan güncel değer veya durum (ör. kesici pozisyon bilgisi)
+- **Write Address:** Cihaza gönderilen komut veya setpoint (ör. kesici açma komutu)
+
+**Örnek — Kesici Kontrolü:**
+
+| Senaryo | Read Address | Write Address | Açıklama |
+|---------|:-----------:|:------------:|----------|
+| Kesici Durumu + Kontrol | IOA 100 (pozisyon) | IOA 200 (komut) | Tek variable: pozisyon okur, komut yazar |
+| Setpoint + Feedback | IOA 300 (gerçek değer) | IOA 400 (hedef değer) | Tek variable: ölçümü okur, setpoint yazar |
+
+Bu yaklaşımla:
+- Okuma ve yazma için **ayrı ayrı variable oluşturmanıza gerek kalmaz**
+- Ekranlarda değişkenin güncel değerini görebilir, aynı değişken üzerinden kontrol komutu gönderebilirsiniz
+- Proje yapılandırması daha sade ve yönetilebilir olur
+
+:::caution[Önemli Tavsiye]
+IEC 104 kullandığınız uygulamalarınızda bu read/write adresleme yaklaşımını bir standart olarak benimsemenizi önemle tavsiye ederiz. RTU/PLC yapılandırmasında bu pattern'e uygun adresleme planı oluşturulması, hem inSCADA tarafındaki yapılandırmayı basitleştirir hem de işletme sırasında operatör deneyimini iyileştirir.
+:::
+
 ## Adım 5: Bağlantıyı Başlatma
 
 **Runtime Control Panel**'den bağlantıyı başlatın. inSCADA otomatik olarak:

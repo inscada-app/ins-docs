@@ -77,10 +77,39 @@ IEC 104 değişkenleri IOA (Information Object Address) ile tanımlanır:
 | **Write IOA Address 3** | 100 | IOA yazma adresi byte 3 |
 
 :::note
-**Use IOA Addresses = false** durumunda basit `Read Address` / `Write Address` kullanılır. **true** durumunda 3 byte'lık IOA adresleri ayrı ayrı girilir (IOA Field Length = 3 byte ise).
+When **Use IOA Addresses = false**, simple `Read Address` / `Write Address` fields are used. When **true**, 3-byte IOA addresses are entered separately (when IOA Field Length = 3 bytes).
 :::
 
-## Adım 5: Bağlantıyı Başlatma
+### Read and Write Address Usage Pattern
+
+In inSCADA, an IEC 104 variable can have both a **Read Address** and a **Write Address**. Correct usage of these two addresses is critical for efficient configuration.
+
+**Basic rule:** If you only enter a Write Address for a variable, you **cannot see** the written value on inSCADA screens — because no read address is defined. This is a common configuration mistake, especially with control commands.
+
+**Recommended approach:**
+
+When configuring IEC 104 on the RTU or PLC side, create a read address for every writable address so the same value can be read back. This allows a single variable in inSCADA to handle both reading and writing:
+
+- **Read Address:** Current value or status read from the device (e.g., breaker position)
+- **Write Address:** Command or setpoint sent to the device (e.g., breaker open command)
+
+**Example — Breaker Control:**
+
+| Scenario | Read Address | Write Address | Description |
+|---------|:-----------:|:------------:|-------------|
+| Breaker Status + Control | IOA 100 (position) | IOA 200 (command) | Single variable: reads position, writes command |
+| Setpoint + Feedback | IOA 300 (actual value) | IOA 400 (target value) | Single variable: reads measurement, writes setpoint |
+
+With this approach:
+- **No need to create separate variables** for reading and writing
+- You can see the variable's current value on screens and send control commands from the same variable
+- Project configuration becomes simpler and more manageable
+
+:::caution[Important Recommendation]
+We strongly recommend adopting this read/write addressing approach as a standard practice in your IEC 104 applications. Creating an addressing plan on the RTU/PLC side that follows this pattern simplifies inSCADA configuration and improves the operator experience during operation.
+:::
+
+## Step 5: Start the Connection
 
 **Runtime Control Panel**'den bağlantıyı başlatın. inSCADA otomatik olarak:
 1. TCP bağlantısı kurar
