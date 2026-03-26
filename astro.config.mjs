@@ -46,6 +46,7 @@ export default defineConfig({
 					label: 'Protokoller',
 					translations: { en: 'Protocols' },
 					items: [
+						{ slug: 'protocols', label: 'Genel Bakış', translations: { en: 'Overview' } },
 						{
 							label: 'MODBUS',
 							collapsed: true,
