@@ -56,7 +56,11 @@ export default defineConfig({
 							collapsed: true,
 							autogenerate: { directory: 'protocols/dnp3' },
 						},
-						{ slug: 'protocols/iec104' },
+						{
+							label: 'IEC 60870-5-104',
+							collapsed: true,
+							autogenerate: { directory: 'protocols/iec104' },
+						},
 						{ slug: 'protocols/iec61850' },
 						{ slug: 'protocols/opc-ua' },
 						{ slug: 'protocols/opc-da' },
