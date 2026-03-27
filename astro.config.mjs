@@ -35,7 +35,19 @@ export default defineConfig({
 				{
 					label: 'Platform',
 					translations: { en: 'Platform' },
-					autogenerate: { directory: 'platform' },
+					items: [
+						{ slug: 'platform/architecture' },
+						{ slug: 'platform/projects' },
+						{ slug: 'platform/connections' },
+						{ slug: 'platform/devices' },
+						{ slug: 'platform/variables' },
+						{ slug: 'platform/alarms' },
+						{
+							label: 'Script Engine',
+							collapsed: true,
+							autogenerate: { directory: 'platform/scripts' },
+						},
+					],
 				},
 				{
 					label: 'Görselleştirme',
