@@ -51,12 +51,12 @@ export default defineConfig({
 							collapsed: false,
 							autogenerate: { directory: 'platform/scripts' },
 						},
+						{ slug: 'platform/svg-animations' },
+						{ slug: 'platform/faceplates' },
+						{ slug: 'platform/custom-menus' },
+						{ slug: 'platform/web-components' },
+						{ slug: 'platform/dashboards' },
 					],
-				},
-				{
-					label: 'Görselleştirme',
-					translations: { en: 'Visualization' },
-					autogenerate: { directory: 'visualization' },
 				},
 				{
 					label: 'Protokoller',
