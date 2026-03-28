@@ -5,14 +5,26 @@ sidebar:
   order: 0
 ---
 
-inSCADA'nın tüm yapılandırması `application.yml` dosyası üzerinden yönetilir. Bu dosya kurulum dizininde yer alır ve platform başlatılırken okunur.
+inSCADA tek bir **JAR dosyası** olarak dağıtılır. `application.yml` varsayılan değerleriyle JAR'ın içinde gömülüdür.
 
-## application.yml Dosya Konumu
+## Yapılandırmayı Özelleştirme
 
-| Platform | Konum |
-|----------|-------|
-| Windows | `C:\inscada\application.yml` |
-| Linux | `/opt/inscada/application.yml` |
+Varsayılan ayarları değiştirmek için JAR'ın yanına (aynı dizine) bir `application.yml` dosyası oluşturmanız yeterlidir. Spring Boot, harici dosyayı otomatik olarak algılar ve JAR içindeki varsayılanların üzerine yazar.
+
+```
+C:\inscada\
+├── inscada.jar          ← platform (tek dosya)
+├── application.yml      ← özelleştirilmiş yapılandırma (opsiyonel)
+└── jdk\                 ← Java runtime
+```
+
+Yalnızca değiştirmek istediğiniz parametreleri yazmanız yeterlidir — geri kalanlar JAR içindeki varsayılan değerlerle çalışır.
+
+Alternatif olarak başlatma sırasında dosya konumu belirtilebilir:
+
+```bash
+java -jar inscada.jar --spring.config.location=file:/opt/config/application.yml
+```
 
 :::tip
 Yapılandırma değişikliklerinin uygulanması için platform yeniden başlatılmalıdır.
