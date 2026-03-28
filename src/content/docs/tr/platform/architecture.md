@@ -13,30 +13,42 @@ inSCADA'daki tüm veriler aşağıdaki hiyerarşik yapıda organize edilir:
 
 ```
 Space (Çalışma Alanı)
+│
+├── [Space Seviyesi Bileşenler]
+│   ├── Custom Menu (Özel Menü)
+│   ├── Dashboard (Pano)
+│   ├── Expression (Paylaşımlı Formüller)
+│   └── Symbol (SVG Sembol Kütüphanesi)
+│
 └── Project (Proje)
-    ├── Connection (Bağlantı)
-    │   └── Device (Cihaz)
-    │       └── Frame (Veri Çerçevesi)
-    │           └── Variable (Değişken)
     │
-    ├── Alarm Group (Alarm Grubu)
-    │   └── Alarm Definition (Alarm Tanımı)
+    ├── [Haberleşme]
+    │   └── Connection (Bağlantı)
+    │       └── Device (Cihaz)
+    │           └── Frame (Veri Çerçevesi)
+    │               └── Variable (Değişken)
     │
-    ├── Script (Otomasyon Scripti)
+    ├── [İzleme & Alarm]
+    │   ├── Alarm Group (Alarm Grubu)
+    │   │   └── Alarm Definition (Alarm Tanımı)
+    │   └── Trend (Trend Grafiği)
+    │       └── Trend Tag
     │
-    ├── Trend (Trend Grafiği)
-    │   └── Trend Tag
+    ├── [Otomasyon]
+    │   ├── Script (Otomasyon Scripti)
+    │   └── Data Transfer (Veri Aktarımı)
     │
-    ├── Report (Rapor)
+    ├── [Görselleştirme]
+    │   ├── Animation (SVG Ekran)
+    │   └── Faceplate (Tekrar Kullanılabilir Bileşen)
     │
-    ├── Animation (SVG Ekran)
-    │
-    ├── Custom Menu (Özel Menü)
-    │
-    ├── Data Transfer (Veri Aktarımı)
-    │
-    └── Notification (Bildirim Tanımları)
+    └── [Raporlama]
+        └── Report (Rapor)
 ```
+
+:::note[Space vs. Project]
+**Custom Menu**, **Dashboard**, **Expression** ve **Symbol** space seviyesinde tanımlanır — tüm projeler tarafından ortaklaşa kullanılabilir. Diğer tüm bileşenler bir projeye bağlıdır.
+:::
 
 ### Space (Çalışma Alanı)
 
@@ -201,21 +213,37 @@ Detaylı bilgi: [Script Engine →](/docs/tr/platform/scripts/)
 
 ## Görselleştirme Bileşenleri
 
-### Animation (SVG Ekran)
+### Animation (SVG Ekran) — Proje Seviyesi
 
 SVG tabanlı interaktif SCADA ekranları. Değişken değerleri ekran üzerinde gerçek zamanlı olarak gösterilir: renk değişimi, hareket, sayısal gösterim, açma/kapama kontrolleri.
 
-### Trend Grafiği
+### Faceplate — Proje Seviyesi
+
+Tekrar kullanılabilir SVG bileşenleri. Bir motor, vana, pompa gibi sık kullanılan görsel öğeler faceplate olarak tanımlanıp birden fazla animation ekranında kullanılabilir.
+
+### Symbol (SVG Sembol Kütüphanesi) — Space Seviyesi
+
+Space genelinde paylaşılan SVG sembol kütüphanesi. Tüm projelerdeki animation ve faceplate'ler bu sembolleri kullanabilir.
+
+### Dashboard (Pano) — Space Seviyesi
+
+Farklı projelerden verileri tek bir panoda birleştirmek için kullanılır. Space seviyesinde tanımlandığı için projeler arası veri karşılaştırması yapılabilir.
+
+### Trend Grafiği — Proje Seviyesi
 
 Değişkenlerin zaman içindeki değişimini gösteren grafikler. Birden fazla değişken aynı grafikte gösterilebilir (Trend Tag). Geçmişe dönük veri inceleme ve karşılaştırma için kullanılır.
 
-### Custom Menu (Özel Menü)
+### Custom Menu (Özel Menü) — Space Seviyesi
 
-Kullanıcıya özel menü yapısı oluşturmak için kullanılır. Farklı roller için farklı menüler tanımlanabilir — operatör yalnızca izleme ekranlarını, yönetici raporları, mühendis yapılandırma sayfalarını görür.
+Kullanıcıya özel menü yapısı oluşturmak için kullanılır. Space seviyesinde tanımlanır — farklı roller için farklı menüler atanabilir. Operatör yalnızca izleme ekranlarını, yönetici raporları, mühendis yapılandırma sayfalarını görür.
 
-### Report (Rapor)
+### Report (Rapor) — Proje Seviyesi
 
-Jasper Reports tabanlı rapor sistemi. PDF ve Excel formatında çıktı üretir. Zamanlanabilir, e-posta ile gönderilebilir, dosyaya kaydedilebilir.
+Rapor sistemi, PDF ve Excel formatında çıktı üretir. Zamanlanabilir, e-posta ile gönderilebilir, dosyaya kaydedilebilir.
+
+### Expression (Paylaşımlı Formül) — Space Seviyesi
+
+Space genelinde paylaşılan hesaplama formülleri. Birden fazla değişken veya alarm tarafından ortak kullanılabilir. Tekrarlanan formülleri merkezi olarak yönetmeyi sağlar.
 
 ### Project Map (Harita)
 
