@@ -7,6 +7,8 @@ sidebar:
 
 Alarm sistemi, değişken değerlerindeki anormal durumları tespit eder, kaydeder ve bildirir. Alarmlar grup halinde organize edilir ve her grup bir projeye bağlıdır.
 
+![Alarm Grupları](../../../../assets/docs/dev-alarm-groups.png)
+
 ## Alarm Grubu
 
 Alarm grubu, alarm tanımlarını organize eden ve ortak davranış parametreleri belirleyen konteynerdir.
@@ -118,7 +120,9 @@ Normal → Fired (Tetiklendi) → Acknowledged (Onaylandı) → Off (Kapandı)
 
 ### Alarm Monitor
 
-**Menü:** Visualization → Alarm Monitor
+**Menü:** Runtime → Alarm Tracking → Alarm Monitor
+
+![Alarm Monitor](../../../../assets/docs/rt-alarm-monitor.png)
 
 Aktif alarmları gerçek zamanlı olarak gösterir. Operatör bu ekrandan:
 - Alarmları görüntüler

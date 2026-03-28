@@ -9,7 +9,9 @@ inSCADA, platform üzerindeki tüm önemli olayları otomatik olarak kaydeder. L
 
 ## Olay Logları (Event Log)
 
-**Menü:** System → Logs
+**Menü:** Logs → Log
+
+![Event Log](../../../../assets/docs/log-event.png)
 
 Her olay kaydı aşağıdaki bilgileri içerir:
 

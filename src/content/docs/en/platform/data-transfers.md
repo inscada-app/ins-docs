@@ -7,6 +7,8 @@ sidebar:
 
 Data Transfer, bir projedeki değişken değerlerini başka bir projedeki değişkenlere periyodik olarak aktarır. Kaynak değişkenden istatistiksel hesaplama yaparak hedef değişkene yazmayı sağlar.
 
+![Data Transfers](../../../../assets/docs/dev-data-transfers.png)
+
 ## Data Transfer Oluşturma
 
 **Menü:** Development → Data Transfers → Yeni Transfer

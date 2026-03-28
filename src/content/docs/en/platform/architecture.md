@@ -215,6 +215,8 @@ Detaylı bilgi: [Script Engine →](/docs/tr/platform/scripts/)
 
 ### Animation (SVG Ekran) — Proje Seviyesi
 
+![SVG Animation — Energy Monitoring Dashboard](../../../../assets/docs/variable-tracking.png)
+
 SVG tabanlı interaktif SCADA ekranları. Değişken değerleri ekran üzerinde gerçek zamanlı olarak gösterilir: renk değişimi, hareket, sayısal gösterim, açma/kapama kontrolleri.
 
 ### Faceplate — Proje Seviyesi
@@ -246,6 +248,8 @@ Rapor sistemi, PDF ve Excel formatında çıktı üretir. Zamanlanabilir, e-post
 Space genelinde paylaşılan hesaplama formülleri. Birden fazla değişken veya alarm tarafından ortak kullanılabilir. Tekrarlanan formülleri merkezi olarak yönetmeyi sağlar.
 
 ### Project Map (Harita)
+
+![Project Map](../../../../assets/docs/rt-project-map.png)
 
 GIS harita üzerinde projelerin coğrafi konumlarını gösterir. Her proje noktasında anlık değerler, alarm durumu ve bağlantı durumu popup olarak görüntülenir.
 

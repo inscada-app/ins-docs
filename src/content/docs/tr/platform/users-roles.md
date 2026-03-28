@@ -9,7 +9,9 @@ inSCADA, rol tabanlı erişim kontrolü (RBAC) ile kullanıcı yetkilendirmesi s
 
 ## Kullanıcı Yönetimi
 
-**Menü:** System → Users
+**Menü:** User Menu → Users
+
+![Kullanıcı Listesi](../../../../assets/docs/sys-users.png)
 
 ### Kullanıcı Oluşturma
 
@@ -41,7 +43,9 @@ inSCADA, rol tabanlı erişim kontrolü (RBAC) ile kullanıcı yetkilendirmesi s
 
 ## Rol Yönetimi
 
-**Menü:** System → Roles
+**Menü:** User Menu → Roles
+
+![Rol Listesi](../../../../assets/docs/sys-roles.png)
 
 Rol, yetki ve menü gruplarının bir bütünüdür. Bir kullanıcıya birden fazla rol atanabilir — tüm rollerin yetkileri birleştirilir.
 

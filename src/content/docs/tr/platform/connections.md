@@ -7,6 +7,8 @@ sidebar:
 
 Bağlantı (Connection), bir saha cihazına veya sisteme olan haberleşme kanalıdır. Her bağlantı bir protokol kullanır ve bir projeye bağlıdır.
 
+![Bağlantı Listesi](../../../../assets/docs/dev-connections.png)
+
 ## Bağlantı Oluşturma
 
 **Menü:** Runtime → Connections → Yeni Bağlantı

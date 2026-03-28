@@ -85,6 +85,10 @@ Script'ler içinden `ins` nesnesi üzerinden inSCADA platformunun tüm fonksiyon
 | **Map API** | GIS harita fonksiyonları | [Detay →](/docs/tr/platform/scripts/map-api/) |
 | **Data Transfer API** | Dosya tabanlı veri aktarımı | [Detay →](/docs/tr/platform/scripts/datatransfer-api/) |
 
+### Script Editor
+
+![Script Editor](../../../../../assets/docs/dev-script-editor.png)
+
 ### Temel Kullanım
 
 ```javascript

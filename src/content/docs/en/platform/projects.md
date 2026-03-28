@@ -7,6 +7,8 @@ sidebar:
 
 Proje, inSCADA'daki temel organizasyon birimidir. Bir tesis, saha veya mantıksal birim temsil eder. Tüm bağlantılar, değişkenler, alarmlar, script'ler ve ekranlar bir projeye bağlıdır.
 
+![Proje Listesi](../../../../assets/docs/dev-projects.png)
+
 ## Proje Oluşturma
 
 **Menü:** System → Projects → Yeni Proje

@@ -5,6 +5,8 @@ sidebar:
   order: 3
 ---
 
+![Cihaz Listesi](../../../../assets/docs/dev-devices.png)
+
 ## Cihaz (Device)
 
 Cihaz, bir bağlantı üzerindeki fiziksel veya mantıksal birimi temsil eder. Bir bağlantı altında birden fazla cihaz olabilir.

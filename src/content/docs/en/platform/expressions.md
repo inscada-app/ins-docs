@@ -7,6 +7,8 @@ sidebar:
 
 Expression, space seviyesinde tanımlanan paylaşımlı JavaScript formülleridir. Birden fazla değişken veya alarm tarafından referans olarak kullanılabilir. Tekrarlayan formülleri merkezi olarak yönetmeyi sağlar.
 
+![Expressions](../../../../assets/docs/dev-expressions.png)
+
 ## Expression Oluşturma
 
 **Menü:** Development → Expressions → Yeni Expression

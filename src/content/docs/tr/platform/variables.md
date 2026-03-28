@@ -7,6 +7,8 @@ sidebar:
 
 Değişken (Variable), inSCADA'daki en temel veri birimidir. Bir sıcaklık ölçümü, bir motor durumu, bir enerji sayacı — her biri bir değişkendir.
 
+![Değişken Listesi](../../../../assets/docs/dev-variables.png)
+
 ## Değişken Oluşturma
 
 **Menü:** Runtime → Variables → Yeni Değişken
