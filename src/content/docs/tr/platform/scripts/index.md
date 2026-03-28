@@ -46,6 +46,23 @@ Zamanlanmış script'ler, projeye bağlı bağımsız görevlerdir. **Developmen
 | **Period / Time** | Zamanlama parametresi |
 | **Log** | Script çalıştırma loglarını kaydet |
 
+### Örnek Script Tanımı
+
+REST API'den alınan bir script tanımı:
+
+```json
+{
+  "id": 159,
+  "name": "Chart_ActiveReactivePower",
+  "projectId": 153,
+  "type": "None",
+  "log": false,
+  "dsc": null,
+  "owner": "inscada",
+  "code": "function main() { ... }"
+}
+```
+
 ## ins.* API
 
 Script'ler içinden `ins` nesnesi üzerinden inSCADA platformunun tüm fonksiyonlarına erişilebilir. `ins` nesnesi script çalıştırıldığında otomatik olarak enjekte edilir.
@@ -72,21 +89,26 @@ Script'ler içinden `ins` nesnesi üzerinden inSCADA platformunun tüm fonksiyon
 
 ```javascript
 // Değişken değeri okuma
-var temp = ins.getVariableValue("temperature");
-ins.consoleLog("Sıcaklık: " + temp.value);
+var result = ins.getVariableValue("ActivePower_kW");
+ins.consoleLog("Güç: " + result.value + " kW");
 
 // Değişken değeri yazma
-ins.setVariableValue("setpoint", {value: 75.0});
+ins.setVariableValue("Temperature_C", {value: 55.0});
 
 // REST API çağrısı
-var response = ins.rest("GET", "https://api.example.com/data", "application/json", null);
+var response = ins.rest("GET",
+    "https://jsonplaceholder.typicode.com/todos/1",
+    "application/json", null);
 var data = JSON.parse(response.body);
+// → { userId: 1, id: 1, title: "delectus aut autem", completed: false }
 
-// E-posta gönderme
-ins.sendMail(["operator1"], "Alarm Bildirimi", "Sıcaklık eşiği aşıldı!");
+// Denetim logu yazma
+ins.writeLog("INFO", "Script Test", "Otomasyon görevi tamamlandı");
 
-// SQL sorgusu
-var result = ins.runSql("SELECT * FROM production_data WHERE date = CURRENT_DATE");
+// Global nesne paylaşımı (script'ler arası)
+ins.setGlobalObject("shift_data", {shift: "A", count: 150});
+var data = ins.getGlobalObject("shift_data");
+// → { shift: "A", count: 150 }
 ```
 
 ## Sandbox Ortamı
