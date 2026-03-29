@@ -83,7 +83,7 @@ Kalem ikonuna tıklayarak animation'ın genel ayarlarını düzenleyebilirsiniz:
 | Alan | Zorunlu | Açıklama |
 |------|---------|----------|
 | **Name** | Evet | Ekran adı (proje içinde benzersiz) |
-| **Duration** | Evet | Güncelleme periyodu (ms, min: 100). Ne sıklıkla değişken değerleri okunup ekran güncellenecek |
+| **Duration** | Evet | Güncelleme bekleme süresi (ms, min: 100). Bir tarama tamamlandıktan sonra bir sonraki taramaya kadar geçecek bekleme süresi |
 | **Play Order** | Evet | Visualization ekranındaki sıralama numarası |
 | **Main** | Evet | Visualization menüsünde görünsün mü |
 | **Color** | Hayır | Ekranın arka plan rengi (Inkscape'teki arka plan aktarılmaz, buradan ayarlanır) |
@@ -295,7 +295,31 @@ var params = __parameters; // "motor_id=3&motor_name=Motor 3"
 
 ## Gerçek Zamanlı Güncelleme
 
-Animation açıldığında WebSocket bağlantısı kurulur. Platform, `duration` parametresinde belirtilen aralıkta değişken değerlerini istemciye push eder ve binding'ler otomatik güncellenir.
+Animation açıldığında WebSocket bağlantısı kurulur ve tarama döngüsü başlar.
+
+### Duration ve Tarama Döngüsü
+
+Duration, iki tarama arasındaki **bekleme süresidir** — tarama periyodu değil. Gerçek güncelleme süresi şöyledir:
+
+```
+Toplam Döngü = Tarama Süresi + Duration (bekleme)
+```
+
+1. Sunucu tüm element expression'larını çalıştırır ve sonuçları döndürür → **tarama süresi**
+2. Tarama tamamlandıktan sonra `duration` ms kadar beklenir
+3. Yeni tarama başlar
+
+Örnek: Tarama 200ms sürüyorsa ve Duration 500ms ise, ekran yaklaşık her 700ms'de güncellenir.
+
+:::caution[Duration Çok Küçük Olursa]
+Duration değeri çok küçük ayarlandığında (örn: 100ms), element sayısı fazla veya expression'lar ağır ise bir önceki tarama tamamlanmadan yeni tarama başlayabilir. Bu durum tarayıcıda **arayüz donması/tıkanması** oluşturabilir. Önerilen minimum değerler:
+
+| Senaryo | Önerilen Duration |
+|---------|------------------|
+| Az element (< 20), basit expression | 200 - 500 ms |
+| Orta element (20-50), karışık expression | 500 - 1000 ms |
+| Çok element (50+), ağır hesaplama | 1000 - 2000 ms |
+:::
 
 ## Placeholder (Parametrik Ekran)
 
