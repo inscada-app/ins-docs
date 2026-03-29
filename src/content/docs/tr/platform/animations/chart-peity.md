@@ -9,15 +9,7 @@ sidebar:
 
 **Chart**, SVG ekran içine interaktif grafik bileşeni yerleştirir. Tarihsel veri veya anlık değer serilerini görselleştirir.
 
-### Element Editor — Chart Yapılandırması
-
-![Animation Element Editor — Chart tipi](../../../../../assets/docs/animations.png)
-
-Yukarıdaki ekranda: SVG üzerinde `powerChart` (rect) objesi seçilmiş, **Chart** sekmesi aktif, Expression alanında `return ins.executeScript('Chart_ActiveReactivePower');` kodu yazılmış. TYPE olarak EXPRESSION seçili. Sağ tarafta Chart'a özel ayarlar (Extra width, Extra height, Chart 4) görünüyor.
-
-### Sonuç — Canlı Grafik
-
-![Preview Animation — Active & Reactive Power Chart](../../../../../assets/docs/anim-rocket-click.png)
+![Active & Reactive Power Chart](../../../../../assets/docs/editor-preview.png)
 
 ### Kullanım
 
