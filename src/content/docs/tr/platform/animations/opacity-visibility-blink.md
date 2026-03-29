@@ -9,26 +9,44 @@ sidebar:
 
 **Opacity**, bir SVG öğesinin saydamlığını değere göre ayarlar. Haberleşme durumuna göre cihaz sembolünü soluklaştırma, güç durumuna göre bölge parlaklığı gibi efektler için kullanılır.
 
-### Kullanım
-
 | Alan | Değer |
 |------|-------|
 | **Type** | Opacity |
 | **Uygun SVG Öğeleri** | Tümü |
-| **Expression Type** | Tag, Expression |
 
-### Expression Örnekleri
+### TAG — Değişken Seçimi
+
+![Opacity — Tag](../../../../../assets/docs/anim-opacity-tag.png)
+
+Listeden değişken seçilir. Değer, Min-Max aralığına göre 0 (tamamen saydam) ile 1 (tamamen opak) arasına normalize edilir.
+
+| Alan | Açıklama |
+|------|----------|
+| **Variable** | Açılır listeden değişken seçimi |
+| **Default** | Değer okunamadığında varsayılan opaklık |
+| **Min** | Minimum değer (bu değerde opacity = 0, tamamen saydam) |
+| **Max** | Maksimum değer (bu değerde opacity = 1, tamamen opak) |
+
+Formül: `opacity = (değer - min) / (max - min)`
+
+Örnek: Min=0, Max=100, Değer=50 → opacity = 0.5 (yarı saydam)
+
+### EXPRESSION — JavaScript ile Hesaplama
+
+![Opacity — Expression](../../../../../assets/docs/anim-opacity-expression.png)
+
+0 ile 1 arasında sayısal değer döndürülür. Min/Max alanları expression modunda da kullanılır.
 
 ```javascript
-// Bağlantı durumuna göre: bağlı=opak, bağlı değil=soluk
+// Bağlantı durumuna göre: bağlı=opak, değil=soluk
 var status = ins.getConnectionStatus("MODBUS-PLC");
 return status === "Connected" ? 1.0 : 0.3;
 ```
 
 ```javascript
-// Değere orantılı saydamlık (0-100 → 0.2-1.0)
+// Sinyal gücüne orantılı saydamlık
 var val = ins.getVariableValue("Signal_Strength").value;
-return 0.2 + (val / 100) * 0.8;
+return 0.2 + (val / 100) * 0.8; // 0.2-1.0 aralığı
 ```
 
 ---
@@ -37,40 +55,42 @@ return 0.2 + (val / 100) * 0.8;
 
 **Visibility**, bir SVG öğesini koşula göre gösterir veya tamamen gizler (`display: none`). Opacity'den farkı: kademeli değil, ya tamamen görünür ya tamamen gizli.
 
-### Kullanım
-
 | Alan | Değer |
 |------|-------|
 | **Type** | Visibility |
 | **Uygun SVG Öğeleri** | Tümü (özellikle `<g>` grupları) |
-| **Expression Type** | Tag (Boolean), Expression |
 
-### SVG Hazırlığı
+### TAG — Değişken Seçimi
 
-```xml
-<!-- Alarm ikonu — normalde gizli -->
-<g id="alarm_warning" display="none">
-  <polygon points="100,10 120,50 80,50" fill="#ff0000"/>
-  <text x="100" y="43" text-anchor="middle" fill="white" font-size="20">!</text>
-</g>
-```
+![Visibility — Tag](../../../../../assets/docs/anim-visibility-tag.png)
 
-### Expression Örnekleri
+Boolean veya sayısal değişken seçilir. Değer `true` veya `0`'dan farklı ise öğe görünür, aksi halde gizlenir.
 
-**Boolean değişken — Tag:**
-```
-GridStatus
-```
-`true` → görünür, `false` → gizli
+| Alan | Açıklama |
+|------|----------|
+| **Variable** | Açılır listeden değişken seçimi |
+| **Default** | Varsayılan görünürlük durumu |
+| **Bit** | Word/Integer değişkenlerde belirli bir bit'e göre göster/gizle. Örn: Bit=3 → değerin 3. bit'i 1 ise görünür |
+| **Inverse** | İşaretlenirse mantık tersine çevrilir: `true` → gizle, `false` → göster |
 
-**Eşik koşulu — Expression:**
+**Bit alanı** özellikle durum word'lerinde kullanışlıdır. Bir Integer değişkenin tek bir bit'ini izleyerek o bit'e göre öğeyi gösterir/gizler.
+
+**Inverse** alanı ile mantığı tersine çevirebilirsiniz — örneğin "alarm yoksa göster" yerine "alarm varsa gizle" gibi.
+
+### EXPRESSION — JavaScript ile Koşul
+
+![Visibility — Expression](../../../../../assets/docs/anim-visibility-expression.png)
+
+`true` veya `false` döndürülür. `true` → görünür, `false` → gizli.
+
 ```javascript
+// Sıcaklık eşiğinde uyarı ikonu göster
 var temp = ins.getVariableValue("Temperature_C").value;
-return temp > 70; // 70°C üzerinde uyarı ikonu görünsün
+return temp > 70;
 ```
 
-**Birden fazla koşul:**
 ```javascript
+// Birden fazla koşul
 var power = ins.getVariableValue("ActivePower_kW").value;
 var status = ins.getVariableValue("GridStatus").value;
 return power > 500 && status; // hem güç yüksek hem de bağlı
@@ -86,7 +106,7 @@ return power > 500 && status; // hem güç yüksek hem de bağlı
 </g>
 
 <!-- Alarm durum ikonu -->
-<g id="icon_alarm" display="none">
+<g id="icon_alarm">
   <circle r="15" fill="#ff0000"/>
   <text text-anchor="middle" y="5" fill="white">!</text>
 </g>
@@ -95,48 +115,72 @@ return power > 500 && status; // hem güç yüksek hem de bağlı
 - `icon_normal` → Visibility, Expression: `ins.getVariableValue("Temperature_C").value <= 70`
 - `icon_alarm` → Visibility, Expression: `ins.getVariableValue("Temperature_C").value > 70`
 
+Veya TAG modunda: `icon_alarm` → Variable: `AlarmActive`, Inverse: kapalı (alarm aktifken görünür)
+
 ---
 
 ## Blink (Yanıp Sönme)
 
-**Blink**, koşul sağlandığında SVG öğesini yanıp söndürür. Dikkat gerektiren durumlarda (aktif alarm, kritik değer, haberleşme hatası) görsel uyarı sağlar.
-
-### Kullanım
+**Blink**, koşul sağlandığında SVG öğesini yanıp söndürür. Aktif alarm, kritik değer, haberleşme hatası gibi dikkat gerektiren durumlarda görsel uyarı sağlar.
 
 | Alan | Değer |
 |------|-------|
 | **Type** | Blink |
 | **Uygun SVG Öğeleri** | Tümü |
-| **Expression Type** | Tag (Boolean), Expression |
+
+### TAG — Değişken Seçimi
+
+![Blink — Tag](../../../../../assets/docs/anim-blink-tag.png)
+
+Boolean değişken seçilir. `true` → yanıp sönme başlar, `false` → durur.
+
+| Alan | Açıklama |
+|------|----------|
+| **Variable** | Açılır listeden değişken seçimi |
+| **Duration** | Yanıp sönme hızı (ms). Varsayılan: 200ms. Küçük değer = hızlı yanıp sönme |
+
+### EXPRESSION — JavaScript ile Koşul
+
+![Blink — Expression](../../../../../assets/docs/anim-blink-expression.png)
+
+`true` veya `false` döndürülür. `true` → yanıp sönme başlar, `false` → durur. Duration alanı expression modunda da kullanılır.
+
+```javascript
+// Sıcaklık kritik seviyede yanıp sön
+var temp = ins.getVariableValue("Temperature_C").value;
+return temp > 80;
+```
+
+```javascript
+// Haberleşme kesilince yanıp sön
+var status = ins.getConnectionStatus("MODBUS-PLC");
+return status !== "Connected";
+```
 
 ### Çalışma Prensibi
 
-`true` döndüğünde SVG `<animate>` elementi oluşturulur ve öğenin opacity'si 0↔1 arasında geçiş yapar. `false` döndüğünde animasyon kaldırılır.
+Blink, JavaScript `setInterval` ile öğenin `visibility` özniteliğini `visible` ↔ `hidden` arasında periyodik olarak değiştirir. Duration değeri bu geçişin aralığını belirler:
 
-### SVG Hazırlığı
+| Duration | Hız |
+|----------|-----|
+| **100 ms** | Çok hızlı yanıp sönme |
+| **200 ms** | Hızlı (varsayılan) |
+| **500 ms** | Orta |
+| **1000 ms** | Yavaş |
 
-```xml
-<circle id="critical_alarm" cx="50" cy="50" r="20" fill="#ff0000"/>
-```
+---
 
-### Expression Örnekleri
+## Kombinasyon Kullanımı
 
-**Boolean — Tag:**
-```
-AlarmActive
-```
+Aynı SVG öğesine birden fazla animation tipi bağlanabilir. Örneğin:
 
-**Eşik — Expression:**
-```javascript
-var temp = ins.getVariableValue("Temperature_C").value;
-return temp > 80; // 80°C üzerinde yanıp sön
-```
-
-### Blink + Color Kombinasyonu
-
-Aynı öğeye hem Blink hem Color uygulanabilir:
-
-1. **Color** element: sıcaklığa göre renk (yeşil → turuncu → kırmızı)
+1. **Color** element: Sıcaklığa göre renk (yeşil → turuncu → kırmızı)
 2. **Blink** element: 80°C üzerinde yanıp sönme
 
-Sonuç: Normal durumda yeşil sabit, 60°C'de turuncu sabit, 80°C üzerinde kırmızı yanıp söner.
+Sonuç: Normal durumda yeşil sabit, 60°C'de turuncu sabit, 80°C üzerinde **kırmızı yanıp söner**.
+
+| Element | Type | Koşul | Davranış |
+|---------|------|-------|----------|
+| Element 1 | Color | Her zaman | Değere göre renk |
+| Element 2 | Blink | temp > 80 | Yanıp sönme |
+| Element 3 | Opacity | Bağlantı durumu | Kopunca soluk |
