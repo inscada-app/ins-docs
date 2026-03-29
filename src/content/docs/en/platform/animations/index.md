@@ -219,18 +219,25 @@ Her animation element'te değerin nasıl hesaplanacağını belirler:
 
 ## Animation Scripts
 
-Her animation'a Pre ve Post script bağlanabilir. Runtime'da Visualization ekranı açıldığında çalışma sırası şöyledir:
+Her animation'a Pre ve Post script bağlanabilir. Runtime'da her döngüde (her `duration` ms'de) çalışma sırası şöyledir:
 
 ```
-1. Pre-Animation Code      ← İlk çalışır (bir kez)
-2. Animation Elements       ← Periyodik döngü başlar (her duration ms'de)
-3. Post-Animation Code      ← Ekran kapatıldığında çalışır
+Her döngüde tekrar eder:
+┌─────────────────────────┐
+│ 1. Pre-Animation Code   │
+│ 2. Animation Elements   │
+│ 3. Post-Animation Code  │
+└────────┬────────────────┘
+         │ duration ms sonra
+         └──── tekrar başa dön
 ```
 
 | Script | Çalışma Zamanı | Kullanım |
 |--------|---------------|----------|
-| **Pre-Animation Code** | Ekran açıldığında, element döngüsünden önce | Başlangıç değerleri, veri çekme, tablo doldurma |
-| **Post-Animation Code** | Ekran kapatıldığında | Temizlik, kaynak serbest bırakma |
+| **Pre-Animation Code** | Her döngüde, element'lerden önce | Ön hesaplama, veri hazırlama |
+| **Post-Animation Code** | Her döngüde, element'lerden sonra | Son işlemler, temizlik |
+
+Tüm bu kodlar **her döngüde tekrar çalışır**. Yalnızca ilk açılışta bir kez çalışması gereken kod varsa `__firstScan` değişkeni kullanılır.
 
 ### Yerleşik Sistem Değişkenleri
 
