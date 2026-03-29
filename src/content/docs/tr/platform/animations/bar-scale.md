@@ -1,96 +1,119 @@
 ---
-title: "Bar & Scale"
-description: "Çubuk gösterge ve ölçekleme animasyonları"
+title: "Bar"
+description: "Değere göre çubuk yüksekliği/genişliği ayarlama"
 sidebar:
   order: 12
 ---
 
-## Bar (Çubuk Gösterge)
+**Bar**, bir SVG dikdörtgeninin yüksekliğini veya genişliğini değere orantılı olarak değiştirir. Tank seviyesi, ilerleme çubuğu, yük göstergesi, enerji barı gibi gösterimlerde kullanılır.
 
-**Bar**, bir SVG dikdörtgeninin yüksekliğini veya genişliğini değere orantılı olarak değiştirir. Tank seviyesi, ilerleme çubuğu, yük göstergesi gibi gösterimlerde kullanılır.
-
-### Kullanım
+## Kullanım
 
 | Alan | Değer |
 |------|-------|
 | **Type** | Bar |
 | **Uygun SVG Öğeleri** | `<rect>` |
-| **Expression Type** | Tag, Expression |
 
-### Yapılandırma (Props)
+## Yapılandırma Tipleri
 
-| Özellik | Açıklama |
-|---------|----------|
-| **direction** | Yön: `vertical` (aşağıdan yukarı) veya `horizontal` (soldan sağa) |
-| **min** | Minimum değer (bu değerde bar boş) |
-| **max** | Maksimum değer (bu değerde bar dolu) |
-| **fillColor** | Dolgu rengi |
+### TAG — Değişken Seçimi (Kod Yazmadan)
 
-### SVG Hazırlığı — Dikey Bar
+En hızlı kullanım. Listeden değişken seçilir, bar otomatik olarak değere göre büyür/küçülür.
 
-```xml
-<!-- Tank çerçevesi -->
-<rect x="40" y="20" width="40" height="200" fill="none" stroke="#666" stroke-width="2"/>
-<!-- Seviye bar'ı (başlangıçta boş) -->
-<rect id="tank_level" x="42" y="220" width="36" height="0" fill="#3498db"/>
-```
+![Bar — Tag](../../../../../assets/docs/anim-bar-tag.png)
 
-### Expression Örnekleri
+TYPE bölümünden **TAG** seçildiğinde değişken listesi ve bar yapılandırma alanları açılır.
 
-**Tag:**
-```
-Temperature_C
-```
-Props: `min=0, max=100, direction=vertical`
-→ 50°C'de bar %50 dolu
+#### Temel Alanlar
 
-**Expression ile renk değişimi:**
+| Alan | Açıklama |
+|------|----------|
+| **Variable** | Açılır listeden değişken seçimi |
+| **Default** | Değer okunamadığında gösterilecek varsayılan bar boyutu |
+
+#### Bar Ayarları
+
+| Alan | Açıklama |
+|------|----------|
+| **Min** | Minimum değer (bu değerde bar boş / sıfır boyut) |
+| **Max** | Maksimum değer (bu değerde bar tam dolu) |
+| **Direction** | Bar'ın büyüme yönü |
+| **Gradient** | İşaretlenirse bar dolgusu gradient (renk geçişi) olarak gösterilir |
+
+#### Direction (Yön) Seçenekleri
+
+| Değer | Açıklama | Kullanım |
+|-------|----------|----------|
+| **Right** | Soldan sağa büyür | Yatay ilerleme çubuğu |
+| **Left** | Sağdan sola büyür | Ters yönlü yatay bar |
+| **Up** | Aşağıdan yukarı büyür | Tank seviyesi, dikey gösterge |
+| **Down** | Yukarıdan aşağı büyür | Ters yönlü dikey bar |
+
+### EXPRESSION — JavaScript ile Hesaplama
+
+Birden fazla değişkenden hesaplama veya özel dönüşüm gerektiğinde kullanılır.
+
+![Bar — Expression](../../../../../assets/docs/anim-bar-expression.png)
+
+TYPE bölümünden **EXPRESSION** seçildiğinde JavaScript kod editörü açılır. `return` ile döndürülen sayısal değer, Min-Max aralığına göre bar boyutuna dönüştürülür.
+
+Expression modunda da **Min**, **Max**, **Direction** ve **Gradient** alanları aynı şekilde kullanılır.
+
+#### Örnek: Doğrudan Değer
+
 ```javascript
-var val = ins.getVariableValue("Temperature_C").value;
-// Değeri döndür, renk ayrıca Color element ile ayarlanabilir
-return val;
+return ins.getVariableValue('ActivePower_kW').value;
 ```
 
-### Tam Örnek — Yatay İlerleme Çubuğu
+#### Örnek: Yüzdeye Dönüştürme
+
+```javascript
+var val = ins.getVariableValue("ActivePower_kW").value;
+var maxPower = 1000;
+return (val / maxPower) * 100; // 0-100 arası yüzde
+```
+
+#### Örnek: İki Değişkenin Oranı
+
+```javascript
+var output = ins.getVariableValue("Output_kW").value;
+var input = ins.getVariableValue("Input_kW").value;
+if (input > 0) return (output / input) * 100; // verimlilik %
+return 0;
+```
+
+---
+
+## Kullanım Örnekleri
+
+### Yatay İlerleme Çubuğu
 
 ```xml
 <svg viewBox="0 0 400 60">
   <!-- Arka plan -->
   <rect x="10" y="20" width="300" height="20" fill="#e0e0e0" rx="3"/>
-  <!-- İlerleme -->
+  <!-- İlerleme barı -->
   <rect id="progress_bar" x="10" y="20" width="0" height="20" fill="#2196F3" rx="3"/>
-  <!-- Yüzde metni -->
-  <text id="progress_text" x="320" y="35" font-size="14">0%</text>
 </svg>
 ```
 
-- `progress_bar` → Bar, Tag: `PowerFactor`, Props: min=0, max=1, horizontal
-- `progress_text` → Get, Expression: `(ins.getVariableValue("PowerFactor").value * 100).toFixed(0) + "%"`
+- TYPE: TAG, Variable: `PowerFactor`
+- Min: `0`, Max: `1`, Direction: **Right**
 
----
+### Dikey Tank Seviyesi
 
-## Scale (Ölçekleme)
-
-**Scale**, bir SVG öğesini veya grubunu değere göre büyütür veya küçültür. `transform: scale()` CSS özelliğini kullanır.
-
-### Kullanım
-
-| Alan | Değer |
-|------|-------|
-| **Type** | Scale |
-| **Uygun SVG Öğeleri** | `<g>`, `<rect>`, `<circle>`, `<path>` |
-| **Expression Type** | Tag, Expression |
-
-### Expression Örnekleri
-
-```javascript
-// 0-1000 kW aralığını 0.5-2.0 scale'e dönüştür
-var power = ins.getVariableValue("ActivePower_kW").value;
-return 0.5 + (power / 1000) * 1.5;
+```xml
+<svg viewBox="0 0 100 250">
+  <!-- Tank çerçevesi -->
+  <rect x="20" y="10" width="60" height="200" fill="none" stroke="#666" stroke-width="2"/>
+  <!-- Seviye barı -->
+  <rect id="tank_level" x="22" y="210" width="56" height="0" fill="#3498db"/>
+</svg>
 ```
 
-### Kullanım Senaryoları
+- TYPE: TAG, Variable: `Tank_Level`
+- Min: `0`, Max: `100`, Direction: **Up**
 
-- Üretim miktarına göre büyüyen/küçülen sembol
-- Dinamik boyutlu gauge ibresi
-- Alarm durumunda büyüyen uyarı ikonu
+:::tip
+Bar animasyonu, SVG rect öğesinin `width` veya `height` özniteliğini değere orantılı olarak ayarlar. Yönüne göre `x` veya `y` koordinatı da otomatik güncellenir — rect'in sabit kalan kenarı yerinde kalır.
+:::
