@@ -1,91 +1,124 @@
 ---
 title: "Element Editor"
-description: "Animation Element Editor — SVG öğelerine değişken bağlama, ifade yazma ve canlı önizleme"
+description: "Animation Element Editor — SVG üzerinde obje seçerek animation binding yapılandırma"
 sidebar:
   order: 1
   label: "Element Editor"
 ---
 
-Animation Element Editor, SVG ekranlarına interaktif davranış eklemek için kullanılan görsel düzenleyicidir. SVG içindeki öğeleri seçerek değişkenlere bağlar ve animation tipine göre gerçek zamanlı güncelleme sağlar.
+Animation Element Editor, SVG ekran üzerinde görsel olarak obje seçip, seçilen objeye animation davranışı bağlamak için kullanılan düzenleyicidir. Kod yazmadan, görsel yapılandırma arayüzü ile hızlıca SCADA ekranları oluşturulur.
 
 ## Editöre Erişim
 
-**Menü:** Development → Animations → Animation Dev → sağ üst köşedeki **Element Editor** butonuna tıklayın.
+**Menü:** Development → Animations → Animation Dev → sağ üst köşedeki **Element Editor** butonu
 
-Editör sağ panelde açılır ve SVG ekranıyla yan yana çalışır.
+Editör, SVG ekranının yanında panel olarak açılır.
+
+---
 
 ## İş Akışı
 
-### 1. SVG Öğesi Seçme
+### Adım 1: SVG Üzerinde Obje Seçme
 
-**"Choose Dom Id"** butonuna tıklayarak SVG içindeki öğeleri ağaç yapısında görüntüleyin:
+Animation Dev ekranında açık olan SVG üzerinde **mouse ile tıklayarak** obje seçersiniz. Seçilen obje görsel olarak vurgulanır.
 
-| Kolon | Açıklama |
-|-------|----------|
-| **Dom ID** | SVG öğesinin `id` özniteliği |
-| **Tag Name** | Öğe tipi (text, rect, circle, g, path, image...) |
-| **Attached** | Bu öğeye zaten element bağlı mı |
+#### Grup İçi Objelere Erişim
 
-Listeden bir öğe seçtiğinizde, öğenin tipine göre uygun animation tipleri otomatik filtrelenir:
+SVG'deki objeler genellikle `<g>` (group) elementleri içinde gruplanmıştır. Varsayılan tıklamada en üst seviye grup seçilir.
 
-| SVG Öğe Tipi | Kullanılabilir Animation Tipleri |
-|-------------|--------------------------------|
-| **text / tspan** | Get, Color, Rotate, Move, Opacity, Visibility, Click, Tooltip, Bar, Pipe, Scale, Blink, AlarmIndication |
-| **rect** | Yukarıdakilere ek: Chart, Iframe, Datatable, Slider, Input, QRCode, GetSymbol, Faceplate, Peity, Menu, Button, Image |
-| **g (group)** | Animate, Faceplate, Iframe, transform animasyonları |
+**Grup içindeki bir objeye erişmek için:**
+
+1. **Ctrl** tuşuna bir kez basıp bırakın
+2. Artık mouse ile tıkladığınızda grup yerine **doğrudan tıkladığınız obje** seçilir
+3. Bu sayede bir grup içindeki text, rect, circle gibi iç objeleri hedefleyebilirsiniz
+
+:::tip
+Ctrl modu bir kez tıklama sonrası normal moda döner. Tekrar iç obje seçmek isterseniz Ctrl'ye tekrar basın.
+:::
+
+### Adım 2: Element Editor'ü Açma
+
+Bir obje seçili iken **Element Editor** butonuna tıklayın. Editör açıldığında:
+
+- Seçili objenin **DOM ID**'si otomatik olarak alınır
+- Objenin SVG tag tipine göre (text, rect, g, image, circle, path...) **uygulanabilir animation tipleri** otomatik filtrelenir
+- Uygun animation tipleri sekmeler halinde yapılandırmaya hazır gösterilir
+
+#### SVG Tag Tipine Göre Kullanılabilir Animation Tipleri
+
+| SVG Tag | Kullanılabilir Tipler |
+|---------|----------------------|
+| **text / tspan** | Get, Color, Opacity, Visibility, Rotate, Move, Scale, Bar, Pipe, Blink, Tooltip, AlarmIndication, Click |
+| **rect / circle / ellipse / polygon** | Yukarıdakilere ek: Chart, Iframe, Datatable, Slider, Input, QRCode, GetSymbol, Faceplate, Peity, Menu, Button, Image |
+| **g (group)** | Animate, Faceplate, Iframe, Rotate, Move, Scale, Opacity, Visibility |
 | **image** | Faceplate, Iframe, Image |
 
-### 2. Animation Tipi Seçme
+### Adım 3: Animation Tipi Seçme ve Yapılandırma
 
-Filtrelenen animation tipleri sekme (tab) olarak gösterilir. İstediğiniz davranışa göre sekmeyi seçin:
+Sekmelerden istediğiniz animation tipini seçin. Her animation tipinin **kendine özel görsel yapılandırma arayüzü** vardır:
 
-- **Get** → Değer gösterimi (metin)
-- **Color** → Renk değişimi
-- **Rotate** → Döndürme
-- **Chart** → Grafik yerleştirme
-- **Set** → Tıkla-yaz kontrolü
-- ... ([Tam liste →](/docs/tr/platform/animations/))
+#### Kod Yazmadan Görsel Yapılandırma
 
-### 3. Expression Yapılandırma
+Her animation tipi, tipine uygun form alanlarıyla birlikte gelir. Geliştirici bu form alanlarını doldurarak **kod yazmadan** yapılandırma yapar:
 
-Her animation element'te değerin nasıl hesaplanacağını belirleyen bir expression tanımlanır.
+| Animation Tipi | Yapılandırma Arayüzü |
+|---------------|---------------------|
+| **Get** | Değişken seçici, format ayarı, birim |
+| **Color** | Renk paleti, koşul tablosu (değer → renk eşleşmesi) |
+| **Rotate** | Döndürme merkezi (cx, cy), min/max açı, min/max değer |
+| **Bar** | Yön (yatay/dikey), min/max değer, dolgu rengi |
+| **Move** | Eksen (X/Y), mesafe aralığı, min/max değer |
+| **Slider** | Min, max, step, yön, renk |
+| **Chart** | Grafik tipi, renkler, eksen ayarları, veri kaynağı |
+| **Opacity** | Min/max opaklık, min/max değer |
+| **Visibility** | Koşul (Boolean veya eşik) |
+| **Blink** | Yanıp sönme hızı, renkler |
+| **Set** | Hedef değişken, yazılacak değer |
+| **Input** | Tip (text/number), min, max, placeholder |
+| **Iframe** | URL adresi |
+| **Open** | Hedef animation seçici |
+| **Faceplate** | Faceplate seçici, placeholder değerleri |
+| **Datatable** | Kolon tanımları, veri kaynağı |
+| **AlarmIndication** | Alarm grubu seçici |
 
-#### Expression Tipi Seçimi
+### Adım 4: Expression (İleri Düzey — Opsiyonel)
 
-| Tip | Açıklama | Kullanım |
-|-----|----------|----------|
-| **Tag** | Doğrudan değişken adı | En basit — `ActivePower_kW` yazmanız yeterli |
-| **Expression** | JavaScript formülü | Karmaşık hesaplama, formatlama, koşullu mantık |
-| **Switch** | Değere göre çoklu eşleşme | Durum bazlı renk/metin seçimi |
-| **Numeric** | Sabit sayısal değer | Test veya sabit gösterim |
+Her animation tipinde bir **Expression** bölümü bulunur. Bu bölüm opsiyoneldir — görsel yapılandırma yeterliyse kullanmanıza gerek yoktur.
+
+Expression, geliştiricinin animation davranışını tamamen serbest biçimde programlamasını sağlar:
+
+#### Expression Tipleri
+
+| Tip | Açıklama | Ne Zaman Kullanılır |
+|-----|----------|---------------------|
+| **Tag** | Değişken adı referansı | En basit — bir değişkeni doğrudan bağlamak |
+| **Expression** | JavaScript kodu | Hesaplama, formatlama, koşullu mantık |
+| **Switch** | Değer → sonuç tablosu | Durum bazlı çoklu eşleşme |
+| **Numeric** | Sabit sayı | Test amaçlı |
 | **Text** | Sabit metin | Etiket, başlık |
-| **Collection** | Birden fazla değişken | Chart, Datatable gibi çoklu veri |
-| **Alarm** | Alarm durumu | AlarmIndication tipi için |
+| **Collection** | Çoklu değişken | Chart, Datatable için |
+| **Alarm** | Alarm referansı | AlarmIndication için |
 | **Faceplate** | Faceplate referansı | Faceplate yerleştirme |
-| **Animation** | Başka animation referansı | Open tipi ile ekran geçişi |
-| **Animation Popup** | Popup animation | Modal ekran açma |
-| **Custom Menu** | Custom Menu referansı | Menu tipi ile menü açma |
-| **Url** | URL adresi | Iframe tipi için |
-| **Tetra Color** | Alarm 4-renk durumu | Alarm grubu renk kodları |
-| **Button** | Buton yapılandırması | Button tipi için |
-| **Html** | HTML içerik | Zengin içerik gömme |
-| **System Page** | Sistem sayfası | Platform sayfa referansı |
-| **InSCADA View** | Platform görünüm | Dahili görünüm referansı |
+| **Animation** | Animation referansı | Ekran geçişi (Open) |
+| **Animation Popup** | Popup referansı | Modal ekran açma |
+| **Custom Menu** | Menü referansı | Menü açma |
+| **Url** | URL | Iframe gömme |
+| **Tetra Color** | 4 renkli alarm durumu | Alarm renk kodları |
+| **Button** | Buton yapılandırması | Button tipi |
+| **Html** | HTML içerik | Zengin içerik |
+| **System Page** | Sistem sayfası | Platform dahili sayfa |
+| **InSCADA View** | Platform görünümü | Dahili görünüm |
 
-#### Tag Expression Örneği
+#### Expression Örnekleri
 
-En basit kullanım — değişken adını yazmanız yeterli:
-
+**Tag** — Değişken adı yazmak yeterli:
 ```
 ActivePower_kW
 ```
 
-Sunucu her `duration` ms'de bu değişkenin güncel değerini okur ve SVG öğesine uygular.
-
-#### JavaScript Expression Örnekleri
-
+**Expression** — JavaScript ile serbest hesaplama:
 ```javascript
-// Formatlı değer gösterimi
+// Formatlı değer
 var val = ins.getVariableValue("ActivePower_kW");
 return val.value.toFixed(1) + " kW";
 ```
@@ -99,17 +132,14 @@ return "#00cc00";
 ```
 
 ```javascript
-// Birden fazla değişkenden hesaplama
+// İki değişkenden hesaplama
 var power = ins.getVariableValue("ActivePower_kW").value;
 var voltage = ins.getVariableValue("Voltage_V").value;
 if (voltage > 0) return (power * 1000 / voltage).toFixed(1);
 return "0";
 ```
 
-#### Switch Expression Örneği
-
-Değer → sonuç eşleşmesi. Her satır bir koşul:
-
+**Switch** — Değer → sonuç eşleşme tablosu:
 ```
 0 → Durdu
 1 → Çalışıyor
@@ -117,138 +147,81 @@ Değer → sonuç eşleşmesi. Her satır bir koşul:
 3 → Bakım
 ```
 
-veya renk switch:
-
+Renk switch:
 ```
 true → #00cc00
 false → #ff0000
 ```
 
-### 4. Props (Ek Özellikler)
-
-Her animation tipinin kendine özel ek özellikleri vardır. Bu özellikler JSON formatında `props` alanında saklanır.
-
-Örnekler:
-- **Rotate:** döndürme merkezi (cx, cy), min/max açı
-- **Bar:** yön (horizontal/vertical), min/max değer, genişlik/yükseklik
-- **Slider:** min, max, step değerleri
-- **Chart:** grafik tipi, renkler, eksen ayarları
-
-### 5. Test ve Kaydetme
+### Adım 5: Kaydetme
 
 | Buton | İşlev |
 |-------|-------|
-| **Save** | Element'i veritabanına kaydeder |
-| **Run & Save** | Önce expression'ı sunucuda çalıştırıp sonucu test eder, başarılıysa kaydeder |
+| **Save** | Animation element'i kaydeder. Objeye binding bağlanmış olur |
+| **Run & Save** | Önce expression'ı sunucuda test eder, sonuç başarılıysa kaydeder |
 
 **Run & Save** özellikle expression geliştirirken kullanışlıdır — kaydetmeden önce sonucu doğrularsınız.
 
+Kayıt sonrası, animation Visualization modunda çalıştırıldığında binding otomatik olarak aktif olur.
+
 ---
 
-## Çalışma Zamanı (Runtime) Mimarisi
+## Çalışma Zamanı Mimarisi
 
-Animation Element Editor'de yapılandırılan binding'ler çalışma zamanında şu akışla işler:
+Element Editor'de yapılandırılan binding'ler, Visualization ekranında şu şekilde çalışır:
 
 ### WebSocket Tabanlı Gerçek Zamanlı Güncelleme
 
 ```
-┌─────────┐                    ┌──────────┐                    ┌─────────┐
-│ Tarayıcı│──eval-animation──▶│  Sunucu  │◀── Variable ──────│  Cache  │
-│ (UI)    │◀─anim-results────│  (Engine) │    Values          │ (Redis) │
-└────┬────┘                    └──────────┘                    └─────────┘
-     │
-     ▼
- DOM Güncelleme
- (SVG öğeleri)
+┌─────────────┐                    ┌──────────┐                  ┌─────────┐
+│  Tarayıcı   │──eval-animation──▶│  Sunucu  │◀── Değişken ───│  Cache  │
+│  (SVG DOM)  │◀─anim-results────│  (Engine) │    Değerleri    │         │
+└──────┬──────┘                    └──────────┘                  └─────────┘
+       │
+       ▼
+  Her element için
+  tipine uygun
+  DOM güncelleme
 ```
 
-### Adım Adım Akış
+### Akış
 
-**1. Animation Başlatma**
+1. **Visualization açılır** → Animation element'leri yüklenir, WebSocket abone olunur
+2. **Her `duration` ms'de** → Tarayıcı `eval-animation` mesajı gönderir
+3. **Sunucu** → Tüm element expression'larını çalıştırır, değişken değerlerini cache'ten okur
+4. **Sonuç döner** → Her element ID için hesaplanan değer
+5. **DOM güncellenir** → Her element tipine göre uygun DOM işlemi uygulanır
 
-Kullanıcı Visualization ekranına girdiğinde:
-- Animation element'leri yüklenir
-- WebSocket `animation-results` kanalına abone olunur
-- İlk değerlendirme isteği gönderilir
+### DOM Güncelleme Tablosu
 
-**2. Periyodik Değerlendirme İsteği**
+| Animation Tipi | DOM İşlemi |
+|---------------|-----------|
+| **Get** | `element.textContent = değer` |
+| **Color** | `element.style.fill = renk` |
+| **Opacity** | `element.style.opacity = değer` |
+| **Visibility** | `element.style.display = değer ? '' : 'none'` |
+| **Rotate** | `transform: rotate(açı)` |
+| **Move** | `transform: translate(x, y)` |
+| **Bar** | `element.height = değer` veya `element.width = değer` |
+| **Scale** | `transform: scale(değer)` |
+| **Blink** | SVG `<animate>` element ekleme/kaldırma |
+| **Pipe** | `stroke-dashoffset` animasyonu |
 
-Her `duration` milisaniyede bir tarayıcı sunucuya WebSocket mesajı gönderir:
+### Kontrol Element'leri (Set, Slider, Input, Click)
 
-```json
-{
-  "animationId": 123,
-  "callbackId": "user_session_id",
-  "animName": "Energy_Dashboard",
-  "sendId": "unique-request-id",
-  "firstScan": false,
-  "parameters": ""
-}
+Kontrol tipleri periyodik değerlendirmeye dahil **değildir**. Kullanıcı etkileşiminde tetiklenir:
+
+```
+Kullanıcı Tıklama → Expression Çalıştır → ins.setVariableValue() → Cache → Saha Cihazı
 ```
 
-**3. Sunucu Tarafı Değerlendirme**
-
-Sunucu her element için:
-1. Expression'daki değişken referanslarını çıkarır (örn: `ins.getVariableValue("ActivePower_kW")`)
-2. İlgili değişken değerlerini cache'ten toplu okur
-3. Her element'in expression'ını JavaScript engine'de çalıştırır
-4. Sonuçları toplar
-
-**4. Sonuç Gönderme**
-
-```json
-{
-  "callbackId": "user_session_id",
-  "sendId": "unique-request-id",
-  "results": {
-    "101": 359.91,
-    "102": "#00cc00",
-    "103": true,
-    "104": "45.2 °C"
-  },
-  "isError": false
-}
-```
-
-`results` map'inde key = element ID, value = expression sonucu.
-
-**5. DOM Güncelleme**
-
-Tarayıcıda her element için animation tipine göre uygun DOM işlemi yapılır:
-
-| Tip | DOM İşlemi |
-|-----|-----------|
-| **Get** | `element.textContent = value` |
-| **Color** | `element.style.fill = value` |
-| **Opacity** | `element.style.opacity = value` |
-| **Visibility** | `element.style.display = value ? '' : 'none'` |
-| **Rotate** | `element.setAttribute('transform', 'rotate(' + value + ')')` |
-| **Move** | `element.setAttribute('transform', 'translate(' + x + ',' + y + ')')` |
-| **Bar** | `element.setAttribute('height', value)` |
-| **Blink** | SVG animate element ekleme/kaldırma |
-
-### Timeout ve Hata Yönetimi
-
-- Sunucudan `duration × 10` ms içinde yanıt gelmezse → yeniden deneme
-- Expression hatasında → `isError: true`, ilgili element güncellenmez
-- Bağlantı koptuğunda → otomatik yeniden bağlanma
-
-### Performans Optimizasyonu
+### Performans
 
 - Tüm element'ler **tek bir WebSocket mesajında** toplu değerlendirilir
-- Değişken değerleri **cache'ten** okunur (veritabanına gidilmez)
+- Değişken değerleri **cache'ten** okunur (veritabanına gidilmez, < 1ms)
 - Sadece **aktif** element'ler (`status: true`) değerlendirilir
-- Click, MouseDown gibi **olay bazlı** element'ler periyodik değerlendirmeden hariçtir
-
----
-
-## Kontrol (Set) Element'leri
-
-Kontrol tipleri (Set, Slider, Input, Button, Click) farklı çalışır — periyodik değerlendirmeye dahil değildir. Kullanıcı etkileşiminde (tıklama, kaydırma vb.) tetiklenir:
-
-```
-Kullanıcı Tıklama → Set Expression Çalıştır → ins.setVariableValue() → Cache → Saha Cihazı
-```
+- Click, MouseDown gibi **olay bazlı** element'ler periyodik döngüden hariçtir
+- Timeout: yanıt `duration × 10` ms içinde gelmezse yeniden denenir
 
 :::caution
 Kontrol element'leri sunucu tarafında `ins.setVariableValue()` çağırır. Kullanıcının `SET_VARIABLE_VALUE` yetkisi olmalıdır.
