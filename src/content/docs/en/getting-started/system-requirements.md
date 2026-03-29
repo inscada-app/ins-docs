@@ -166,15 +166,102 @@ inSCADA is supported on the following virtualisation platforms:
 
 ## Disk Space Calculation
 
-Disk space required for historical data storage depends on:
+Disk space required for historical data storage depends on three factors:
 
 - **Tag count**: Number of logged variables
-- **Logging frequency**: How often values are recorded
+- **Sampling period**: How often values are recorded (seconds)
 - **Retention period**: How many years of historical data to keep
 
-:::tip
-For detailed disk calculations, contact the inSCADA technical team. As a general rule: **1,000 tags × 10-second logging × 1 year ≈ 50 GB** TSDB space.
+### Calculation Formula
+
+Based on field measurements, numeric SCADA data consumes approximately **~8 Bytes per point** (including index, WAL and metadata).
+
+```
+Daily Bytes = Tag Count × (86400 / Period) × 8.08 Bytes
+```
+
+- `86400` = seconds in a day
+- `Period` = sampling period (seconds)
+- `8.08` = measured average bytes per point (InfluxDB 1.8)
+
+### Scenario Table
+
+The following table shows disk requirements for **2 years** of retention at various tag counts and sampling periods:
+
+#### 1,000 Tags
+
+| Period | Daily | Annual | 2 Years |
+|--------|-------|--------|---------|
+| **1 sec** | 699 MB | 249 GB | 498 GB |
+| **5 sec** | 140 MB | 50 GB | 100 GB |
+| **10 sec** | 70 MB | 25 GB | 50 GB |
+| **30 sec** | 23 MB | 8 GB | 17 GB |
+| **60 sec** | 12 MB | 4 GB | 8 GB |
+
+#### 10,000 Tags
+
+| Period | Daily | Annual | 2 Years |
+|--------|-------|--------|---------|
+| **1 sec** | 6.8 GB | 2.4 TB | 4.9 TB |
+| **5 sec** | 1.4 GB | 498 GB | 996 GB |
+| **10 sec** | 698 MB | 249 GB | 498 GB |
+| **30 sec** | 233 MB | 83 GB | 166 GB |
+| **60 sec** | 116 MB | 41 GB | 83 GB |
+
+#### 50,000 Tags
+
+| Period | Daily | Annual | 2 Years |
+|--------|-------|--------|---------|
+| **1 sec** | 34 GB | 12.2 TB | 24.4 TB |
+| **5 sec** | 6.8 GB | 2.4 TB | 4.9 TB |
+| **10 sec** | 3.4 GB | 1.2 TB | 2.4 TB |
+| **30 sec** | 1.1 GB | 415 GB | 830 GB |
+| **60 sec** | 581 MB | 207 GB | 415 GB |
+
+#### 300,000 Tags
+
+| Period | Daily | Annual | 2 Years |
+|--------|-------|--------|---------|
+| **1 sec** | 205 GB | 73 TB | 146 TB |
+| **5 sec** | 41 GB | 14.6 TB | 29.2 TB |
+| **10 sec** | 20.5 GB | 7.3 TB | 14.6 TB |
+| **30 sec** | 6.8 GB | 2.4 TB | 4.9 TB |
+| **60 sec** | 3.4 GB | 1.2 TB | 2.4 TB |
+
+### Measuring Your Own Environment
+
+To derive the Bytes/Point coefficient from your own field measurements:
+
+1. Measure disk size at two different times:
+```bash
+du -sb /var/lib/influxdb
+```
+
+2. Divide the difference by the time interval to get daily growth
+3. Calculate Bytes/Point:
+```
+Bytes/Point = Daily Growth / (Tag Count × 86400 / Period)
+```
+
+:::note
+- The values above are for **numeric (Float/Integer) heavy** SCADA data
+- **String** field usage significantly increases disk consumption
+- If series cardinality rises (many different tag combinations), the coefficient may increase
+- **Retention policy** and **downsampling** can reduce long-term disk requirements by 70-95%
 :::
+
+### Savings with Retention Policy
+
+Default retention periods:
+
+| Data Type | Default Retention |
+|-----------|------------------|
+| Variable values | 365 days |
+| Alarm history | 365 days |
+| Event logs | 14 days |
+| Login attempts | 365 days |
+
+These can be adjusted via retention policy settings described in [Configuration](/docs/en/deployment/configuration/). Downsampling (e.g., 1 second → 1 minute average) can reduce archive data by up to 95%.
 
 ## Next Step
 

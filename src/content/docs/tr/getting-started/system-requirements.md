@@ -166,15 +166,102 @@ inSCADA aşağıdaki sanallaştırma platformlarında desteklenir:
 
 ## Disk Alanı Hesaplama
 
-Tarihsel veri depolama için gereken disk alanı şu faktörlere bağlıdır:
+Tarihsel veri depolama için gereken disk alanı üç faktöre bağlıdır:
 
 - **Tag sayısı**: Loglanan değişken adedi
-- **Loglama sıklığı**: Her kaç saniyede/dakikada bir kayıt
+- **Loglama periyodu**: Her kaç saniyede bir kayıt
 - **Saklama süresi**: Kaç yıl tarihsel veri tutulacak
 
-:::tip
-Detaylı disk hesaplaması için inSCADA teknik ekibi ile iletişime geçin. Genel kural olarak: **1.000 tag × 10 saniye loglama × 1 yıl ≈ 50 GB** TSDB alanı.
+### Hesaplama Formülü
+
+Saha ölçümlerine dayalı olarak, numerik SCADA verileri için point başına ortalama **~8 Byte** disk tüketimi ölçülmüştür (index, WAL ve metadata dahil).
+
+```
+Günlük Byte = Tag Sayısı × (86400 / Periyot) × 8.08 Byte
+```
+
+- `86400` = bir gündeki saniye sayısı
+- `Periyot` = loglama periyodu (saniye)
+- `8.08` = saha ölçümünden türetilen point başına ortalama byte (InfluxDB 1.8)
+
+### Senaryo Tablosu
+
+Aşağıdaki tablo, farklı tag sayısı ve loglama periyotları için **2 yıllık** disk ihtiyacını gösterir:
+
+#### 1.000 Tag
+
+| Periyot | Günlük | Yıllık | 2 Yıl |
+|---------|--------|--------|-------|
+| **1 sn** | 699 MB | 249 GB | 498 GB |
+| **5 sn** | 140 MB | 50 GB | 100 GB |
+| **10 sn** | 70 MB | 25 GB | 50 GB |
+| **30 sn** | 23 MB | 8 GB | 17 GB |
+| **60 sn** | 12 MB | 4 GB | 8 GB |
+
+#### 10.000 Tag
+
+| Periyot | Günlük | Yıllık | 2 Yıl |
+|---------|--------|--------|-------|
+| **1 sn** | 6.8 GB | 2.4 TB | 4.9 TB |
+| **5 sn** | 1.4 GB | 498 GB | 996 GB |
+| **10 sn** | 698 MB | 249 GB | 498 GB |
+| **30 sn** | 233 MB | 83 GB | 166 GB |
+| **60 sn** | 116 MB | 41 GB | 83 GB |
+
+#### 50.000 Tag
+
+| Periyot | Günlük | Yıllık | 2 Yıl |
+|---------|--------|--------|-------|
+| **1 sn** | 34 GB | 12.2 TB | 24.4 TB |
+| **5 sn** | 6.8 GB | 2.4 TB | 4.9 TB |
+| **10 sn** | 3.4 GB | 1.2 TB | 2.4 TB |
+| **30 sn** | 1.1 GB | 415 GB | 830 GB |
+| **60 sn** | 581 MB | 207 GB | 415 GB |
+
+#### 300.000 Tag
+
+| Periyot | Günlük | Yıllık | 2 Yıl |
+|---------|--------|--------|-------|
+| **1 sn** | 205 GB | 73 TB | 146 TB |
+| **5 sn** | 41 GB | 14.6 TB | 29.2 TB |
+| **10 sn** | 20.5 GB | 7.3 TB | 14.6 TB |
+| **30 sn** | 6.8 GB | 2.4 TB | 4.9 TB |
+| **60 sn** | 3.4 GB | 1.2 TB | 2.4 TB |
+
+### Kendi Ortamınız İçin Hesaplama
+
+Kendi saha ölçümünüzden Bytes/Point katsayısını türetmek için:
+
+1. İki farklı zamanda disk boyutunu ölçün:
+```bash
+du -sb /var/lib/influxdb
+```
+
+2. Aradaki farkı süreye bölüp günlük büyümeyi bulun
+3. Bytes/Point hesaplayın:
+```
+Bytes/Point = Günlük Büyüme / (Tag Sayısı × 86400 / Periyot)
+```
+
+:::note
+- Yukarıdaki değerler **numerik (Float/Integer) ağırlıklı** SCADA verileri içindir
+- **String** field kullanımı disk tüketimini önemli ölçüde artırır
+- Series cardinality yükselirse (çok sayıda farklı tag kombinasyonu) katsayı büyüyebilir
+- **Retention policy** ve **downsample** ile uzun vadeli disk ihtiyacı %70-95 azaltılabilir
 :::
+
+### Retention Policy ile Tasarruf
+
+Varsayılan saklama süreleri:
+
+| Veri Tipi | Varsayılan Saklama |
+|-----------|-------------------|
+| Değişken değerleri | 365 gün |
+| Alarm geçmişi | 365 gün |
+| Olay logları | 14 gün |
+| Giriş denemeleri | 365 gün |
+
+Bu süreler [Yapılandırma](/docs/tr/deployment/configuration/) sayfasında açıklanan retention policy ayarları ile değiştirilebilir. Downsample (örn: 1 saniye → 1 dakika ortalama) ile arşiv verisi %95'e kadar küçültülebilir.
 
 ## Sonraki Adım
 
