@@ -76,20 +76,18 @@ Roket ikonuna tıklayarak animation'ı canlı olarak önizleyebilirsiniz:
 
 ### Animation Yapılandırma Paneli
 
-Kalem ikonuna tıklayarak animation'ın genel ayarlarını (Duration, Play Order, Alignment, Scripts) düzenleyebilirsiniz:
+Kalem ikonuna tıklayarak animation'ın genel ayarlarını düzenleyebilirsiniz:
 
 ![Animation Yapılandırma](../../../../../assets/docs/editor-anim-config.png)
-
-## Animation Oluşturma
 
 | Alan | Zorunlu | Açıklama |
 |------|---------|----------|
 | **Name** | Evet | Ekran adı (proje içinde benzersiz) |
-| **SVG Content** | Evet | SVG kaynak kodu |
-| **Duration** | Evet | Animasyon güncelleme periyodu (ms, min: 100) |
+| **Duration** | Evet | Güncelleme periyodu (ms, min: 100). Ne sıklıkla değişken değerleri okunup ekran güncellenecek |
 | **Play Order** | Evet | Visualization ekranındaki sıralama numarası |
 | **Main** | Evet | Visualization menüsünde görünsün mü |
-| **Color** | Hayır | Arka plan rengi |
+| **Color** | Hayır | Ekranın arka plan rengi (Inkscape'teki arka plan aktarılmaz, buradan ayarlanır) |
+| **Alignment** | Hayır | SVG'nin ekrana hizalama modu |
 | **Description** | Hayır | Açıklama |
 
 ### Main ve Play Order
@@ -119,29 +117,28 @@ Her animation üç bileşenden oluşur:
 
 ```
 Animation
-├── SVG Content (ekranın görsel yapısı)
-├── Animation Elements (değişken bağlantıları)
-│   ├── Element 1: "temp_text" → Temperature_C (Get binding)
-│   ├── Element 2: "motor_rect" → MotorStatus (Color binding)
-│   └── Element 3: "valve_group" → ValvePosition (Rotate binding)
-└── Animation Scripts (ekran scriptleri)
+├── SVG Content (upload edilen SVG dosyası)
+├── Animation Elements (mouse ile seçilen objelere bağlanan davranışlar)
+│   ├── Element 1: sıcaklık metni → Temperature_C (Get)
+│   ├── Element 2: motor göstergesi → MotorStatus (Color)
+│   └── Element 3: vana grubu → ValvePosition (Rotate)
+└── Animation Scripts (her döngüde çalışan kodlar)
     ├── Pre-Animation Code
     └── Post-Animation Code
 ```
 
 ## Animation Elements
 
-Animation Element, SVG içindeki bir DOM öğesini bir değişkene bağlar. Her element şu alanlardan oluşur:
+Animation Element, SVG üzerinde mouse ile seçilen bir objeye bağlanan davranış tanımıdır. Objeye tıklayıp Element Editor'ü açtığınızda aşağıdaki alanlar otomatik doldurulur veya yapılandırılır:
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Name** | Evet | Element adı |
-| **DOM ID** | Evet | SVG içindeki hedef öğenin `id` özniteliği |
-| **Type** | Evet | Animation tipi (binding davranışı) |
-| **Expression Type** | Evet | İfade tipi (değerin nasıl hesaplanacağı) |
-| **Expression** | Evet | Değer ifadesi (değişken adı, formül vb.) |
-| **Props** | Evet | Ek özellikler (JSON) |
-| **Status** | Evet | Aktif/pasif |
+| Alan | Açıklama |
+|------|----------|
+| **DOM ID** | Seçilen SVG objesinin ID'si (otomatik alınır — elle girmenize gerek yok) |
+| **Type** | Animation tipi — obje tipine göre uygun tipler otomatik listelenir |
+| **Expression Type** | Değerin nasıl hesaplanacağı (Tag, Expression, Switch vb.) |
+| **Expression** | Değer ifadesi (değişken adı, formül veya yapılandırma) |
+| **Props** | Tipe özel ek ayarlar (her tip kendi görsel formunu sunar) |
+| **Status** | Aktif/pasif |
 
 ### Animation Tipleri
 
