@@ -33,8 +33,8 @@ Varsayılan giriş bilgileri:
 
 | Alan | Değer |
 |------|-------|
-| Kullanıcı Adı | `admin` |
-| Şifre | `admin` |
+| Kullanıcı Adı | `inscada` |
+| Şifre | `1907` |
 
 :::caution[Güvenlik]
 İlk girişten sonra varsayılan şifreyi mutlaka değiştirin.

@@ -33,8 +33,8 @@ Default login credentials:
 
 | Field | Value |
 |-------|-------|
-| Username | `admin` |
-| Password | `admin` |
+| Username | `inscada` |
+| Password | `1907` |
 
 :::caution[Security]
 Change the default password immediately after your first login.
