@@ -1,35 +1,35 @@
 ---
 title: "Script API"
-description: "Script CRUD, çalıştırma ve ad-hoc script runner endpoint'leri"
+description: "Script CRUD, execution, and ad-hoc script runner endpoints"
 sidebar:
   order: 7
 ---
 
-Script API, script oluşturma, güncelleme, silme ve çalıştırma işlemlerini sağlar.
+The Script API provides script creation, update, deletion, and execution operations.
 
-## CRUD İşlemleri
+## CRUD Operations
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/scripts` | Script listesi |
-| GET | `/api/scripts/{id}` | Script detayı |
-| POST | `/api/scripts` | Yeni script oluştur |
-| PUT | `/api/scripts/{id}` | Script güncelle |
-| DELETE | `/api/scripts/{id}` | Script sil |
-| GET | `/api/scripts/{id}/status` | Script çalışma durumu |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/scripts` | Script list |
+| GET | `/api/scripts/{id}` | Script details |
+| POST | `/api/scripts` | Create a new script |
+| PUT | `/api/scripts/{id}` | Update a script |
+| DELETE | `/api/scripts/{id}` | Delete a script |
+| GET | `/api/scripts/{id}/status` | Script execution status |
 
-## Ad-Hoc Script Çalıştırma
+## Ad-Hoc Script Execution
 
 ### POST /api/scripts/runner
 
-JavaScript kodunu string olarak alıp sunucu tarafında çalıştırır. Script `ins.*` API'sine tam erişime sahiptir.
+Accepts JavaScript code as a string and executes it on the server side. The script has full access to the `ins.*` API.
 
-### İstek
+### Request
 
 ```
 POST /api/scripts/runner
 Content-Type: application/json
-X-Space: <space_adı>
+X-Space: <space_name>
 ```
 
 ```json
@@ -42,18 +42,18 @@ X-Space: <space_adı>
 }
 ```
 
-| Alan | Tip | Zorunlu | Açıklama |
-|------|-----|---------|----------|
-| **projectId** | Integer | Evet | Hedef proje ID'si |
-| **name** | String | Evet | Script tanımlayıcı adı |
-| **code** | String | Evet | Çalıştırılacak JavaScript kodu |
-| **log** | Boolean | Hayır | Execution log'u etkinleştir |
-| **compile** | Boolean | Hayır | Çalıştırmadan önce derle |
-| **bindings** | Object | Hayır | Script'e enjekte edilecek özel değişkenler |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **projectId** | Integer | Yes | Target project ID |
+| **name** | String | Yes | Script identifier name |
+| **code** | String | Yes | JavaScript code to execute |
+| **log** | Boolean | No | Enable execution log |
+| **compile** | Boolean | No | Compile before execution |
+| **bindings** | Object | No | Custom variables to inject into the script |
 
-### Yanıt
+### Response
 
-Script'in son ifadesinin sonucu doğrudan döner:
+The result of the script's last expression is returned directly:
 
 ```
 HTTP/1.1 200 OK
@@ -62,14 +62,14 @@ Content-Type: application/json
 359.91
 ```
 
-### cURL Örnekleri
+### cURL Examples
 
 ```bash
 # Login
 curl -c cookies.txt -X POST http://localhost:8081/login \
   -F "username=inscada" -F "password=1907"
 
-# Değişken değeri oku
+# Read variable value
 curl -b cookies.txt -X POST http://localhost:8081/api/scripts/runner \
   -H "X-Space: claude" -H "Content-Type: application/json" \
   -d '{
@@ -81,7 +81,7 @@ curl -b cookies.txt -X POST http://localhost:8081/api/scripts/runner \
   }'
 ```
 
-Yanıt:
+Response:
 ```json
 {
   "flags": { "scaled": true },
@@ -101,7 +101,7 @@ Yanıt:
 ```
 
 ```bash
-# Toplu değer oku
+# Read multiple values
 curl -b cookies.txt -X POST http://localhost:8081/api/scripts/runner \
   -H "X-Space: claude" -H "Content-Type: application/json" \
   -d '{
@@ -114,7 +114,7 @@ curl -b cookies.txt -X POST http://localhost:8081/api/scripts/runner \
 ```
 
 ```bash
-# Değer yaz
+# Write a value
 curl -b cookies.txt -X POST http://localhost:8081/api/scripts/runner \
   -H "X-Space: claude" -H "Content-Type: application/json" \
   -d '{
@@ -127,7 +127,7 @@ curl -b cookies.txt -X POST http://localhost:8081/api/scripts/runner \
 ```
 
 ```bash
-# İstatistik sorgula
+# Query statistics
 curl -b cookies.txt -X POST http://localhost:8081/api/scripts/runner \
   -H "X-Space: claude" -H "Content-Type: application/json" \
   -d '{
@@ -139,7 +139,7 @@ curl -b cookies.txt -X POST http://localhost:8081/api/scripts/runner \
   }'
 ```
 
-Yanıt:
+Response:
 ```json
 {
   "ActivePower_kW": {
@@ -155,10 +155,10 @@ Yanıt:
 }
 ```
 
-### Yetki
+### Authorization
 
-Bu endpoint `RUN_SCRIPT` yetkisi gerektirir. Script'ler sunucu tarafında Nashorn JavaScript engine ile çalışır ve `ins.*` API'sine (Variable, Connection, Alarm, Script, Report vb.) tam erişim sağlar.
+This endpoint requires the `RUN_SCRIPT` permission. Scripts run on the server side using the Nashorn JavaScript engine and have full access to the `ins.*` API (Variable, Connection, Alarm, Script, Report, etc.).
 
 :::caution
-Bu endpoint sunucu tarafında kod çalıştırır. Yalnızca güvenilir kullanıcılara `RUN_SCRIPT` yetkisi verilmelidir.
+This endpoint executes code on the server side. The `RUN_SCRIPT` permission should only be granted to trusted users.
 :::

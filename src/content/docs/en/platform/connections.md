@@ -5,52 +5,52 @@ sidebar:
   order: 2
 ---
 
-Bağlantı (Connection), bir saha cihazına veya sisteme olan haberleşme kanalıdır. Her bağlantı bir protokol kullanır ve bir projeye bağlıdır.
+A connection is the communication channel to a field device or system. Each connection uses a protocol and is bound to a project.
 
-![Bağlantı Listesi](../../../../assets/docs/dev-connections.png)
+![Connection List](../../../../assets/docs/dev-connections.png)
 
-## Bağlantı Oluşturma
+## Creating a Connection
 
-**Menü:** Runtime → Connections → Yeni Bağlantı
+**Menu:** Runtime → Connections → New Connection
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Name** | Evet | Bağlantı adı (proje içinde benzersiz) |
-| **Protocol** | Evet | Haberleşme protokolü |
-| **IP** | Protokole göre | Hedef IP adresi |
-| **Port** | Protokole göre | Hedef port numarası |
-| **Description** | Hayır | Açıklama |
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Name** | Yes | Connection name (unique within the project) |
+| **Protocol** | Yes | Communication protocol |
+| **IP** | Depends on protocol | Target IP address |
+| **Port** | Depends on protocol | Target port number |
+| **Description** | No | Description |
 
-## Desteklenen Protokoller
+## Supported Protocols
 
-| Protokol | Kullanım Alanı | Tipik Cihaz |
-|----------|---------------|-------------|
-| **MODBUS TCP** | Endüstriyel otomasyon | PLC, enerji analizörü, sürücü |
-| **MODBUS UDP** | Hızlı okuma gerektiren uygulamalar | Enerji sayacı |
-| **MODBUS RTU over TCP** | Seri haberleşme gateway | RTU, seri cihaz |
-| **DNP3** | Enerji dağıtım | RTU, koruma rölesi |
-| **IEC 60870-5-104** | Enerji iletim/dağıtım | RTU, SCADA gateway |
-| **IEC 61850** | Trafo merkezi | IED, koruma rölesi |
-| **OPC UA** | Açık standart | PLC, DCS, SCADA |
-| **OPC DA** | Windows COM/DCOM | Eski nesil OPC sunucular |
-| **OPC XML** | HTTP/SOAP tabanlı | Web servis OPC |
+| Protocol | Use Case | Typical Device |
+|----------|----------|----------------|
+| **MODBUS TCP** | Industrial automation | PLC, energy analyzer, drive |
+| **MODBUS UDP** | Applications requiring fast reads | Energy meter |
+| **MODBUS RTU over TCP** | Serial communication gateway | RTU, serial device |
+| **DNP3** | Energy distribution | RTU, protection relay |
+| **IEC 60870-5-104** | Energy transmission/distribution | RTU, SCADA gateway |
+| **IEC 61850** | Substation | IED, protection relay |
+| **OPC UA** | Open standard | PLC, DCS, SCADA |
+| **OPC DA** | Windows COM/DCOM | Legacy OPC servers |
+| **OPC XML** | HTTP/SOAP based | Web service OPC |
 | **S7** | Siemens PLC | S7-300, S7-400, S7-1200, S7-1500 |
-| **MQTT** | IoT / mesaj tabanlı | Gateway, sensör, broker |
-| **EtherNet/IP** | Rockwell/Allen-Bradley | Logix 5000+ serisi |
-| **Fatek** | Fatek PLC | FBs, FBe serisi |
-| **LOCAL** | Simülasyon / hesaplama | Dahili değişken |
+| **MQTT** | IoT / message-based | Gateway, sensor, broker |
+| **EtherNet/IP** | Rockwell/Allen-Bradley | Logix 5000+ series |
+| **Fatek** | Fatek PLC | FBs, FBe series |
+| **LOCAL** | Simulation / calculation | Internal variable |
 
-Detaylı protokol ayarları: [Protokoller →](/docs/tr/protocols/)
+Detailed protocol settings: [Protocols →](/docs/tr/protocols/)
 
-## Bağlantı Durumları
+## Connection States
 
-| Durum | Açıklama |
-|-------|----------|
-| **Connected** | Bağlantı aktif, veri okunuyor |
-| **Disconnected** | Bağlantı kesilmiş |
-| **Error** | Bağlantı hatası (timeout, yetki vb.) |
+| State | Description |
+|-------|-------------|
+| **Connected** | Connection is active, data is being read |
+| **Disconnected** | Connection is lost |
+| **Error** | Connection error (timeout, authorization, etc.) |
 
-## Bağlantı Yapısı (Örnek)
+## Connection Structure (Example)
 
 ```json
 {
@@ -64,27 +64,27 @@ Detaylı protokol ayarları: [Protokoller →](/docs/tr/protocols/)
 }
 ```
 
-## Bağlantı Başlatma / Durdurma
+## Starting / Stopping Connections
 
-Bağlantılar arayüzden veya script ile yönetilebilir:
+Connections can be managed from the interface or via scripts:
 
 ```javascript
-// Durumu sorgula
+// Query status
 var status = ins.getConnectionStatus("LOCAL-Energy");
 // → "Connected"
 
-// Durdur ve yeniden başlat
+// Stop and restart
 ins.stopConnection("MODBUS-PLC");
 java.lang.Thread.sleep(2000);
 ins.startConnection("MODBUS-PLC");
 ```
 
-## Bağlantı Parametrelerini Güncelleme
+## Updating Connection Parameters
 
-Çalışma sırasında bağlantı parametreleri dinamik olarak değiştirilebilir:
+Connection parameters can be dynamically changed during runtime:
 
 ```javascript
-// IP adresini değiştir
+// Change IP address
 ins.updateConnection("MODBUS-PLC", {
     "ip": "192.168.1.100",
     "port": 502
@@ -92,7 +92,7 @@ ins.updateConnection("MODBUS-PLC", {
 ```
 
 :::tip
-Bağlantı parametresi güncellemesi sonrası bağlantıyı durdurup yeniden başlatmanız önerilir.
+It is recommended to stop and restart the connection after updating connection parameters.
 :::
 
-Detaylı API: [Connection API →](/docs/tr/platform/scripts/connection-api/)
+Detailed API: [Connection API →](/docs/tr/platform/scripts/connection-api/)

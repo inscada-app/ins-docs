@@ -1,79 +1,79 @@
 ---
 title: "Expressions"
-description: "Paylaşımlı formül tanımlama ve değişkenlerde kullanımı"
+description: "Defining shared formulas and using them in variables"
 sidebar:
   order: 7
 ---
 
-Expression, space seviyesinde tanımlanan paylaşımlı JavaScript formülleridir. Birden fazla değişken veya alarm tarafından referans olarak kullanılabilir. Tekrarlayan formülleri merkezi olarak yönetmeyi sağlar.
+An Expression is a shared JavaScript formula defined at the space level. It can be referenced by multiple variables or alarms. This enables centralized management of recurring formulas.
 
 ![Expressions](../../../../assets/docs/dev-expressions.png)
 
-## Expression Oluşturma
+## Creating an Expression
 
-**Menü:** Development → Expressions → Yeni Expression
+**Menu:** Development → Expressions → New Expression
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Name** | Evet | Formül adı (space içinde benzersiz) |
-| **Code** | Evet | JavaScript kodu |
-| **Description** | Hayır | Açıklama |
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Name** | Yes | Formula name (unique within the space) |
+| **Code** | Yes | JavaScript code |
+| **Description** | No | Description |
 
-## Kullanım Alanları
+## Use Cases
 
-Expression iki farklı amaçla kullanılır:
+Expressions are used for two different purposes:
 
 ### Value Expression
 
-Değişkenin değerini hesaplamak için kullanılır. Her okuma döngüsünde çalışır.
+Used to calculate a variable's value. Runs on every read cycle.
 
-| Tip | Açıklama |
-|-----|----------|
-| **NONE** | Expression yok, ham değer kullanılır |
-| **CUSTOM** | Değişkene özel inline JavaScript |
-| **REFERENCE** | Paylaşımlı Expression'a referans |
+| Type | Description |
+|------|-------------|
+| **NONE** | No expression, raw value is used |
+| **CUSTOM** | Inline JavaScript specific to the variable |
+| **REFERENCE** | Reference to a shared Expression |
 
-REFERENCE seçildiğinde, değişken tanımında Expression adı belirtilir. Bu sayede aynı formül onlarca değişkende kullanılabilir.
+When REFERENCE is selected, the Expression name is specified in the variable definition. This allows the same formula to be used across dozens of variables.
 
 ### Log Expression
 
-Değişkenin ne zaman loglanacağını belirleyen özel koşul. `true` dönerse loglanır, `false` dönerse atlanır.
+A custom condition that determines when a variable is logged. If it returns `true`, the value is logged; if `false`, it is skipped.
 
 ```javascript
-// Sadece değer belirli aralıkta ise logla
+// Only log if value is within a specific range
 if (value > 100 && value < 900) {
     return true;
 }
 return false;
 ```
 
-## Örnek Expression'lar
+## Example Expressions
 
-### Birim Dönüşümü
+### Unit Conversion
 
 ```javascript
-// Fahrenheit → Celsius (birden fazla sıcaklık sensöründe kullanılır)
+// Fahrenheit → Celsius (used across multiple temperature sensors)
 return ((value - 32) * 5 / 9).toFixed(1) * 1;
 ```
 
-### Ölçek Normalizasyonu
+### Scale Normalization
 
 ```javascript
-// 0-65535 raw değeri 0-100 yüzdeye çevir
+// Convert 0-65535 raw value to 0-100 percentage
 return (value / 65535 * 100).toFixed(1) * 1;
 ```
 
-### Durum Metni
+### Status Text
 
 ```javascript
-// Sayısal durum kodunu metne çevir
-var states = {0: "Durdu", 1: "Çalışıyor", 2: "Arıza", 3: "Bakım"};
-return states[value] || "Bilinmiyor";
+// Convert numeric status code to text
+var states = {0: "Stopped", 1: "Running", 2: "Fault", 3: "Maintenance"};
+return states[value] || "Unknown";
 ```
 
-## Space Seviyesi Avantajı
+## Space-Level Advantage
 
-Expression space seviyesinde tanımlandığı için:
-- Bir formülü değiştirdiğinizde, onu kullanan **tüm değişkenler** otomatik güncellenir
-- Farklı projelerdeki değişkenler aynı formülü paylaşabilir
-- Formül kütüphanesi oluşturarak standart dönüşümler tanımlanabilir
+Since Expressions are defined at the space level:
+- When you modify a formula, **all variables** using it are automatically updated
+- Variables in different projects can share the same formula
+- You can create a formula library to define standard conversions

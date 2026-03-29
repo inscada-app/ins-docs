@@ -1,152 +1,152 @@
 ---
 title: "Fatek"
-description: "inSCADA'da Fatek FBs/FBe serisi PLC bağlantı yapılandırması (TCP ve UDP)"
+description: "Fatek FBs/FBe series PLC connection configuration in inSCADA (TCP and UDP)"
 sidebar:
   order: 10
 ---
 
-Fatek protokolü, Fatek Automation firmasının FBs ve FBe serisi PLC'leri ile Ethernet üzerinden haberleşme sağlar. inSCADA, Fatek protokolünü **TCP** ve **UDP** transport katmanları ile yalnızca **Client** rolünde destekler.
+The Fatek protocol provides communication with Fatek Automation's FBs and FBe series PLCs over Ethernet. inSCADA supports the Fatek protocol with **TCP** and **UDP** transport layers in **Client** role only.
 
-## Desteklenen Varyantlar
+## Supported Variants
 
-| Varyant | Açıklama |
-|---------|----------|
-| **Fatek TCP** | TCP/IP üzerinden Fatek haberleşme |
-| **Fatek UDP** | UDP üzerinden Fatek haberleşme |
+| Variant | Description |
+|---------|-------------|
+| **Fatek TCP** | Fatek communication over TCP/IP |
+| **Fatek UDP** | Fatek communication over UDP |
 
-## Veri Modeli
+## Data Model
 
 ```
-Connection (Bağlantı — IP, port)
-└── Device (Cihaz — Station Address)
-    └── Frame (Veri Bloğu — Register alanı)
-        └── Variable (Değişken — Register adresi)
+Connection (IP, port)
+└── Device (Station Address)
+    └── Frame (Data Block — Register area)
+        └── Variable (Register address)
 ```
 
-## Yapılandırma
+## Configuration
 
 ### Connection
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Protocol** | Fatek TCP veya Fatek UDP | Protokol seçimi |
-| **IP Address** | 192.168.1.10 | PLC IP adresi |
-| **Port** | 500 | Fatek Ethernet portu (varsayılan: 500) |
-| **Timeout** | 5000 ms | İstek timeout süresi |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Protocol** | Fatek TCP or Fatek UDP | Protocol selection |
+| **IP Address** | 192.168.1.10 | PLC IP address |
+| **Port** | 500 | Fatek Ethernet port (default: 500) |
+| **Timeout** | 5000 ms | Request timeout duration |
 
 ### Device
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Station Address** | 1 | PLC istasyon numarası (1-254) |
-| **Scan Time** | 1000 ms | Tarama periyodu |
-| **Scan Type** | PERIODIC | `PERIODIC` veya `FIXED_DELAY` |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Station Address** | 1 | PLC station number (1-254) |
+| **Scan Time** | 1000 ms | Scan period |
+| **Scan Type** | PERIODIC | `PERIODIC` or `FIXED_DELAY` |
 
 ### Frame
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Type** | D | Register alanı tipi (aşağıya bakın) |
-| **Start Address** | 0 | Başlangıç register adresi |
-| **Quantity** | 50 | Okunacak register/bit sayısı |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Type** | D | Register area type (see below) |
+| **Start Address** | 0 | Starting register address |
+| **Quantity** | 50 | Number of registers/bits to read |
 
-#### Register Alanları (Frame Tipleri)
+#### Register Areas (Frame Types)
 
-Fatek PLC'ler birden fazla bellek alanına sahiptir. Bu alanlar **discrete (bit)** ve **register (word)** olarak iki ana kategoriye ayrılır:
+Fatek PLCs have multiple memory areas. These areas are divided into two main categories: **discrete (bit)** and **register (word)**.
 
-**Discrete (Bit) Alanları:**
+**Discrete (Bit) Areas:**
 
-| Tip | Açıklama | Erişim |
-|-----|----------|--------|
-| **X** | Dijital giriş (Input) | Salt okunur |
-| **Y** | Dijital çıkış (Output) | Okunur/Yazılır |
-| **M** | İç röle (Internal Relay) | Okunur/Yazılır |
-| **S** | Step röle (Step Relay) | Okunur/Yazılır |
-| **T** | Timer kontağı (Timer Contact) | Salt okunur |
-| **C** | Counter kontağı (Counter Contact) | Salt okunur |
+| Type | Description | Access |
+|------|-------------|--------|
+| **X** | Digital input (Input) | Read-only |
+| **Y** | Digital output (Output) | Read/Write |
+| **M** | Internal relay | Read/Write |
+| **S** | Step relay | Read/Write |
+| **T** | Timer contact | Read-only |
+| **C** | Counter contact | Read-only |
 
-**Word (16-bit) Register Alanları:**
+**Word (16-bit) Register Areas:**
 
-| Tip | Açıklama | Erişim |
-|-----|----------|--------|
-| **WX** | Giriş word registeri | Salt okunur |
-| **WY** | Çıkış word registeri | Okunur/Yazılır |
-| **WM** | İç röle word registeri | Okunur/Yazılır |
-| **WS** | Step röle word registeri | Okunur/Yazılır |
-| **WT** | Timer mevcut değeri (16-bit) | Salt okunur |
-| **WC** | Counter mevcut değeri (16-bit) | Salt okunur |
-| **RT** | Timer ayar değeri (16-bit) | Okunur/Yazılır |
-| **RC** | Counter ayar değeri (16-bit) | Okunur/Yazılır |
-| **R** | Data register (16-bit) | Okunur/Yazılır |
-| **D** | Data register (16-bit) | Okunur/Yazılır |
-| **F** | Dosya register (16-bit) | Okunur/Yazılır |
+| Type | Description | Access |
+|------|-------------|--------|
+| **WX** | Input word register | Read-only |
+| **WY** | Output word register | Read/Write |
+| **WM** | Internal relay word register | Read/Write |
+| **WS** | Step relay word register | Read/Write |
+| **WT** | Timer current value (16-bit) | Read-only |
+| **WC** | Counter current value (16-bit) | Read-only |
+| **RT** | Timer preset value (16-bit) | Read/Write |
+| **RC** | Counter preset value (16-bit) | Read/Write |
+| **R** | Data register (16-bit) | Read/Write |
+| **D** | Data register (16-bit) | Read/Write |
+| **F** | File register (16-bit) | Read/Write |
 
-**Double Word (32-bit) Register Alanları:**
+**Double Word (32-bit) Register Areas:**
 
-| Tip | Açıklama | Erişim |
-|-----|----------|--------|
-| **DWX** | Giriş double word | Salt okunur |
-| **DWY** | Çıkış double word | Okunur/Yazılır |
-| **DWM** | İç röle double word | Okunur/Yazılır |
-| **DWS** | Step röle double word | Okunur/Yazılır |
-| **DWT** | Timer mevcut değeri (32-bit) | Salt okunur |
-| **DWC** | Counter mevcut değeri (32-bit) | Salt okunur |
-| **DRT** | Timer ayar değeri (32-bit) | Okunur/Yazılır |
-| **DRC** | Counter ayar değeri (32-bit) | Okunur/Yazılır |
-| **DR** | Data register (32-bit) | Okunur/Yazılır |
-| **DD** | Data register (32-bit) | Okunur/Yazılır |
-| **DF** | Dosya register (32-bit) | Okunur/Yazılır |
+| Type | Description | Access |
+|------|-------------|--------|
+| **DWX** | Input double word | Read-only |
+| **DWY** | Output double word | Read/Write |
+| **DWM** | Internal relay double word | Read/Write |
+| **DWS** | Step relay double word | Read/Write |
+| **DWT** | Timer current value (32-bit) | Read-only |
+| **DWC** | Counter current value (32-bit) | Read-only |
+| **DRT** | Timer preset value (32-bit) | Read/Write |
+| **DRC** | Counter preset value (32-bit) | Read/Write |
+| **DR** | Data register (32-bit) | Read/Write |
+| **DD** | Data register (32-bit) | Read/Write |
+| **DF** | File register (32-bit) | Read/Write |
 
 :::tip
-En yaygın kullanım: Discrete I/O için **X**, **Y**, **M**; veri depolama için **D** veya **R** register'ları; 32-bit değerler için **DD** veya **DR** kullanılır.
+Most common usage: **X**, **Y**, **M** for discrete I/O; **D** or **R** registers for data storage; **DD** or **DR** for 32-bit values.
 :::
 
 ### Variable
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Start Address** | 0 | Frame içindeki register ofseti |
-| **Type** | FLOAT | Veri tipi |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Start Address** | 0 | Register offset within the frame |
+| **Type** | FLOAT | Data type |
 
-#### Desteklenen Veri Tipleri
+#### Supported Data Types
 
-| Veri Tipi | Boyut | Açıklama |
-|-----------|-------|----------|
-| **BOOL** | 1 bit | Discrete (bit) değer |
-| **INT16** | 16 bit | İşaretli 16-bit tam sayı |
-| **UINT16** | 16 bit | İşaretsiz 16-bit tam sayı |
-| **INT32** | 32 bit | İşaretli 32-bit tam sayı |
-| **UINT32** | 32 bit | İşaretsiz 32-bit tam sayı |
-| **FLOAT** | 32 bit | 32-bit kayan nokta (IEEE 754) |
+| Data Type | Size | Description |
+|-----------|------|-------------|
+| **BOOL** | 1 bit | Discrete (bit) value |
+| **INT16** | 16 bit | Signed 16-bit integer |
+| **UINT16** | 16 bit | Unsigned 16-bit integer |
+| **INT32** | 32 bit | Signed 32-bit integer |
+| **UINT32** | 32 bit | Unsigned 32-bit integer |
+| **FLOAT** | 32 bit | 32-bit floating point (IEEE 754) |
 
-## Adres Hesaplama Örneği
+## Address Calculation Example
 
 ```
 Frame: D register, Start Address: 0, Quantity: 20
 
-Variable örnekleri:
-├── D0    → Start: 0, Type: INT16    (ilk data register)
-├── D1    → Start: 1, Type: UINT16   (ikinci data register)
-├── D2-3  → Start: 2, Type: FLOAT    (32-bit float, 2 register kaplar)
-├── D4-5  → Start: 4, Type: INT32    (32-bit integer, 2 register kaplar)
+Variable examples:
+├── D0    → Start: 0, Type: INT16    (first data register)
+├── D1    → Start: 1, Type: UINT16   (second data register)
+├── D2-3  → Start: 2, Type: FLOAT    (32-bit float, occupies 2 registers)
+├── D4-5  → Start: 4, Type: INT32    (32-bit integer, occupies 2 registers)
 └── D10   → Start: 10, Type: INT16
 
 Frame: M relay, Start Address: 0, Quantity: 32
 
-Variable örnekleri:
-├── M0    → Start: 0, Type: BOOL     (ilk iç röle)
-├── M1    → Start: 1, Type: BOOL     (ikinci iç röle)
+Variable examples:
+├── M0    → Start: 0, Type: BOOL     (first internal relay)
+├── M1    → Start: 1, Type: BOOL     (second internal relay)
 └── M16   → Start: 16, Type: BOOL
 ```
 
-## TCP vs UDP Seçimi
+## TCP vs UDP Selection
 
-| Özellik | Fatek TCP | Fatek UDP |
+| Feature | Fatek TCP | Fatek UDP |
 |---------|-----------|-----------|
-| **Güvenilirlik** | Yüksek (garanti teslim) | Düşük (paket kaybı mümkün) |
-| **Gecikme** | Normal | Düşük |
-| **Kullanım** | Genel amaç (önerilen) | Düşük gecikme gerektiren durumlar |
+| **Reliability** | High (guaranteed delivery) | Low (packet loss possible) |
+| **Latency** | Normal | Low |
+| **Usage** | General purpose (recommended) | Low-latency requirements |
 
 :::note
-Çoğu uygulamada **Fatek TCP** tercih edilmelidir. UDP yalnızca özel performans gereksinimleri olan durumlarda kullanılmalıdır.
+**Fatek TCP** should be preferred for most applications. UDP should only be used in cases with special performance requirements.
 :::

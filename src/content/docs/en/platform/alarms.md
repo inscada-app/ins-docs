@@ -1,168 +1,168 @@
 ---
 title: "Alarm Management"
-description: "Alarm grubu, alarm tanımları, alarm tipleri ve alarm izleme"
+description: "Alarm groups, alarm definitions, alarm types and alarm monitoring"
 sidebar:
   order: 5
 ---
 
-Alarm sistemi, değişken değerlerindeki anormal durumları tespit eder, kaydeder ve bildirir. Alarmlar grup halinde organize edilir ve her grup bir projeye bağlıdır.
+The alarm system detects, records, and notifies abnormal conditions in variable values. Alarms are organized in groups, and each group is bound to a project.
 
-![Alarm Grupları](../../../../assets/docs/dev-alarm-groups.png)
+![Alarm Groups](../../../../assets/docs/dev-alarm-groups.png)
 
-## Alarm Grubu
+## Alarm Group
 
-Alarm grubu, alarm tanımlarını organize eden ve ortak davranış parametreleri belirleyen konteynerdir.
+An alarm group is a container that organizes alarm definitions and sets common behavior parameters.
 
-### Alarm Grubu Oluşturma
+### Creating an Alarm Group
 
-**Menü:** Runtime → Alarms → Alarm Groups → Yeni Grup
+**Menu:** Runtime → Alarms → Alarm Groups → New Group
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Name** | Evet | Grup adı |
-| **Scan Time (ms)** | Evet | Alarm kontrol periyodu (min: 100ms) |
-| **Priority** | Evet | Öncelik seviyesi (1-255) |
-| **Description** | Hayır | Açıklama |
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Name** | Yes | Group name |
+| **Scan Time (ms)** | Yes | Alarm check period (min: 100ms) |
+| **Priority** | Yes | Priority level (1-255) |
+| **Description** | No | Description |
 
-### Alarm Grubu Gelişmiş Ayarlar
+### Alarm Group Advanced Settings
 
-| Alan | Açıklama |
-|------|----------|
-| **On Script** | Alarm tetiklendiğinde çalışacak script |
-| **Off Script** | Alarm kapandığında çalışacak script |
-| **Ack Script** | Alarm onaylandığında çalışacak script |
-| **On (No Ack) Color** | Tetiklendi, onaylanmadı rengi |
-| **On (Ack) Color** | Tetiklendi, onaylandı rengi |
-| **Off (No Ack) Color** | Kapandı, onaylanmadı rengi |
-| **Off (Ack) Color** | Kapandı, onaylandı rengi |
-| **Hidden on Monitor** | Alarm monitöründe gizle |
+| Field | Description |
+|-------|-------------|
+| **On Script** | Script to run when an alarm fires |
+| **Off Script** | Script to run when an alarm clears |
+| **Ack Script** | Script to run when an alarm is acknowledged |
+| **On (No Ack) Color** | Fired, not acknowledged color |
+| **On (Ack) Color** | Fired, acknowledged color |
+| **Off (No Ack) Color** | Cleared, not acknowledged color |
+| **Off (Ack) Color** | Cleared, acknowledged color |
+| **Hidden on Monitor** | Hide on alarm monitor |
 
-### Yazıcı Entegrasyonu
+### Printer Integration
 
-Alarm olayları doğrudan ağ yazıcısına gönderilebilir:
+Alarm events can be sent directly to a network printer:
 
-| Alan | Açıklama |
-|------|----------|
-| **Printer IP** | Yazıcı IP adresi |
-| **Printer Port** | Yazıcı port numarası |
-| **Print When On** | Tetiklendiğinde yazdır |
-| **Print When Off** | Kapandığında yazdır |
-| **Print When Ack** | Onaylandığında yazdır |
+| Field | Description |
+|-------|-------------|
+| **Printer IP** | Printer IP address |
+| **Printer Port** | Printer port number |
+| **Print When On** | Print when fired |
+| **Print When Off** | Print when cleared |
+| **Print When Ack** | Print when acknowledged |
 
 ---
 
-## Alarm Tipleri
+## Alarm Types
 
 ### Analog Alarm
 
-Sayısal değişkenlerin eşik değerlerini izler.
+Monitors threshold values of numeric variables.
 
-| Eşik | Açıklama | Örnek |
-|------|----------|-------|
-| **High-High** | Çok yüksek (kritik) | Sıcaklık > 90°C |
-| **High** | Yüksek (uyarı) | Sıcaklık > 70°C |
-| **Low** | Düşük (uyarı) | Basınç < 2 bar |
-| **Low-Low** | Çok düşük (kritik) | Basınç < 1 bar |
+| Threshold | Description | Example |
+|-----------|-------------|---------|
+| **High-High** | Very high (critical) | Temperature > 90°C |
+| **High** | High (warning) | Temperature > 70°C |
+| **Low** | Low (warning) | Pressure < 2 bar |
+| **Low-Low** | Very low (critical) | Pressure < 1 bar |
 
-Her eşik için ayrı ayrı alarm tanımı oluşturulur. Hysteresis (gecikme bandı) değeri ile alarm titreşimi önlenir.
+A separate alarm definition is created for each threshold. Hysteresis (deadband) value prevents alarm chattering.
 
 ### Digital Alarm
 
-Boolean değişkenlerin durum değişimini izler.
+Monitors state changes of Boolean variables.
 
-| Koşul | Açıklama |
-|-------|----------|
-| **ON = Alarm** | Değer `true` olduğunda alarm tetiklenir |
-| **OFF = Normal** | Değer `false` olduğunda alarm kapanır |
+| Condition | Description |
+|-----------|-------------|
+| **ON = Alarm** | Alarm fires when value is `true` |
+| **OFF = Normal** | Alarm clears when value is `false` |
 
-Örnek: Motor arıza sinyali, kapı açık kontağı, acil stop butonu.
+Examples: Motor fault signal, door open contact, emergency stop button.
 
 ### Custom Alarm
 
-JavaScript expression ile özel alarm koşulu tanımlama.
+Define custom alarm conditions using JavaScript expressions.
 
 ```javascript
-// Birden fazla değişkene bağlı alarm koşulu
+// Alarm condition dependent on multiple variables
 var power = ins.getVariableValue("ActivePower_kW").value;
 var temp = ins.getVariableValue("Temperature_C").value;
-return power > 500 && temp > 70; // her ikisi de yüksekse alarm
+return power > 500 && temp > 70; // alarm if both are high
 ```
 
 ---
 
-## Alarm Yaşam Döngüsü
+## Alarm Lifecycle
 
 ```
-Normal → Fired (Tetiklendi) → Acknowledged (Onaylandı) → Off (Kapandı)
+Normal → Fired → Acknowledged → Off
 ```
 
-### Durum Geçişleri
+### State Transitions
 
-| Geçiş | Tetikleyen | Açıklama |
-|-------|-----------|----------|
-| Normal → **Fired** | Sistem | Alarm koşulu sağlandı |
-| Fired → **Acknowledged** | Operatör | Operatör alarmı onayladı |
-| Fired/Ack → **Off** | Sistem | Alarm koşulu ortadan kalktı |
-| Fired → **Force Off** | Operatör | Alarm zorla kapatıldı |
+| Transition | Triggered By | Description |
+|------------|-------------|-------------|
+| Normal → **Fired** | System | Alarm condition is met |
+| Fired → **Acknowledged** | Operator | Operator acknowledged the alarm |
+| Fired/Ack → **Off** | System | Alarm condition is no longer met |
+| Fired → **Force Off** | Operator | Alarm is force-cleared |
 
-### Alarm Renk Kodları
+### Alarm Color Codes
 
-| Durum | Varsayılan | Anlamı |
-|-------|-----------|--------|
-| Fired + No Ack | Kırmızı yanıp söner | Dikkat gerekli |
-| Fired + Ack | Kırmızı sabit | Farkında, devam ediyor |
-| Off + No Ack | Sarı | Kapandı ama görülmedi |
-| Off + Ack | Normal | Tamamlandı |
+| State | Default | Meaning |
+|-------|---------|---------|
+| Fired + No Ack | Red flashing | Attention required |
+| Fired + Ack | Red solid | Aware, still active |
+| Off + No Ack | Yellow | Cleared but not seen |
+| Off + Ack | Normal | Completed |
 
 ---
 
-## Alarm İzleme
+## Alarm Monitoring
 
 ### Alarm Monitor
 
-**Menü:** Runtime → Alarm Tracking → Alarm Monitor
+**Menu:** Runtime → Alarm Tracking → Alarm Monitor
 
 ![Alarm Monitor](../../../../assets/docs/rt-alarm-monitor.png)
 
-Aktif alarmları gerçek zamanlı olarak gösterir. Operatör bu ekrandan:
-- Alarmları görüntüler
-- Alarmları onaylar (Acknowledge)
-- Alarmları zorla kapatır (Force Off)
+Displays active alarms in real time. From this screen, operators can:
+- View alarms
+- Acknowledge alarms
+- Force-clear alarms (Force Off)
 
 ### Alarm Tracking
 
-**Menü:** Visualization → Alarm Tracking
+**Menu:** Visualization → Alarm Tracking
 
-Alarm geçmişini tarih aralığına göre sorgular. Her alarm kaydı:
+Queries alarm history by date range. Each alarm record contains:
 
-| Alan | Açıklama |
-|------|----------|
-| Alarm adı | Hangi alarm tetiklendi |
-| Tetiklenme zamanı | Ne zaman tetiklendi |
-| Kapanma zamanı | Ne zaman kapandı |
-| Onaylayan | Kim onayladı |
-| Süre | Ne kadar sürdü |
-| Değer | Tetiklenme anındaki değer |
+| Field | Description |
+|-------|-------------|
+| Alarm name | Which alarm fired |
+| Fire time | When it fired |
+| Off time | When it cleared |
+| Acknowledged by | Who acknowledged it |
+| Duration | How long it lasted |
+| Value | Value at the time of firing |
 
 ---
 
-## Script ile Alarm Yönetimi
+## Managing Alarms with Scripts
 
 ```javascript
-// Son tetiklenen alarmlar
+// Last fired alarms
 var alarms = ins.getLastFiredAlarms(0, 10);
-// → [] (aktif alarm yoksa boş dizi)
+// → [] (empty array if no active alarms)
 
-// Tarih aralığında alarm geçmişi
+// Alarm history by date range
 var end = ins.now();
 var start = ins.getDate(end.getTime() - 86400000);
 var history = ins.getLastFiredAlarmsByDate(start, end, true, 100);
 
-// Alarm grubunu devre dışı bırak (bakım modu)
+// Deactivate alarm group (maintenance mode)
 ins.deactivateAlarmGroup("Temperature_Alarms");
 
-// Bakım sonrası tekrar etkinleştir
+// Reactivate after maintenance
 ins.activateAlarmGroup("Temperature_Alarms");
 ```
 
-Detaylı API: [Alarm API →](/docs/tr/platform/scripts/alarm-api/) | [REST API →](/docs/tr/api/alarms/)
+Detailed API: [Alarm API →](/docs/tr/platform/scripts/alarm-api/) | [REST API →](/docs/tr/api/alarms/)

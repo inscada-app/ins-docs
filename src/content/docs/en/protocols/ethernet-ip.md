@@ -1,148 +1,148 @@
 ---
 title: "EtherNet/IP"
-description: "inSCADA'da EtherNet/IP (CIP) protokolü — Rockwell/Allen-Bradley Logix serisi PLC bağlantısı"
+description: "EtherNet/IP (CIP) protocol in inSCADA — Rockwell/Allen-Bradley Logix series PLC connection"
 sidebar:
   order: 9
 ---
 
-EtherNet/IP (Ethernet Industrial Protocol), CIP (Common Industrial Protocol) tabanlı bir endüstriyel haberleşme protokolüdür. ODVA (Open DeviceNet Vendors Association) tarafından yönetilir. TCP/IP ve UDP üzerinde çalışır, varsayılan olarak port **44818** kullanır.
+EtherNet/IP (Ethernet Industrial Protocol) is an industrial communication protocol based on CIP (Common Industrial Protocol). It is managed by ODVA (Open DeviceNet Vendors Association). It runs over TCP/IP and UDP, using port **44818** by default.
 
-inSCADA, EtherNet/IP protokolünü yalnızca **Client** rolünde destekler.
+inSCADA supports the EtherNet/IP protocol in **Client** role only.
 
-## Desteklenen Cihazlar
+## Supported Devices
 
-inSCADA'nın EtherNet/IP implementasyonu **tag-based addressing** (CIP implicit messaging) kullanır. Bu adresleme yöntemi aşağıdaki kontrol platformlarında desteklenir:
+inSCADA's EtherNet/IP implementation uses **tag-based addressing** (CIP implicit messaging). This addressing method is supported on the following control platforms:
 
-| Platform | Destek | Açıklama |
-|----------|:------:|----------|
-| **ControlLogix** (Allen-Bradley) | ✓ | Logix 5000+ serisi — tam destek |
-| **CompactLogix** (Allen-Bradley) | ✓ | Logix 5000+ serisi — tam destek |
-| **SoftLogix** (Rockwell) | ✓ | PC tabanlı Logix çalışma ortamı |
-| **MicroLogix** (Allen-Bradley) | ✗ | Data file tabanlı adresleme — desteklenmez |
-| **SLC 500** (Allen-Bradley) | ✗ | Data file tabanlı adresleme — desteklenmez |
-| **PLC-5** (Allen-Bradley) | ✗ | Data file tabanlı adresleme — desteklenmez |
+| Platform | Support | Description |
+|----------|:------:|-------------|
+| **ControlLogix** (Allen-Bradley) | ✓ | Logix 5000+ series — full support |
+| **CompactLogix** (Allen-Bradley) | ✓ | Logix 5000+ series — full support |
+| **SoftLogix** (Rockwell) | ✓ | PC-based Logix runtime environment |
+| **MicroLogix** (Allen-Bradley) | ✗ | Data file-based addressing — not supported |
+| **SLC 500** (Allen-Bradley) | ✗ | Data file-based addressing — not supported |
+| **PLC-5** (Allen-Bradley) | ✗ | Data file-based addressing — not supported |
 
 :::note
-**Neden MicroLogix/SLC/PLC-5 desteklenmiyor?**
+**Why is MicroLogix/SLC/PLC-5 not supported?**
 
-Bu eski platformlar **data file tabanlı adresleme** kullanır (ör. `N7:0`, `F8:3`, `B3/0`). inSCADA'nın EtherNet/IP implementasyonu ise Logix 5000+ serisinin **tag-based adresleme** yapısını kullanır (ör. `Motor_1_Speed`, `Tank.Level`). Bu iki adresleme yöntemi protokol seviyesinde farklıdır — CIP mesaj yapısı ve routing mekanizması uyuşmaz.
+These older platforms use **data file-based addressing** (e.g., `N7:0`, `F8:3`, `B3/0`). inSCADA's EtherNet/IP implementation uses the **tag-based addressing** structure of the Logix 5000+ series (e.g., `Motor_1_Speed`, `Tank.Level`). These two addressing methods differ at the protocol level — the CIP message structure and routing mechanism are incompatible.
 
-Data file tabanlı cihazlarla haberleşme gerekiyorsa alternatif olarak OPC DA/UA gateway veya ControlLogix üzerinden proxy kullanılabilir.
+If communication with data file-based devices is required, an OPC DA/UA gateway or a proxy through ControlLogix can be used as alternatives.
 :::
 
-## Tag-Based Adresleme
+## Tag-Based Addressing
 
-Logix platformlarında veriler **tag (etiket)** isimleri ile erişilir. Register adresi yerine programda tanımlanan tag adı doğrudan kullanılır:
+On Logix platforms, data is accessed by **tag (label)** names. Instead of register addresses, the tag name defined in the program is used directly:
 
 ```
-Motor_1_Speed          → Basit tag (REAL)
-Tank.Level             → UDT (User Defined Type) üyesi
-Station[3].Temp        → Dizi elemanı
+Motor_1_Speed          → Simple tag (REAL)
+Tank.Level             → UDT (User Defined Type) member
+Station[3].Temp        → Array element
 Program:MainProgram.Counter  → Program scope tag
 ```
 
-Bu yaklaşım:
-- İnsan okunabilir — tag adı verinin ne olduğunu açıklar
-- PLC programı ile doğrudan eşleşir
-- Register adresi hesaplamaya gerek kalmaz
+This approach:
+- Is human-readable — the tag name describes what the data is
+- Maps directly to the PLC program
+- Eliminates the need for register address calculations
 
-## Veri Modeli
+## Data Model
 
 ```
-Connection (Bağlantı — IP, port, timeout)
-└── Device (Cihaz — Slot numarası)
-    └── Frame (Veri Bloğu — Gruplama)
-        └── Variable (Değişken — Tag adı)
+Connection (IP, port, timeout)
+└── Device (Slot number)
+    └── Frame (Data Block — Grouping)
+        └── Variable (Tag name)
 ```
 
-## Yapılandırma
+## Configuration
 
 ### Connection
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Protocol** | EthernetIp | Protokol seçimi |
-| **IP Address** | 192.168.1.1 | PLC IP adresi |
-| **Port** | 44818 | EtherNet/IP portu (varsayılan: 44818) |
-| **Timeout** | 5000 ms | İstek timeout süresi |
-| **Retries** | 3 | Başarısız istek tekrar sayısı |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Protocol** | EthernetIp | Protocol selection |
+| **IP Address** | 192.168.1.1 | PLC IP address |
+| **Port** | 44818 | EtherNet/IP port (default: 44818) |
+| **Timeout** | 5000 ms | Request timeout duration |
+| **Retries** | 3 | Number of failed request retries |
 
 ### Device
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Slot** | 0 | PLC'nin backplane slot numarası |
-| **Scan Time** | 1000 ms | Tarama periyodu |
-| **Scan Type** | PERIODIC | `PERIODIC` veya `FIXED_DELAY` |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Slot** | 0 | PLC backplane slot number |
+| **Scan Time** | 1000 ms | Scan period |
+| **Scan Type** | PERIODIC | `PERIODIC` or `FIXED_DELAY` |
 
 :::tip
-**Slot numarası**, PLC CPU modülünün şasi üzerindeki fiziksel konumudur. CompactLogix için genellikle `0`, ControlLogix için CPU'nun takılı olduğu slot (ör. `0`, `1` veya `2`).
+**Slot number** is the physical position of the PLC CPU module on the chassis. For CompactLogix it is typically `0`, for ControlLogix it is the slot where the CPU is installed (e.g., `0`, `1`, or `2`).
 :::
 
 ### Frame
 
-Frame, EtherNet/IP'de sadece variable'ları gruplamak için kullanılır. Protokole özgü ek parametre yoktur.
+In EtherNet/IP, a Frame is used only to group variables. There are no protocol-specific additional parameters.
 
 ### Variable
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Name** | `Motor_1_Speed` | PLC'deki tag adı (tam yol) |
-| **Type** | REAL | CIP veri tipi |
-| **Bit Parent Type** | (opsiyonel) | Bit erişim için üst veri tipi |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Name** | `Motor_1_Speed` | Tag name in the PLC (full path) |
+| **Type** | REAL | CIP data type |
+| **Bit Parent Type** | (optional) | Parent data type for bit access |
 
-Variable adı, PLC programındaki tag adıyla **birebir aynı** olmalıdır. inSCADA bu adı kullanarak CIP Read/Write Tag Service isteği gönderir.
+The variable name must be **exactly the same** as the tag name in the PLC program. inSCADA uses this name to send a CIP Read/Write Tag Service request.
 
-#### Desteklenen Veri Tipleri
+#### Supported Data Types
 
-| Veri Tipi | CIP Boyutu | Açıklama |
-|-----------|-----------|----------|
-| **BIT** | 1 bit | Tek bit (Bit Parent Type gerektirir) |
-| **BOOL** | 1 bit | Boolean değer |
-| **SINT** | 8 bit | İşaretli 8-bit tam sayı (-128 ~ 127) |
-| **INT** | 16 bit | İşaretli 16-bit tam sayı (-32768 ~ 32767) |
-| **DINT** | 32 bit | İşaretli 32-bit tam sayı |
-| **LINT** | 64 bit | İşaretli 64-bit tam sayı |
-| **REAL** | 32 bit | 32-bit kayan nokta (IEEE 754) |
-| **BITS** | 32 bit | Bit dizisi (32-bit word olarak) |
-| **STRUCT** | Değişken | Yapısal veri tipi (UDT) |
+| Data Type | CIP Size | Description |
+|-----------|----------|-------------|
+| **BIT** | 1 bit | Single bit (requires Bit Parent Type) |
+| **BOOL** | 1 bit | Boolean value |
+| **SINT** | 8 bit | Signed 8-bit integer (-128 ~ 127) |
+| **INT** | 16 bit | Signed 16-bit integer (-32768 ~ 32767) |
+| **DINT** | 32 bit | Signed 32-bit integer |
+| **LINT** | 64 bit | Signed 64-bit integer |
+| **REAL** | 32 bit | 32-bit floating point (IEEE 754) |
+| **BITS** | 32 bit | Bit array (as 32-bit word) |
+| **STRUCT** | Variable | Structured data type (UDT) |
 
-#### Bit Erişimi
+#### Bit Access
 
-Tek bir bit'e erişmek için **BIT** tipi kullanılır. Bu durumda bit'in hangi veri tipinin içinden okunacağını belirten **Bit Parent Type** seçilmelidir:
+The **BIT** type is used to access a single bit. In this case, the **Bit Parent Type** must be selected to specify which data type the bit is read from:
 
-| Bit Parent Type | Açıklama |
-|----------------|----------|
-| **SINT** | 8-bit integer içinden bit okuma |
-| **BITS** | 32-bit word içinden bit okuma |
+| Bit Parent Type | Description |
+|----------------|-------------|
+| **SINT** | Read bit from 8-bit integer |
+| **BITS** | Read bit from 32-bit word |
 
-### Tag Adı Örnekleri
+### Tag Name Examples
 
-| Tag Adı | Tip | Açıklama |
-|---------|-----|----------|
-| `Motor_Speed` | REAL | Basit controller tag |
-| `Tank.Level` | REAL | UDT (yapısal tip) üyesi |
-| `Sensors[0]` | DINT | Dizi'nin ilk elemanı |
-| `Sensors[5]` | DINT | Dizi'nin 6. elemanı |
-| `Station[2].Temperature` | REAL | Dizi + yapısal tip |
+| Tag Name | Type | Description |
+|----------|------|-------------|
+| `Motor_Speed` | REAL | Simple controller tag |
+| `Tank.Level` | REAL | UDT (structured type) member |
+| `Sensors[0]` | DINT | First element of array |
+| `Sensors[5]` | DINT | 6th element of array |
+| `Station[2].Temperature` | REAL | Array + structured type |
 | `Program:MainProgram.LocalTag` | INT | Program scope tag |
 | `Motor_Run` | BOOL | Boolean tag |
-| `StatusBits` | BITS | 32-bit durum word'ü |
+| `StatusBits` | BITS | 32-bit status word |
 
-## Toplu Okuma (Batch Read)
+## Batch Read
 
-inSCADA, EtherNet/IP tag'lerini performans için **toplu olarak** okur. Tek bir CIP isteğiyle birden fazla tag okunur:
+inSCADA reads EtherNet/IP tags **in bulk** for performance. Multiple tags are read with a single CIP request:
 
-- Normal tag'ler: 20 tag/istek
-- String tag'ler: 5 tag/istek (daha büyük payload)
-- Bit tag'ler: 20 tag/istek (üst tip üzerinden okuma)
+- Normal tags: 20 tags/request
+- String tags: 5 tags/request (larger payload)
+- Bit tags: 20 tags/request (read via parent type)
 
-Bu davranış otomatiktir — kullanıcı yapılandırması gerekmez.
+This behavior is automatic — no user configuration is required.
 
-## Rockwell Studio 5000 / RSLogix 5000 Notları
+## Rockwell Studio 5000 / RSLogix 5000 Notes
 
-PLC tarafında inSCADA ile haberleşme için özel bir yapılandırma gerekmez. Aşağıdaki noktalar kontrol edilmelidir:
+No special configuration is required on the PLC side for communication with inSCADA. The following points should be checked:
 
-- Tag'lerin **Controller Scope** (global) olarak tanımlandığından emin olun — Program scope tag'lere erişim için `Program:ProgramName.TagName` formatı kullanılmalıdır
-- PLC'nin **Remote Access** (uzak erişim) ayarlarının açık olduğunu doğrulayın
-- Firewall'da **44818** portunun açık olduğundan emin olun
+- Ensure tags are defined as **Controller Scope** (global) — for Program scope tags, use the `Program:ProgramName.TagName` format
+- Verify that the PLC's **Remote Access** settings are enabled
+- Ensure port **44818** is open in the firewall

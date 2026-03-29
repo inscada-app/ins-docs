@@ -1,106 +1,106 @@
 ---
 title: "OPC DA"
-description: "inSCADA'da OPC DA Client bağlantı yapılandırması"
+description: "OPC DA Client connection configuration in inSCADA"
 sidebar:
   order: 5
 ---
 
-OPC DA (Data Access), OPC Classic standartlarının en yaygın kullanılan bileşenidir. Windows COM/DCOM teknolojisi üzerine inşa edilmiştir ve gerçek zamanlı veri erişimi sağlar. OPC UA'dan önce endüstriyel otomasyonda fiili standart olarak kullanılmıştır.
+OPC DA (Data Access) is the most widely used component of the OPC Classic standards. It is built on Windows COM/DCOM technology and provides real-time data access. It was used as the de facto standard in industrial automation before OPC UA.
 
-inSCADA, OPC DA protokolünü yalnızca **Client** rolünde destekler.
+inSCADA supports the OPC DA protocol in **Client** role only.
 
 :::note
-OPC DA, Windows COM/DCOM tabanlıdır. Bu nedenle **yalnızca Windows** üzerinde çalışır. Platform bağımsız çözüm için [OPC UA](/docs/tr/protocols/opc-ua/) tercih edilmelidir.
+OPC DA is based on Windows COM/DCOM. Therefore, it only runs on **Windows**. For a platform-independent solution, [OPC UA](/docs/en/protocols/opc-ua/) should be preferred.
 :::
 
 ## OPC DA vs OPC UA
 
-| Özellik | OPC DA | OPC UA |
+| Feature | OPC DA | OPC UA |
 |---------|--------|--------|
-| **Platform** | Yalnızca Windows | Platform bağımsız |
-| **Teknoloji** | COM/DCOM | TCP/IP, HTTP, WebSocket |
-| **Güvenlik** | DCOM güvenliği | TLS, sertifika, kullanıcı auth |
-| **Keşif** | DCOM ile | Browse + Discovery |
-| **Durum** | Eski (legacy) | Aktif geliştirme |
+| **Platform** | Windows only | Platform independent |
+| **Technology** | COM/DCOM | TCP/IP, HTTP, WebSocket |
+| **Security** | DCOM security | TLS, certificates, user auth |
+| **Discovery** | Via DCOM | Browse + Discovery |
+| **Status** | Legacy | Active development |
 
-## Veri Modeli
+## Data Model
 
 ```
-Connection (Bağlantı — COM ProgID)
-└── Device (Cihaz)
-    └── Frame (Veri Bloğu — Subscription grubu)
-        └── Variable (Değişken — Item ID)
+Connection (COM ProgID)
+└── Device
+    └── Frame (Data Block — Subscription group)
+        └── Variable (Item ID)
 ```
 
-## Yapılandırma
+## Configuration
 
 ### Connection
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Protocol** | OPC DA | Protokol seçimi |
-| **IP Address** | 192.168.1.100 | OPC DA sunucusunun IP adresi |
-| **Port** | 135 | DCOM portu (varsayılan: 135) |
-| **COM ProgID** | `Matrikon.OPC.Simulation` | OPC sunucusunun COM programatik tanımlayıcısı |
-| **Separator** | `.` | Tag yolu ayırıcı karakteri (varsayılan: nokta) |
-| **Max Depth** | 12 | Tag ağacı tarama derinliği |
-| **Server Status Check Time** | 30000 ms | Sunucu durum kontrol periyodu |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Protocol** | OPC DA | Protocol selection |
+| **IP Address** | 192.168.1.100 | OPC DA server IP address |
+| **Port** | 135 | DCOM port (default: 135) |
+| **COM ProgID** | `Matrikon.OPC.Simulation` | OPC server COM programmatic identifier |
+| **Separator** | `.` | Tag path separator character (default: dot) |
+| **Max Depth** | 12 | Tag tree browse depth |
+| **Server Status Check Time** | 30000 ms | Server status check period |
 
 :::tip
-**COM ProgID**, OPC sunucusunun Windows Registry'deki programatik adıdır. Örnek: `Matrikon.OPC.Simulation`, `KEPServerEX.V6`, `RSLinx OPC Server`. OPC sunucu dokümantasyonundan veya OPC tarayıcı araçlarından öğrenilebilir.
+**COM ProgID** is the OPC server's programmatic name in the Windows Registry. Examples: `Matrikon.OPC.Simulation`, `KEPServerEX.V6`, `RSLinx OPC Server`. It can be found from the OPC server documentation or OPC browser tools.
 :::
 
 ### Device
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Scan Time** | 1000 ms | Tarama periyodu |
-| **Scan Type** | PERIODIC | `PERIODIC` veya `FIXED_DELAY` |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Scan Time** | 1000 ms | Scan period |
+| **Scan Type** | PERIODIC | `PERIODIC` or `FIXED_DELAY` |
 
 ### Frame
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Use Subscription Mode** | true | Subscription tabanlı veri alma (değişiklikte bildirim) |
-| **Percent Deadband** | 0.5 | Analog değer değişim eşiği (%) |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Use Subscription Mode** | true | Subscription-based data retrieval (notification on change) |
+| **Percent Deadband** | 0.5 | Analog value change threshold (%) |
 
-**Subscription Mode:** `true` olduğunda OPC sunucusu yalnızca değer değiştiğinde bildirim gönderir — ağ trafiği ve işlemci yükü azalır. `false` olduğunda periyodik polling yapılır.
+**Subscription Mode:** When `true`, the OPC server sends notifications only when values change — reducing network traffic and CPU load. When `false`, periodic polling is performed.
 
 ### Variable
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Name** | `Temperature` | Değişken adı (OPC Item ID olarak da kullanılır) |
-| **Type** | VT_R4 | OPC DA veri tipi |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Name** | `Temperature` | Variable name (also used as OPC Item ID) |
+| **Type** | VT_R4 | OPC DA data type |
 
-### Desteklenen Veri Tipleri (VARIANT Types)
+### Supported Data Types (VARIANT Types)
 
-| Veri Tipi | Açıklama |
-|-----------|----------|
+| Data Type | Description |
+|-----------|-------------|
 | **VT_BOOL** | Boolean |
-| **VT_I1** | İşaretli 8-bit tam sayı |
-| **VT_UI1** | İşaretsiz 8-bit tam sayı |
-| **VT_I2** | İşaretli 16-bit tam sayı |
-| **VT_UI2** | İşaretsiz 16-bit tam sayı |
-| **VT_INT** | İşaretli 32-bit tam sayı |
-| **VT_UINT** | İşaretsiz 32-bit tam sayı |
-| **VT_I8** | İşaretli 64-bit tam sayı |
-| **VT_R4** | 32-bit kayan nokta (float) |
-| **VT_R8** | 64-bit kayan nokta (double) |
-| **VT_BSTR** | Karakter dizisi (string) |
+| **VT_I1** | Signed 8-bit integer |
+| **VT_UI1** | Unsigned 8-bit integer |
+| **VT_I2** | Signed 16-bit integer |
+| **VT_UI2** | Unsigned 16-bit integer |
+| **VT_INT** | Signed 32-bit integer |
+| **VT_UINT** | Unsigned 32-bit integer |
+| **VT_I8** | Signed 64-bit integer |
+| **VT_R4** | 32-bit floating point (float) |
+| **VT_R8** | 64-bit floating point (double) |
+| **VT_BSTR** | Character string |
 
-## Browse (Keşif)
+## Browse (Discovery)
 
-inSCADA, OPC DA sunucusunun tag ağacını **browse** ederek mevcut item'ları keşfedebilir. Bu özellik, variable tanımlarken doğru Item ID bilgilerine ulaşmanızı kolaylaştırır.
+inSCADA can discover available items by **browsing** the OPC DA server's tag tree. This feature makes it easier to find the correct Item ID information when defining variables.
 
-## DCOM Yapılandırma Notları
+## DCOM Configuration Notes
 
-OPC DA, Windows DCOM üzerinden çalıştığı için uzak bağlantılarda DCOM yapılandırması gerekir:
+Since OPC DA runs over Windows DCOM, DCOM configuration is required for remote connections:
 
-1. OPC sunucusu bilgisayarında **DCOMCNFG** ile uzak erişim izinlerini ayarlayın
-2. Windows Firewall'da DCOM portlarını (135 + dinamik portlar) açın
-3. Her iki bilgisayarda da aynı kullanıcı hesabı veya uygun yetkilendirme olmalıdır
+1. Configure remote access permissions using **DCOMCNFG** on the OPC server computer
+2. Open DCOM ports (135 + dynamic ports) in Windows Firewall
+3. Both computers must have the same user account or appropriate authorization
 
 :::caution
-DCOM yapılandırması karmaşık ve güvenlik açıklarına neden olabilir. Mümkünse OPC DA yerine [OPC UA](/docs/tr/protocols/opc-ua/) kullanmanız önerilir.
+DCOM configuration is complex and can create security vulnerabilities. Where possible, using [OPC UA](/docs/en/protocols/opc-ua/) instead of OPC DA is recommended.
 :::

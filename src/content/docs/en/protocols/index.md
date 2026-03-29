@@ -1,217 +1,217 @@
 ---
-title: "Haberleşme Protokolleri"
-description: "inSCADA'da protokol mimarisi — Connection, Device, Frame, Variable yapısı ve adresleme mantığı"
+title: "Communication Protocols"
+description: "Protocol architecture in inSCADA — Connection, Device, Frame, Variable structure and addressing logic"
 sidebar:
   order: 0
-  label: "Genel Bakış"
+  label: "Overview"
 ---
 
-inSCADA, saha cihazları ile haberleşmeyi standart bir hiyerarşik yapı üzerinden yönetir. Kullanılan protokol ne olursa olsun — MODBUS, DNP3, IEC 104, OPC UA veya diğerleri — veri modeli her zaman aynı dört seviyeli yapıyı izler.
+inSCADA manages communication with field devices through a standard hierarchical structure. Regardless of the protocol used — MODBUS, DNP3, IEC 104, OPC UA, or others — the data model always follows the same four-level structure.
 
-## Veri Modeli: Connection → Device → Frame → Variable
+## Data Model: Connection → Device → Frame → Variable
 
 ```
-Connection (Bağlantı)
-│   Protokol tipi, IP adresi, port ve protokole özgü parametreler
+Connection
+│   Protocol type, IP address, port, and protocol-specific parameters
 │
-└── Device (Cihaz)
-    │   Cihaz adresi, tarama periyodu
+└── Device
+    │   Device address, scan period
     │
-    └── Frame (Veri Bloğu)
-        │   Bellek alanı tipi, başlangıç adresi, blok boyutu
+    └── Frame (Data Block)
+        │   Memory area type, start address, block size
         │
-        └── Variable (Değişken)
-              Blok içi ofset adresi, veri tipi
+        └── Variable
+              Offset address within the block, data type
 ```
 
-### Connection (Bağlantı)
+### Connection
 
-Bir saha cihazına veya sisteme açılan haberleşme kanalıdır. Her Connection tek bir protokol tipine ve hedef adrese bağlıdır.
+A communication channel opened to a field device or system. Each Connection is bound to a single protocol type and target address.
 
-- IP adresi ve port bilgisi
-- Protokol seçimi (MODBUS TCP, DNP3, OPC UA vb.)
-- Timeout, retry gibi haberleşme parametreleri
-- Protokole özgü ayarlar (güvenlik, kimlik doğrulama vb.)
+- IP address and port information
+- Protocol selection (MODBUS TCP, DNP3, OPC UA, etc.)
+- Communication parameters such as timeout, retry
+- Protocol-specific settings (security, authentication, etc.)
 
-Bir Connection altında birden fazla Device tanımlanabilir.
+Multiple Devices can be defined under a single Connection.
 
-### Device (Cihaz)
+### Device
 
-Connection üzerinden erişilen fiziksel veya lojik bir birimdir. Protokole göre farklı şekilde adreslenir:
+A physical or logical unit accessed through the Connection. It is addressed differently depending on the protocol:
 
-| Protokol | Device Adresi | Örnek |
-|----------|--------------|-------|
+| Protocol | Device Address | Example |
+|----------|---------------|---------|
 | MODBUS | Station Address (Slave ID) | `1` |
-| DNP3 | Local/Remote Address çifti | `1 / 10` |
+| DNP3 | Local/Remote Address pair | `1 / 10` |
 | IEC 104 | Common Address (CASDU) | `1` |
 | IEC 61850 | Object Reference (Logical Device) | `IED1LD1` |
 | OPC UA | Base Path | `PLC_1` |
 | S7 | Rack / Slot | `0 / 0` |
 | EtherNet/IP | Slot | `0` |
 
-Her Device'ın bir **Scan Time** (tarama periyodu) parametresi vardır. inSCADA, bu periyotta Device'a bağlı tüm Frame'leri sırayla okur.
+Each Device has a **Scan Time** (scan period) parameter. inSCADA reads all Frames attached to the Device sequentially at this interval.
 
-### Frame (Veri Bloğu)
+### Frame (Data Block)
 
-Device içindeki belirli bir bellek bölgesini veya veri grubunu temsil eder. Frame, **neyin okunacağını** tanımlar:
+Represents a specific memory region or data group within a Device. A Frame defines **what will be read**:
 
-- Hangi bellek alanı (Holding Register, Analog Input, DataBlock vb.)
-- Başlangıç adresi
-- Blok boyutu (kaç birim okunacak)
+- Which memory area (Holding Register, Analog Input, DataBlock, etc.)
+- Start address
+- Block size (how many units to read)
 
-Bir Device altında birden fazla Frame tanımlanabilir — her biri farklı bir bellek bölgesini veya veri grubunu temsil eder.
+Multiple Frames can be defined under a single Device — each representing a different memory region or data group.
 
-### Variable (Değişken)
+### Variable
 
-Frame içindeki tek bir veri noktasıdır. inSCADA'nın temel yapı taşıdır — loglama, ölçekleme, alarm, animasyon ve tüm diğer fonksiyonlar Variable üzerinden çalışır.
+A single data point within a Frame. It is the fundamental building block of inSCADA — logging, scaling, alarms, animations, and all other functions operate through Variables.
 
-## Adresleme Mantığı: Absolute vs Relative
+## Addressing Logic: Absolute vs Relative
 
-Bu konu, inSCADA'yı ilk kez kullanan geliştiricilerin en çok karıştırdığı noktadır. Doğru anlaşılması, hatasız yapılandırma için kritiktir.
+This is the most commonly confused point for developers using inSCADA for the first time. Correct understanding is critical for error-free configuration.
 
-### Frame: Cihaz İçindeki Gerçek (Absolute) Adres
+### Frame: Absolute Address Within the Device
 
-Frame tanımlarken girilen **Start Address**, cihazın bellek alanındaki **gerçek (absolute) başlangıç adresidir**. **Quantity** ise bu başlangıç adresinden itibaren kaç birimlik bir alanın okunacağını belirler.
+The **Start Address** entered when defining a Frame is the **absolute start address** in the device's memory area. The **Quantity** specifies how many units of area will be read from this start address.
 
-Frame, cihaz belleğinden bir **pencere** açar:
+A Frame opens a **window** into the device memory:
 
 ```
-Cihaz Belleği (ör. Holding Register)
+Device Memory (e.g., Holding Register)
 ┌──────────────────────────────────────────────────────────┐
 │ Addr:  0   1   2  ...  99  100  101  102  ...  119  120 │
 │                         ▲                          ▲     │
-│                         │    Frame Penceresi        │     │
+│                         │    Frame Window           │     │
 │                         │◄─────────────────────────►│     │
 │                    Start: 100            Quantity: 20     │
 └──────────────────────────────────────────────────────────┘
 ```
 
-Bu örnekte Frame, cihazın Holding Register alanında **adres 100'den başlayarak 20 register'lık** bir blok okur.
+In this example, the Frame reads a block of **20 registers starting from address 100** in the device's Holding Register area.
 
-### Variable: Frame İçindeki Bağıl (Relative) Adres
+### Variable: Relative Address Within the Frame
 
-Variable tanımlarken girilen adres, **cihazın gerçek adresi değildir** — Frame'in başlangıcına göre **bağıl (relative) ofset**tir. Yani Variable adresi, **"Frame penceresinin içindeki kaçıncı birimde"** olduğunu belirtir.
+The address entered when defining a Variable is **not the device's actual address** — it is a **relative offset** from the start of the Frame. That is, the Variable address specifies **which unit within the Frame window** it is located at.
 
 ```
 Frame: Start Address = 100, Quantity = 20
 
-Cihaz Belleği:    [100] [101] [102] [103] [104] ... [119]
-Frame Ofseti:       0     1     2     3     4   ...   19
+Device Memory:    [100] [101] [102] [103] [104] ... [119]
+Frame Offset:       0     1     2     3     4   ...   19
                     ▲                 ▲     ▲
                     │                 │     │
               Variable A         Variable B  Variable C
               Offset: 0         Offset: 3   Offset: 4
-              (Gerçek: 100)     (Gerçek: 103) (Gerçek: 104)
+              (Actual: 100)     (Actual: 103) (Actual: 104)
 ```
 
-:::caution[Kritik Kural]
-Variable adresine cihazın gerçek adresini **girmeyin**. Frame'in başlangıcına göre olan ofseti girin.
+:::caution[Critical Rule]
+Do **not** enter the device's actual address as the Variable address. Enter the offset relative to the start of the Frame.
 
-Örneğin cihazda adres 103'teki veriyi okumak istiyorsanız ve Frame Start Address = 100 ise:
-- ❌ Yanlış: Variable Address = `103`
-- ✓ Doğru: Variable Address = `3` (çünkü 103 - 100 = 3)
+For example, if you want to read data at address 103 in the device and the Frame Start Address = 100:
+- ❌ Wrong: Variable Address = `103`
+- ✓ Correct: Variable Address = `3` (because 103 - 100 = 3)
 :::
 
-### MODBUS Örneği
+### MODBUS Example
 
-Bir enerji analizöründen gerilim ve akım değerlerini okumak istiyorsunuz. Cihaz dokümantasyonunda:
-- Faz-A Gerilim: Holding Register **40100** (REAL, 2 register)
-- Faz-B Gerilim: Holding Register **40102** (REAL, 2 register)
-- Faz-C Gerilim: Holding Register **40104** (REAL, 2 register)
-- Faz-A Akım: Holding Register **40106** (REAL, 2 register)
+You want to read voltage and current values from an energy analyzer. According to the device documentation:
+- Phase-A Voltage: Holding Register **40100** (REAL, 2 registers)
+- Phase-B Voltage: Holding Register **40102** (REAL, 2 registers)
+- Phase-C Voltage: Holding Register **40104** (REAL, 2 registers)
+- Phase-A Current: Holding Register **40106** (REAL, 2 registers)
 
-**Frame tanımı:**
-| Parametre | Değer | Açıklama |
-|-----------|-------|----------|
-| Type | Holding Register | Bellek alanı |
-| Start Address | 100 | Cihazın gerçek başlangıç adresi |
-| Quantity | 10 | 10 register okunacak (100-109) |
+**Frame definition:**
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Type | Holding Register | Memory area |
+| Start Address | 100 | Actual start address of the device |
+| Quantity | 10 | 10 registers to be read (100-109) |
 
 :::note
-MODBUS adresleme: Bazı cihaz dokümantasyonları **40001 tabanlı** (Modicon convention) adres gösterir. Bu durumda 40100 adresi gerçekte register **100**'dür (40001'i çıkarın). inSCADA'da 0-tabanlı adres girilir.
+MODBUS addressing: Some device documentation shows **40001-based** (Modicon convention) addresses. In this case, address 40100 is actually register **100** (subtract 40001). In inSCADA, 0-based addresses are entered.
 :::
 
-**Variable tanımları:**
+**Variable definitions:**
 
-| Variable | Ofset | Veri Tipi | Gerçek Adres | Açıklama |
-|----------|:-----:|-----------|:------------:|----------|
-| Voltage_A | 0 | Float | 100-101 | Faz-A Gerilim |
-| Voltage_B | 2 | Float | 102-103 | Faz-B Gerilim |
-| Voltage_C | 4 | Float | 104-105 | Faz-C Gerilim |
-| Current_A | 6 | Float | 106-107 | Faz-A Akım |
+| Variable | Offset | Data Type | Actual Address | Description |
+|----------|:------:|-----------|:--------------:|-------------|
+| Voltage_A | 0 | Float | 100-101 | Phase-A Voltage |
+| Voltage_B | 2 | Float | 102-103 | Phase-B Voltage |
+| Voltage_C | 4 | Float | 104-105 | Phase-C Voltage |
+| Current_A | 6 | Float | 106-107 | Phase-A Current |
 
-### Siemens S7 Örneği
+### Siemens S7 Example
 
-S7 PLC'de DB8'den sıcaklık ve durum bilgilerini okumak istiyorsunuz:
-- Çalışma durumu: DB8.DBX0.0 (BIT)
-- Alarm durumu: DB8.DBX0.1 (BIT)
-- Sıcaklık: DB8.DBD2 (REAL, 4 byte)
-- Basınç: DB8.DBD6 (REAL, 4 byte)
-- Setpoint: DB8.DBW10 (INT, 2 byte)
+You want to read temperature and status information from DB8 on an S7 PLC:
+- Running status: DB8.DBX0.0 (BIT)
+- Alarm status: DB8.DBX0.1 (BIT)
+- Temperature: DB8.DBD2 (REAL, 4 bytes)
+- Pressure: DB8.DBD6 (REAL, 4 bytes)
+- Setpoint: DB8.DBW10 (INT, 2 bytes)
 
-**Frame tanımı:**
-| Parametre | Değer | Açıklama |
-|-----------|-------|----------|
-| Type | DB | DataBlock alanı |
-| DB Number | 8 | DataBlock numarası |
-| Start Address | 0 | Byte 0'dan başla |
-| Quantity | 12 | 12 byte oku (0-11) |
+**Frame definition:**
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Type | DB | DataBlock area |
+| DB Number | 8 | DataBlock number |
+| Start Address | 0 | Start from byte 0 |
+| Quantity | 12 | Read 12 bytes (0-11) |
 
-**Variable tanımları:**
+**Variable definitions:**
 
-| Variable | Byte Ofset | Bit Ofset | Veri Tipi | S7 Adresi | Açıklama |
-|----------|:---------:|:---------:|-----------|:---------:|----------|
-| Running | 0 | 0 | BIT | DBX0.0 | Çalışma durumu |
-| Alarm | 0 | 1 | BIT | DBX0.1 | Alarm durumu |
-| Temperature | 2 | — | REAL | DBD2 | Sıcaklık (4 byte) |
-| Pressure | 6 | — | REAL | DBD6 | Basınç (4 byte) |
-| Setpoint | 10 | — | INT | DBW10 | Setpoint (2 byte) |
+| Variable | Byte Offset | Bit Offset | Data Type | S7 Address | Description |
+|----------|:---------:|:---------:|-----------|:---------:|-------------|
+| Running | 0 | 0 | BIT | DBX0.0 | Running status |
+| Alarm | 0 | 1 | BIT | DBX0.1 | Alarm status |
+| Temperature | 2 | — | REAL | DBD2 | Temperature (4 bytes) |
+| Pressure | 6 | — | REAL | DBD6 | Pressure (4 bytes) |
+| Setpoint | 10 | — | INT | DBW10 | Setpoint (2 bytes) |
 
-Dikkat edin: Variable ofsetleri Frame'in başlangıcına (byte 0) göredir. S7'de adresleme byte tabanlı olduğu için Frame Start Address = 0 ise Variable ofsetleri doğrudan S7 byte adresine eşittir. Ancak Frame Start Address farklı olsaydı (ör. 100), Variable ofsetleri yine 0'dan başlayacaktı.
+Note that Variable offsets are relative to the start of the Frame (byte 0). Since S7 addressing is byte-based, when Frame Start Address = 0, the Variable offsets directly correspond to S7 byte addresses. However, if the Frame Start Address were different (e.g., 100), the Variable offsets would still start from 0.
 
-## Frame Boyutu ve Performans
+## Frame Size and Performance
 
-Frame boyutunu (Quantity) doğru ayarlamak haberleşme performansını doğrudan etkiler:
+Setting the Frame size (Quantity) correctly directly affects communication performance:
 
-- **Çok büyük Frame:** Tek istekte çok veri çekilir ama bir hata tüm bloğu etkiler
-- **Çok küçük Frame:** Her variable için ayrı istek gider, haberleşme yavaşlar
-- **Boşluklu adresler:** Arada kullanılmayan adresler varsa bile tek Frame'e dahil etmek genellikle ayrı Frame'lerden daha verimlidir
+- **Frame too large:** Pulls a lot of data in a single request, but an error affects the entire block
+- **Frame too small:** A separate request is sent for each variable, slowing down communication
+- **Gaps in addresses:** Even if there are unused addresses in between, including them in a single Frame is generally more efficient than using separate Frames
 
-:::tip[Önerilen Yaklaşım]
-Ardışık adresleri tek Frame'de gruplayın. Büyük boşluklar varsa (ör. 100 register arayla) ayrı Frame'lere bölün. Protokolün maksimum blok boyutunu aşmamaya dikkat edin (ör. MODBUS: 125 register/istek).
+:::tip[Recommended Approach]
+Group consecutive addresses in a single Frame. If there are large gaps (e.g., 100 registers apart), split into separate Frames. Be careful not to exceed the protocol's maximum block size (e.g., MODBUS: 125 registers/request).
 :::
 
 ## Scan Time Factor
 
-Her Frame'de bir **Scan Time Factor** parametresi bulunur. Frame'in gerçek tarama periyodu şu formülle hesaplanır:
+Each Frame has a **Scan Time Factor** parameter. The Frame's actual scan period is calculated with this formula:
 
 ```
-Frame Tarama Periyodu = Device Scan Time × Scan Time Factor
+Frame Scan Period = Device Scan Time × Scan Time Factor
 ```
 
-Bu özellik, yavaş değişen verilerin daha seyrek taranmasını sağlar. Örneğin Device Scan Time = 1000 ms ise:
+This feature allows slow-changing data to be scanned less frequently. For example, if Device Scan Time = 1000 ms:
 
-| Frame | Scan Time Factor | Gerçek Periyot | Kullanım |
-|-------|:----------------:|:--------------:|----------|
-| Anlık ölçümler | 1 | 1 sn | Akım, gerilim, güç |
-| Durum bilgileri | 5 | 5 sn | Çalışma modu, alarm durumu |
-| Konfigürasyon | 60 | 1 dk | Setpoint, parametre |
+| Frame | Scan Time Factor | Actual Period | Usage |
+|-------|:----------------:|:-------------:|-------|
+| Live measurements | 1 | 1 sec | Current, voltage, power |
+| Status information | 5 | 5 sec | Operating mode, alarm status |
+| Configuration | 60 | 1 min | Setpoint, parameters |
 
-## Protokol Listesi
+## Protocol List
 
-Detaylı yapılandırma bilgileri için ilgili protokol sayfasına gidin:
+For detailed configuration information, go to the relevant protocol page:
 
-- [MODBUS](/docs/tr/protocols/modbus/) — TCP, RTU over TCP, UDP (Client + Server)
-- [DNP3](/docs/tr/protocols/dnp3/) — Master + Outstation
-- [IEC 60870-5-104](/docs/tr/protocols/iec104/) — Client + Server
-- [IEC 61850](/docs/tr/protocols/iec61850/) — MMS Client + Server
-- [OPC UA](/docs/tr/protocols/opc-ua/) — Client + Server
-- [OPC DA](/docs/tr/protocols/opc-da/) — Client
-- [OPC XML-DA](/docs/tr/protocols/opc-xml/) — Client
-- [Siemens S7](/docs/tr/protocols/s7/) — Client
-- [MQTT](/docs/tr/protocols/mqtt/) — Subscribe + Publish
-- [EtherNet/IP](/docs/tr/protocols/ethernet-ip/) — Client (Logix 5000+)
-- [Fatek](/docs/tr/protocols/fatek/) — TCP + UDP Client
-- [REST API Client](/docs/tr/protocols/rest-client/) — Yakında
-- [BACnet](/docs/tr/protocols/bacnet/) — Gateway
-- [KNX](/docs/tr/protocols/knx/) — Gateway
+- [MODBUS](/docs/en/protocols/modbus/) — TCP, RTU over TCP, UDP (Client + Server)
+- [DNP3](/docs/en/protocols/dnp3/) — Master + Outstation
+- [IEC 60870-5-104](/docs/en/protocols/iec104/) — Client + Server
+- [IEC 61850](/docs/en/protocols/iec61850/) — MMS Client + Server
+- [OPC UA](/docs/en/protocols/opc-ua/) — Client + Server
+- [OPC DA](/docs/en/protocols/opc-da/) — Client
+- [OPC XML-DA](/docs/en/protocols/opc-xml/) — Client
+- [Siemens S7](/docs/en/protocols/s7/) — Client
+- [MQTT](/docs/en/protocols/mqtt/) — Subscribe + Publish
+- [EtherNet/IP](/docs/en/protocols/ethernet-ip/) — Client (Logix 5000+)
+- [Fatek](/docs/en/protocols/fatek/) — TCP + UDP Client
+- [REST API Client](/docs/en/protocols/rest-client/) — Coming Soon
+- [BACnet](/docs/en/protocols/bacnet/) — Gateway
+- [KNX](/docs/en/protocols/knx/) — Gateway

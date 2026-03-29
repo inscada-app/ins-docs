@@ -5,144 +5,144 @@ sidebar:
   order: 6
 ---
 
-inSCADA, rol tabanlı erişim kontrolü (RBAC) ile kullanıcı yetkilendirmesi sağlar. Kullanıcılar rollere, roller yetkilere ve menülere bağlanır.
+inSCADA provides user authorization with role-based access control (RBAC). Users are linked to roles, and roles are linked to permissions and menus.
 
-## Kullanıcı Yönetimi
+## User Management
 
-**Menü:** User Menu → Users
+**Menu:** User Menu → Users
 
-![Kullanıcı Listesi](../../../../assets/docs/sys-users.png)
+![User List](../../../../assets/docs/sys-users.png)
 
-### Kullanıcı Oluşturma
+### Creating a User
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Username** | Evet | Giriş kullanıcı adı (değiştirilemez) |
-| **Password** | Evet | Şifre (şifreli saklanır) |
-| **Email** | Hayır | E-posta adresi (bildirimler için) |
-| **Phone** | Hayır | Telefon numarası (SMS bildirimleri için) |
-| **Roles** | Evet | Atanacak roller |
-| **Spaces** | Evet | Erişebileceği space'ler |
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Username** | Yes | Login username (cannot be changed) |
+| **Password** | Yes | Password (stored encrypted) |
+| **Email** | No | Email address (for notifications) |
+| **Phone** | No | Phone number (for SMS notifications) |
+| **Roles** | Yes | Roles to assign |
+| **Spaces** | Yes | Spaces the user can access |
 
-### İki Faktörlü Doğrulama (OTP)
+### Two-Factor Authentication (OTP)
 
-| Tip | Açıklama |
-|-----|----------|
-| **NONE** | OTP kapalı |
-| **SMS** | Giriş sırasında SMS ile doğrulama kodu |
-| **MAIL** | Giriş sırasında e-posta ile doğrulama kodu |
+| Type | Description |
+|------|-------------|
+| **NONE** | OTP disabled |
+| **SMS** | Verification code via SMS during login |
+| **MAIL** | Verification code via email during login |
 
-### Şifre Politikaları
+### Password Policies
 
-| Ayar | Açıklama |
-|------|----------|
-| **Require Password Reset** | Sonraki girişte şifre değişikliği zorla |
-| **EULA Accepted** | Kullanım sözleşmesi onayı |
-
----
-
-## Rol Yönetimi
-
-**Menü:** User Menu → Roles
-
-![Rol Listesi](../../../../assets/docs/sys-roles.png)
-
-Rol, yetki ve menü gruplarının bir bütünüdür. Bir kullanıcıya birden fazla rol atanabilir — tüm rollerin yetkileri birleştirilir.
-
-### Rol Oluşturma
-
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Name** | Evet | Rol adı |
-| **Permissions** | Evet | Bu role atanacak yetkiler |
-| **Menus** | Evet | Bu rolün göreceği menüler |
-
-### Örnek Rol Yapıları
-
-**Operatör Rolü:**
-- Menüler: Home, Control Panel, Alarm Monitor, Trend Graphic
-- Yetkiler: VIEW_VARIABLE, SET_VARIABLE_VALUE, VIEW_FIRED_ALARM, ACK_FIRED_ALARM, VIEW_ANIMATION
-
-**Mühendis Rolü:**
-- Menüler: Connections, Variables, Alarms, Scripts, Animations, Trends
-- Yetkiler: Tüm CRUD yetkileri + RUN_SCRIPT + SCHEDULE_SCRIPT
-
-**Yönetici Rolü:**
-- Menüler: Tüm menüler
-- Yetkiler: Tüm yetkiler
+| Setting | Description |
+|---------|-------------|
+| **Require Password Reset** | Force password change on next login |
+| **EULA Accepted** | End-user license agreement acceptance |
 
 ---
 
-## Yetkiler (Permissions)
+## Role Management
 
-Yetkiler, platformdaki her işlem için granüler erişim kontrolü sağlar. Toplam **242 yetki** mevcuttur.
+**Menu:** User Menu → Roles
 
-### Yetki Kategorileri
+![Role List](../../../../assets/docs/sys-roles.png)
 
-| Kategori | Yetkiler | Açıklama |
-|----------|---------|----------|
-| **Proje** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Proje CRUD |
-| **Bağlantı** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT, START, STOP | Bağlantı yönetimi + kontrol |
-| **Değişken** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT, SET_VALUE | Değişken yönetimi + yazma |
-| **Alarm** | CREATE, VIEW, UPDATE, DELETE, ACTIVATE, DEACTIVATE | Alarm tanımları |
-| **Alarm Grubu** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Alarm grupları |
-| **Tetiklenen Alarm** | VIEW, ACK, FORCE_OFF | Alarm izleme |
-| **Script** | CREATE, VIEW, UPDATE, DELETE, RUN, SCHEDULE, CANCEL | Script yönetimi + çalıştırma |
-| **Rapor** | CREATE, VIEW, UPDATE, DELETE, SCHEDULE, CANCEL, PRINT, MAIL | Rapor yönetimi |
-| **Animasyon** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | SVG ekran yönetimi |
-| **Trend** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Trend grafikleri |
-| **Data Transfer** | CREATE, VIEW, UPDATE, DELETE, SCHEDULE, CANCEL | Veri aktarımı |
-| **Kullanıcı** | CREATE, VIEW, UPDATE, DELETE, RESET_PASSWORD | Kullanıcı yönetimi |
-| **Rol** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Rol yönetimi |
-| **Dashboard** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Pano yönetimi |
-| **Custom Menu** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Özel menü |
-| **Expression** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Formül yönetimi |
-| **E-posta** | SEND, VIEW_SENT, VIEW_SETTINGS, UPDATE_SETTINGS | E-posta |
+A role is a combination of permissions and menu groups. Multiple roles can be assigned to a user — permissions from all roles are merged.
+
+### Creating a Role
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Name** | Yes | Role name |
+| **Permissions** | Yes | Permissions to assign to this role |
+| **Menus** | Yes | Menus this role can see |
+
+### Example Role Structures
+
+**Operator Role:**
+- Menus: Home, Control Panel, Alarm Monitor, Trend Graphic
+- Permissions: VIEW_VARIABLE, SET_VARIABLE_VALUE, VIEW_FIRED_ALARM, ACK_FIRED_ALARM, VIEW_ANIMATION
+
+**Engineer Role:**
+- Menus: Connections, Variables, Alarms, Scripts, Animations, Trends
+- Permissions: All CRUD permissions + RUN_SCRIPT + SCHEDULE_SCRIPT
+
+**Administrator Role:**
+- Menus: All menus
+- Permissions: All permissions
+
+---
+
+## Permissions
+
+Permissions provide granular access control for every operation on the platform. A total of **242 permissions** are available.
+
+### Permission Categories
+
+| Category | Permissions | Description |
+|----------|------------|-------------|
+| **Project** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Project CRUD |
+| **Connection** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT, START, STOP | Connection management + control |
+| **Variable** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT, SET_VALUE | Variable management + writing |
+| **Alarm** | CREATE, VIEW, UPDATE, DELETE, ACTIVATE, DEACTIVATE | Alarm definitions |
+| **Alarm Group** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Alarm groups |
+| **Fired Alarm** | VIEW, ACK, FORCE_OFF | Alarm monitoring |
+| **Script** | CREATE, VIEW, UPDATE, DELETE, RUN, SCHEDULE, CANCEL | Script management + execution |
+| **Report** | CREATE, VIEW, UPDATE, DELETE, SCHEDULE, CANCEL, PRINT, MAIL | Report management |
+| **Animation** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | SVG screen management |
+| **Trend** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Trend charts |
+| **Data Transfer** | CREATE, VIEW, UPDATE, DELETE, SCHEDULE, CANCEL | Data transfer |
+| **User** | CREATE, VIEW, UPDATE, DELETE, RESET_PASSWORD | User management |
+| **Role** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Role management |
+| **Dashboard** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Dashboard management |
+| **Custom Menu** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Custom menu |
+| **Expression** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Formula management |
+| **Email** | SEND, VIEW_SENT, VIEW_SETTINGS, UPDATE_SETTINGS | Email |
 | **SMS** | SEND, VIEW_SENT, VIEW_SETTINGS, UPDATE_SETTINGS | SMS |
-| **Log** | VIEW, TRUNCATE | Denetim logları |
-| **Lisans** | VIEW, ACTIVATE | Lisans yönetimi |
-| **Sistem** | VIEW_SYSTEM_STATS, EXEC_SYSTEM_COMMAND | Sistem komutları |
-| **Dil** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Çoklu dil |
+| **Log** | VIEW, TRUNCATE | Audit logs |
+| **License** | VIEW, ACTIVATE | License management |
+| **System** | VIEW_SYSTEM_STATS, EXEC_SYSTEM_COMMAND | System commands |
+| **Language** | CREATE, VIEW, UPDATE, DELETE, EXPORT, IMPORT | Multi-language |
 
-### Kritik Yetkiler
+### Critical Permissions
 
-| Yetki | Açıklama |
-|-------|----------|
-| **SET_VARIABLE_VALUE** | Değişkene değer yazma (kontrol komutu) |
-| **RUN_SCRIPT** | Script çalıştırma (sunucu tarafı kod) |
-| **EXEC_SYSTEM_COMMAND** | OS komutu çalıştırma |
-| **START_CONNECTION / STOP_CONNECTION** | Bağlantı başlatma/durdurma |
-| **FORCE_OFF_FIRED_ALARM** | Alarmı zorla kapatma |
+| Permission | Description |
+|------------|-------------|
+| **SET_VARIABLE_VALUE** | Write a value to a variable (control command) |
+| **RUN_SCRIPT** | Run a script (server-side code) |
+| **EXEC_SYSTEM_COMMAND** | Execute an OS command |
+| **START_CONNECTION / STOP_CONNECTION** | Start/stop a connection |
+| **FORCE_OFF_FIRED_ALARM** | Force-dismiss an alarm |
 
 :::caution
-Bu yetkiler yalnızca güvenilir kullanıcılara verilmelidir. Özellikle `RUN_SCRIPT` ve `EXEC_SYSTEM_COMMAND` sunucu tarafında kod çalıştırma yetkisi verir.
+These permissions should only be granted to trusted users. In particular, `RUN_SCRIPT` and `EXEC_SYSTEM_COMMAND` grant the ability to execute code on the server side.
 :::
 
 ---
 
-## Menüler
+## Menus
 
-Menüler, kullanıcının arayüzde göreceği sayfaları belirler. Bir role birden fazla menü atanabilir.
+Menus determine the pages a user can see in the interface. Multiple menus can be assigned to a role.
 
-### Menü Kategorileri
+### Menu Categories
 
-| Kategori | Menüler |
-|----------|---------|
-| **Ana Sayfa** | Home |
-| **Çalışma Ortamı** | Control Panel, Process, Processes |
-| **İzleme** | Alarm Monitor, Alarm History, Trend Graphic, Variable History, Variable Monitor |
-| **Yapılandırma** | Projects, Connections, Devices, Variables, Alarms, Alarm Groups |
-| **Geliştirme** | Development, Scripts, Expressions, Animations, Trends, Reports, Data Transfers |
-| **Görselleştirme** | Visualization, Project Map, Custom Menu Dev |
-| **Sistem** | Users, Roles, License, Log, Job, Auth Log, Keywords, Languages |
-| **Bildirim** | Notifications, Email, SMS |
-| **Veri** | Backup/Restore, Device Library |
+| Category | Menus |
+|----------|-------|
+| **Home** | Home |
+| **Workspace** | Control Panel, Process, Processes |
+| **Monitoring** | Alarm Monitor, Alarm History, Trend Graphic, Variable History, Variable Monitor |
+| **Configuration** | Projects, Connections, Devices, Variables, Alarms, Alarm Groups |
+| **Development** | Development, Scripts, Expressions, Animations, Trends, Reports, Data Transfers |
+| **Visualization** | Visualization, Project Map, Custom Menu Dev |
+| **System** | Users, Roles, License, Log, Job, Auth Log, Keywords, Languages |
+| **Notification** | Notifications, Email, SMS |
+| **Data** | Backup/Restore, Device Library |
 
 ---
 
-## Space Erişimi
+## Space Access
 
-Kullanıcılar birden fazla space'e erişebilir. Login yanıtında erişilebilir space listesi döner:
+Users can access multiple spaces. The login response returns the list of accessible spaces:
 
 ```json
 {
@@ -151,4 +151,4 @@ Kullanıcılar birden fazla space'e erişebilir. Login yanıtında erişilebilir
 }
 ```
 
-Kullanıcı oturum sırasında `X-Space` header'ı ile space değiştirebilir.
+The user can switch spaces during a session using the `X-Space` header.

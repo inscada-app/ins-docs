@@ -1,24 +1,24 @@
 ---
 title: "REST API Overview"
-description: "inSCADA REST API — kimlik doğrulama, endpoint yapısı ve kullanım"
+description: "inSCADA REST API — authentication, endpoint structure, and usage"
 sidebar:
   order: 1
 ---
 
-inSCADA, tamamen RESTful bir mimariye sahiptir. Platformdaki her işlem — değişken okuma/yazma, proje yönetimi, alarm sorgulama, bağlantı kontrolü — REST API üzerinden gerçekleştirilebilir.
+inSCADA has a fully RESTful architecture. Every operation on the platform — reading/writing variables, project management, alarm queries, connection control — can be performed through the REST API.
 
-## API Erişimi
+## API Access
 
 **Base URL:**
 ```
 https://<inscada-ip>:8082/api/
 ```
 
-Tüm endpoint'ler `/api/` prefix'i ile başlar. API, JSON formatında veri alır ve döndürür.
+All endpoints start with the `/api/` prefix. The API accepts and returns data in JSON format.
 
-## Kimlik Doğrulama
+## Authentication
 
-inSCADA REST API, form tabanlı login ve JWT token ile kimlik doğrulama kullanır.
+The inSCADA REST API uses form-based login and JWT token authentication.
 
 ### 1. Login
 
@@ -29,11 +29,11 @@ Content-Type: multipart/form-data
 username=admin&password=admin
 ```
 
-Başarılı yanıt, `ins_access_token` ve `ins_refresh_token` cookie'lerini set eder.
+A successful response sets `ins_access_token` and `ins_refresh_token` cookies.
 
-### 2. API İstekleri
+### 2. API Requests
 
-Login sonrası alınan cookie'ler sonraki isteklerde otomatik gönderilir. Alternatif olarak token header ile de gönderilebilir:
+Cookies obtained after login are automatically sent with subsequent requests. Alternatively, the token can also be sent via a header:
 
 ```
 GET /api/projects
@@ -43,144 +43,144 @@ X-Space: default_space
 
 ### 3. Space Header
 
-Çoklu çalışma alanı (multi-tenant) yapısında, hangi space'te çalışıldığını belirtmek için `X-Space` header'ı kullanılır:
+In the multi-workspace (multi-tenant) architecture, the `X-Space` header is used to specify which space the request operates in:
 
 ```
 X-Space: default_space
 ```
 
-## Endpoint Kategorileri
+## Endpoint Categories
 
-inSCADA REST API, 91 controller ve 1100+ endpoint içerir. Aşağıda ana kategoriler ve temel endpoint'ler listelenmiştir:
+The inSCADA REST API contains 91 controllers and 1100+ endpoints. Below are the main categories and key endpoints:
 
-### Kimlik Doğrulama ve Kullanıcı
+### Authentication and User
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| POST | `/login` | Kullanıcı girişi |
-| GET | `/api/auth/currentUser` | Oturum açmış kullanıcı bilgisi |
-| GET | `/api/auth/loggedInUsers` | Aktif oturum listesi |
-| GET | `/api/users` | Kullanıcı listesi |
-| POST | `/api/users` | Yeni kullanıcı oluştur |
-| PUT | `/api/users/{id}` | Kullanıcı güncelle |
-| DELETE | `/api/users/{id}` | Kullanıcı sil |
-| GET | `/api/users/{id}/roles` | Kullanıcının rolleri |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/login` | User login |
+| GET | `/api/auth/currentUser` | Current logged-in user info |
+| GET | `/api/auth/loggedInUsers` | Active session list |
+| GET | `/api/users` | User list |
+| POST | `/api/users` | Create a new user |
+| PUT | `/api/users/{id}` | Update a user |
+| DELETE | `/api/users/{id}` | Delete a user |
+| GET | `/api/users/{id}/roles` | User roles |
 
-### Space (Çalışma Alanı)
+### Space (Workspace)
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/spaces` | Space listesi |
-| GET | `/api/spaces/{id}` | Space detayı |
-| POST | `/api/spaces` | Yeni space oluştur |
-| PUT | `/api/spaces/{id}` | Space güncelle |
-| DELETE | `/api/spaces/{id}` | Space sil |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/spaces` | Space list |
+| GET | `/api/spaces/{id}` | Space details |
+| POST | `/api/spaces` | Create a new space |
+| PUT | `/api/spaces/{id}` | Update a space |
+| DELETE | `/api/spaces/{id}` | Delete a space |
 
-### Proje
+### Project
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/projects` | Proje listesi |
-| GET | `/api/projects/{id}` | Proje detayı |
-| GET | `/api/projects/{id}/status` | Proje durumu |
-| POST | `/api/projects` | Yeni proje oluştur |
-| PUT | `/api/projects/{id}` | Proje güncelle |
-| DELETE | `/api/projects/{id}` | Proje sil |
-| POST | `/api/projects/clone` | Proje klonla |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/projects` | Project list |
+| GET | `/api/projects/{id}` | Project details |
+| GET | `/api/projects/{id}/status` | Project status |
+| POST | `/api/projects` | Create a new project |
+| PUT | `/api/projects/{id}` | Update a project |
+| DELETE | `/api/projects/{id}` | Delete a project |
+| POST | `/api/projects/clone` | Clone a project |
 
-### Bağlantı (Connection)
+### Connection
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| POST | `/api/connections/{id}/start` | Bağlantıyı başlat |
-| POST | `/api/connections/{id}/stop` | Bağlantıyı durdur |
-| GET | `/api/connections/{id}/status` | Bağlantı durumu |
-| GET | `/api/connections/{id}/browse` | Cihaz keşfi (OPC UA, OPC DA) |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/connections/{id}/start` | Start a connection |
+| POST | `/api/connections/{id}/stop` | Stop a connection |
+| GET | `/api/connections/{id}/status` | Connection status |
+| GET | `/api/connections/{id}/browse` | Device discovery (OPC UA, OPC DA) |
 
-Her protokolün kendi CRUD endpoint'leri vardır:
+Each protocol has its own CRUD endpoints:
 - `/api/modbus/connections`, `/api/dnp3/connections`, `/api/iec104/connections` ...
 - `/api/modbus/variables`, `/api/dnp3/variables` ...
 
-### Değişken Değerleri
+### Variable Values
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/variables/{id}/value` | Tek değişken anlık değeri |
-| GET | `/api/variables/values?projectId=X&names=a,b` | Toplu anlık değer |
-| POST | `/api/variables/{id}/value` | Değişkene değer yaz |
-| GET | `/api/variables/loggedValues` | Tarihsel veri sorgula |
-| GET | `/api/variables/loggedValues/stats` | İstatistik (avg, min, max) |
-| GET | `/api/variables/loggedValues/stats/hourly` | Saatlik istatistik |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/variables/{id}/value` | Single variable live value |
+| GET | `/api/variables/values?projectId=X&names=a,b` | Bulk live values |
+| POST | `/api/variables/{id}/value` | Write a value to a variable |
+| GET | `/api/variables/loggedValues` | Query historical data |
+| GET | `/api/variables/loggedValues/stats` | Statistics (avg, min, max) |
+| GET | `/api/variables/loggedValues/stats/hourly` | Hourly statistics |
 
 ### Alarm
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/alarms/fired-alarms` | Aktif alarmlar |
-| GET | `/api/alarms/fired-alarms/all` | Tüm alarm geçmişi |
-| POST | `/api/alarms/fired-alarms/acknowledge` | Alarm onayla |
-| POST | `/api/alarms/fired-alarms/force-off` | Alarm zorla kapat |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/alarms/fired-alarms` | Active alarms |
+| GET | `/api/alarms/fired-alarms/all` | Full alarm history |
+| POST | `/api/alarms/fired-alarms/acknowledge` | Acknowledge an alarm |
+| POST | `/api/alarms/fired-alarms/force-off` | Force-close an alarm |
 
 ### Script
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/scripts` | Script listesi |
-| GET | `/api/scripts/{id}` | Script detayı |
-| POST | `/api/scripts` | Yeni script oluştur |
-| PUT | `/api/scripts/{id}` | Script güncelle |
-| DELETE | `/api/scripts/{id}` | Script sil |
-| GET | `/api/scripts/{id}/status` | Script çalışma durumu |
-| POST | `/api/scripts/runner` | Script kodu çalıştır (ad-hoc) |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/scripts` | Script list |
+| GET | `/api/scripts/{id}` | Script details |
+| POST | `/api/scripts` | Create a new script |
+| PUT | `/api/scripts/{id}` | Update a script |
+| DELETE | `/api/scripts/{id}` | Delete a script |
+| GET | `/api/scripts/{id}/status` | Script execution status |
+| POST | `/api/scripts/runner` | Run script code (ad-hoc) |
 
-### Animasyon (SVG Ekranlar)
+### Animation (SVG Screens)
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/animations` | Animasyon listesi |
-| GET | `/api/animations/{id}` | Animasyon detayı |
-| POST | `/api/animations` | Yeni animasyon oluştur |
-| PUT | `/api/animations/{id}` | Animasyon güncelle |
-| PUT | `/api/animations/{id}/svg` | SVG içeriği güncelle |
-| POST | `/api/animations/{id}/clone` | Animasyon klonla |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/animations` | Animation list |
+| GET | `/api/animations/{id}` | Animation details |
+| POST | `/api/animations` | Create a new animation |
+| PUT | `/api/animations/{id}` | Update an animation |
+| PUT | `/api/animations/{id}/svg` | Update SVG content |
+| POST | `/api/animations/{id}/clone` | Clone an animation |
 
 ### Trend
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/trends` | Trend listesi |
-| POST | `/api/trends` | Yeni trend oluştur |
-| GET | `/api/trends/{id}/tags` | Trend tag'leri |
-| POST | `/api/trends/{id}/tags` | Tag ekle |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/trends` | Trend list |
+| POST | `/api/trends` | Create a new trend |
+| GET | `/api/trends/{id}/tags` | Trend tags |
+| POST | `/api/trends/{id}/tags` | Add a tag |
 
 ### Custom Menu
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/custom-menus` | Menü listesi |
-| POST | `/api/custom-menus` | Yeni menü oluştur |
-| PUT | `/api/custom-menus/{id}` | Menü güncelle |
-| DELETE | `/api/custom-menus/{id}` | Menü sil |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/custom-menus` | Menu list |
+| POST | `/api/custom-menus` | Create a new menu |
+| PUT | `/api/custom-menus/{id}` | Update a menu |
+| DELETE | `/api/custom-menus/{id}` | Delete a menu |
 
-### Rapor
+### Report
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/reports` | Rapor listesi |
-| POST | `/api/reports/{id}/run` | Rapor çalıştır |
-| GET | `/api/reports/{id}/export/pdf` | PDF dışa aktar |
-| GET | `/api/reports/{id}/export/excel` | Excel dışa aktar |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/reports` | Report list |
+| POST | `/api/reports/{id}/run` | Run a report |
+| GET | `/api/reports/{id}/export/pdf` | Export as PDF |
+| GET | `/api/reports/{id}/export/excel` | Export as Excel |
 
-### Sistem
+### System
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/version` | Platform versiyonu |
-| GET | `/api/license` | Lisans bilgisi |
-| GET | `/api/cluster/leader` | Cluster lider node |
-| GET | `/api/system/status` | Sistem durumu |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/version` | Platform version |
+| GET | `/api/license` | License information |
+| GET | `/api/cluster/leader` | Cluster leader node |
+| GET | `/api/system/status` | System status |
 
-### Örnek: Versiyon Sorgulama
+### Example: Version Query
 
 ```bash
 curl -b cookies.txt http://localhost:8081/api/version -H "X-Space: default_space"
@@ -190,22 +190,22 @@ curl -b cookies.txt http://localhost:8081/api/version -H "X-Space: default_space
 20260311-1-jdk11
 ```
 
-## Swagger / API Dokümantasyonu
+## Swagger / API Documentation
 
-inSCADA, yerleşik **Swagger UI** ile interaktif API dokümantasyonu sağlar. Geliştirme modunda (`dev` profili) aktifleşir:
+inSCADA provides interactive API documentation with a built-in **Swagger UI**. It is activated in development mode (`dev` profile):
 
 ```
 https://<inscada-ip>:8082/swagger-ui/
 ```
 
-Swagger UI üzerinden tüm endpoint'leri keşfedebilir, parametre açıklamalarını görebilir ve doğrudan test istekleri gönderebilirsiniz.
+Through Swagger UI, you can discover all endpoints, view parameter descriptions, and send test requests directly.
 
-## Yanıt Formatı
+## Response Format
 
-Tüm yanıtlar JSON formatındadır:
+All responses are in JSON format:
 
 ```json
-// Başarılı yanıt
+// Successful response
 {
     "id": 1,
     "name": "Temperature",
@@ -213,7 +213,7 @@ Tüm yanıtlar JSON formatındadır:
     ...
 }
 
-// Hata yanıtı
+// Error response
 {
     "status": 400,
     "error": "Bad Request",
@@ -221,18 +221,18 @@ Tüm yanıtlar JSON formatındadır:
 }
 ```
 
-### HTTP Durum Kodları
+### HTTP Status Codes
 
-| Kod | Açıklama |
-|-----|----------|
-| **200** | Başarılı |
-| **201** | Oluşturuldu |
-| **400** | Hatalı istek |
-| **401** | Kimlik doğrulama gerekli |
-| **403** | Yetkisiz erişim |
-| **404** | Bulunamadı |
-| **500** | Sunucu hatası |
+| Code | Description |
+|------|-------------|
+| **200** | Success |
+| **201** | Created |
+| **400** | Bad request |
+| **401** | Authentication required |
+| **403** | Unauthorized access |
+| **404** | Not found |
+| **500** | Server error |
 
 ## Rate Limiting
 
-API istekleri rate-limit ile korunur. Aşırı istek durumunda `429 Too Many Requests` yanıtı döner. Limit değerleri sistem yapılandırmasından ayarlanabilir.
+API requests are protected by rate limiting. In case of excessive requests, a `429 Too Many Requests` response is returned. Limit values can be adjusted from the system configuration.

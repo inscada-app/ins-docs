@@ -1,24 +1,24 @@
 ---
 title: "Space API"
-description: "Space (çalışma alanı) CRUD endpoint'leri"
+description: "Space (workspace) CRUD endpoints"
 sidebar:
   order: 3
 ---
 
-Space, inSCADA'nın çoklu çalışma alanı (multi-tenant) yapısıdır. Her space bağımsız projeler, kullanıcılar ve yapılandırmalar içerir.
+Space is inSCADA's multi-workspace (multi-tenant) structure. Each space contains independent projects, users, and configurations.
 
-## Space Listesi
+## Space List
 
 ### GET /api/spaces
 
-Tüm space'leri listeler.
+Lists all spaces.
 
 ```bash
 curl -b cookies.txt http://localhost:8081/api/spaces \
   -H "X-Space: default_space"
 ```
 
-Yanıt:
+Response:
 ```json
 [
   {
@@ -38,15 +38,15 @@ Yanıt:
 
 ## Space CRUD
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/spaces` | Space listesi |
-| GET | `/api/spaces/{id}` | Space detayı |
-| POST | `/api/spaces` | Yeni space oluştur |
-| PUT | `/api/spaces/{id}` | Space güncelle |
-| DELETE | `/api/spaces/{id}` | Space sil |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/spaces` | Space list |
+| GET | `/api/spaces/{id}` | Space details |
+| POST | `/api/spaces` | Create a new space |
+| PUT | `/api/spaces/{id}` | Update a space |
+| DELETE | `/api/spaces/{id}` | Delete a space |
 
-### Space Oluşturma
+### Creating a Space
 
 ```bash
 curl -b cookies.txt -X POST http://localhost:8081/api/spaces \
@@ -56,10 +56,10 @@ curl -b cookies.txt -X POST http://localhost:8081/api/spaces \
 
 ## X-Space Header
 
-Tüm API isteklerinde hangi space'te çalışıldığını belirtmek için `X-Space` header'ı kullanılır:
+The `X-Space` header is used in all API requests to specify which space the request operates in:
 
 ```
 X-Space: default_space
 ```
 
-Bu header gönderilmezse varsayılan space kullanılır.
+If this header is not sent, the default space is used.

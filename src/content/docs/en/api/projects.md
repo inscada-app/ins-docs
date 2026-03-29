@@ -1,22 +1,22 @@
 ---
 title: "Project API"
-description: "Proje CRUD, durum sorgulama ve bağlantı yönetimi endpoint'leri"
+description: "Project CRUD, status queries, and connection management endpoints"
 sidebar:
   order: 4
 ---
 
-## Proje Listesi
+## Project List
 
 ### GET /api/projects
 
-Space'teki tüm projeleri listeler.
+Lists all projects in the space.
 
 ```bash
 curl -b cookies.txt http://localhost:8081/api/projects \
   -H "X-Space: claude"
 ```
 
-Yanıt:
+Response:
 ```json
 [
   {
@@ -41,14 +41,14 @@ Yanıt:
 
 ### GET /api/projects/{id}
 
-Proje detayını getirir.
+Returns project details.
 
 ```bash
 curl -b cookies.txt http://localhost:8081/api/projects/153 \
   -H "X-Space: claude"
 ```
 
-Yanıt:
+Response:
 ```json
 {
   "id": 153,
@@ -67,14 +67,14 @@ Yanıt:
 
 ### GET /api/projects/{id}/status
 
-Projenin tüm bileşenlerinin çalışma durumunu döndürür.
+Returns the running status of all project components.
 
 ```bash
 curl -b cookies.txt http://localhost:8081/api/projects/153/status \
   -H "X-Space: claude"
 ```
 
-Yanıt:
+Response:
 ```json
 {
   "connectionStatuses": { "153": "Connected" },
@@ -85,16 +85,16 @@ Yanıt:
 }
 ```
 
-## Proje CRUD
+## Project CRUD
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| POST | `/api/projects` | Yeni proje oluştur |
-| PUT | `/api/projects/{id}` | Proje güncelle |
-| DELETE | `/api/projects/{id}` | Proje sil |
-| POST | `/api/projects/clone` | Proje klonla |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/projects` | Create a new project |
+| PUT | `/api/projects/{id}` | Update a project |
+| DELETE | `/api/projects/{id}` | Delete a project |
+| POST | `/api/projects/clone` | Clone a project |
 
-### Proje Oluşturma
+### Creating a Project
 
 ```bash
 curl -b cookies.txt -X POST http://localhost:8081/api/projects \
@@ -108,18 +108,18 @@ curl -b cookies.txt -X POST http://localhost:8081/api/projects \
   }'
 ```
 
-## Bağlantılar
+## Connections
 
 ### GET /api/connections?projectId={id}
 
-Projedeki bağlantıları listeler.
+Lists the connections in a project.
 
 ```bash
 curl -b cookies.txt "http://localhost:8081/api/connections?projectId=153" \
   -H "X-Space: claude"
 ```
 
-Yanıt:
+Response:
 ```json
 [
   {
@@ -135,10 +135,10 @@ Yanıt:
 ]
 ```
 
-### Bağlantı Kontrolü
+### Connection Control
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| POST | `/api/connections/{id}/start` | Bağlantıyı başlat |
-| POST | `/api/connections/{id}/stop` | Bağlantıyı durdur |
-| GET | `/api/connections/{id}/status` | Bağlantı durumu |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/connections/{id}/start` | Start a connection |
+| POST | `/api/connections/{id}/stop` | Stop a connection |
+| GET | `/api/connections/{id}/status` | Connection status |

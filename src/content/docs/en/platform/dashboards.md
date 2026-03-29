@@ -1,70 +1,70 @@
 ---
 title: "Dashboards"
-description: "Space seviyesi panolar — projeler arası veri birleştirme ve widget yapısı"
+description: "Space-level dashboards — cross-project data aggregation and widget structure"
 sidebar:
   order: 24
 ---
 
-Dashboard, space seviyesinde tanımlanan pano sistemidir. Farklı projelerden verileri tek bir ekranda birleştirmeyi sağlar. Board Group'lar altında serbest konumlandırılabilen Board (widget) kartlarından oluşur.
+Dashboard is a panel system defined at the space level. It allows combining data from different projects on a single screen. It consists of freely positionable Board (widget) cards organized under Board Groups.
 
-## Dashboard Yapısı
+## Dashboard Structure
 
 ```
-Dashboard (Space Seviyesi)
-├── Board Group: "Enerji Özet"
-│   ├── Board: Aktif Güç Göstergesi (x:0, y:0, 300x200)
-│   ├── Board: Gerilim Göstergesi (x:320, y:0, 300x200)
-│   └── Board: Günlük Tüketim Grafiği (x:0, y:220, 640x300)
+Dashboard (Space Level)
+├── Board Group: "Energy Summary"
+│   ├── Board: Active Power Gauge (x:0, y:0, 300x200)
+│   ├── Board: Voltage Gauge (x:320, y:0, 300x200)
+│   └── Board: Daily Consumption Chart (x:0, y:220, 640x300)
 │
-└── Board Group: "Bina Yönetimi"
-    ├── Board: HVAC Durumu
-    └── Board: İç Ortam Sıcaklığı
+└── Board Group: "Building Management"
+    ├── Board: HVAC Status
+    └── Board: Indoor Temperature
 ```
 
 ## Board Group
 
-Board Group, dashboard içindeki sayfa/sekme birimidir.
+A Board Group is the page/tab unit within a dashboard.
 
-**Menü:** Dashboards (sidebar üst kısım)
+**Menu:** Dashboards (top of sidebar)
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Name** | Evet | Grup adı |
-| **Color** | Hayır | Sekme rengi |
-| **Rank** | Hayır | Sıralama |
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Name** | Yes | Group name |
+| **Color** | No | Tab color |
+| **Rank** | No | Sort order |
 
 ## Board (Widget)
 
-Her Board, Board Group içinde serbest konumlandırılabilen bir karttır.
+Each Board is a freely positionable card within a Board Group.
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Type** | Evet | Widget tipi |
-| **Config** | Evet | Widget yapılandırması (JSON) |
-| **X / Y** | Hayır | Konum (piksel) |
-| **Width / Height** | Hayır | Boyut (piksel) |
-| **Header** | Hayır | Başlık göster |
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Type** | Yes | Widget type |
+| **Config** | Yes | Widget configuration (JSON) |
+| **X / Y** | No | Position (pixels) |
+| **Width / Height** | No | Size (pixels) |
+| **Header** | No | Show header |
 
-### Board Tipleri
+### Board Types
 
-Dashboard'a eklenebilecek widget tipleri konfigürasyon bazlı çalışır. Config alanına JSON formatında widget ayarları yazılır.
+Widget types that can be added to a Dashboard are configuration-based. Widget settings are written in JSON format in the Config field.
 
-## Space Seviyesi Avantajı
+## Space-Level Advantage
 
-Dashboard space seviyesinde tanımlandığı için:
-- Farklı projelerdeki değişkenleri aynı panoda gösterebilir
-- Tüm sahalar tek ekranda izlenebilir (örn: 10 farklı GES'in toplam üretimi)
-- Proje bağımsız karşılaştırma yapılabilir
+Since Dashboards are defined at the space level:
+- Variables from different projects can be displayed on the same panel
+- All sites can be monitored from a single screen (e.g., total production from 10 different solar power plants)
+- Project-independent comparisons can be made
 
 ## Custom Menu vs Dashboard
 
-| Özellik | Dashboard | Custom Menu |
+| Feature | Dashboard | Custom Menu |
 |---------|-----------|-------------|
-| **Seviye** | Space | Space |
-| **Tasarım** | Sürükle-bırak widget | HTML/CSS/JS kodu |
-| **Esneklik** | Yapılandırma bazlı | Tam kontrol |
-| **Kullanım** | Hızlı pano oluşturma | Özel arayüz geliştirme |
+| **Level** | Space | Space |
+| **Design** | Drag-and-drop widgets | HTML/CSS/JS code |
+| **Flexibility** | Configuration-based | Full control |
+| **Usage** | Quick dashboard creation | Custom interface development |
 
 :::tip
-Hızlı bir genel bakış panosu için Dashboard kullanın. Tamamen özelleştirilmiş bir arayüz için Custom Menu + Web Components tercih edin.
+Use Dashboards for a quick overview panel. For a fully customized interface, prefer Custom Menu + Web Components.
 :::

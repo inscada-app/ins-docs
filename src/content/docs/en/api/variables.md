@@ -1,24 +1,24 @@
 ---
 title: "Variable API"
-description: "Değişken anlık değer okuma/yazma, tarihsel veri sorgulama ve istatistik endpoint'leri"
+description: "Variable live value read/write, historical data query, and statistics endpoints"
 sidebar:
   order: 5
 ---
 
-Variable API, inSCADA değişkenlerinin anlık ve tarihsel değerlerine REST üzerinden erişim sağlar.
+The Variable API provides REST access to the live and historical values of inSCADA variables.
 
-## Anlık Değer Okuma
+## Live Value Read
 
 ### GET /api/variables/{id}/value
 
-Tek bir değişkenin anlık değerini okur.
+Reads the live value of a single variable.
 
 ```bash
 curl -b cookies.txt http://localhost:8081/api/variables/23227/value \
   -H "X-Space: claude"
 ```
 
-Yanıt:
+Response:
 ```json
 {
   "flags": { "scaled": true },
@@ -39,12 +39,12 @@ Yanıt:
 
 ### GET /api/variables/values
 
-Birden fazla değişkenin anlık değerini toplu okur.
+Reads the live values of multiple variables in bulk.
 
-| Parametre | Tip | Açıklama |
-|-----------|-----|----------|
-| **projectId** | Integer | Proje ID'si |
-| **names** | String | Virgülle ayrılmış değişken adları |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| **projectId** | Integer | Project ID |
+| **names** | String | Comma-separated variable names |
 
 ```bash
 curl -b cookies.txt \
@@ -52,7 +52,7 @@ curl -b cookies.txt \
   -H "X-Space: claude"
 ```
 
-Yanıt:
+Response:
 ```json
 {
   "ActivePower_kW": {
@@ -82,11 +82,11 @@ Yanıt:
 }
 ```
 
-## Değer Yazma
+## Writing Values
 
 ### POST /api/variables/{id}/value
 
-Bir değişkene değer yazar.
+Writes a value to a variable.
 
 ```bash
 curl -b cookies.txt -X POST http://localhost:8081/api/variables/23234/value \
@@ -94,62 +94,62 @@ curl -b cookies.txt -X POST http://localhost:8081/api/variables/23234/value \
   -d '{"value": 55.0}'
 ```
 
-## Tarihsel Veri
+## Historical Data
 
 ### GET /api/variables/loggedValues
 
-Loglanan değişken verilerini sayfalı olarak sorgular.
+Queries logged variable data with pagination.
 
-| Parametre | Tip | Açıklama |
-|-----------|-----|----------|
-| **projectId** | Integer | Proje ID'si |
-| **names** | String | Virgülle ayrılmış değişken adları |
-| **startDate** | Long | Başlangıç zamanı (epoch ms) |
-| **endDate** | Long | Bitiş zamanı (epoch ms) |
-| **page** | Integer | Sayfa numarası (0'dan başlar) |
-| **size** | Integer | Sayfa boyutu |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| **projectId** | Integer | Project ID |
+| **names** | String | Comma-separated variable names |
+| **startDate** | Long | Start time (epoch ms) |
+| **endDate** | Long | End time (epoch ms) |
+| **page** | Integer | Page number (starts from 0) |
+| **size** | Integer | Page size |
 
 ### GET /api/variables/loggedValues/stats
 
-Belirli aralıktaki istatistikleri döndürür.
+Returns statistics for a specified time range.
 
-| Parametre | Tip | Açıklama |
-|-----------|-----|----------|
-| **projectId** | Integer | Proje ID'si |
-| **names** | String | Virgülle ayrılmış değişken adları |
-| **startDate** | Long | Başlangıç zamanı (epoch ms) |
-| **endDate** | Long | Bitiş zamanı (epoch ms) |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| **projectId** | Integer | Project ID |
+| **names** | String | Comma-separated variable names |
+| **startDate** | Long | Start time (epoch ms) |
+| **endDate** | Long | End time (epoch ms) |
 
 :::tip
-İstatistik yanıtı `avgValue`, `minValue`, `maxValue`, `sumValue`, `countValue`, `medianValue`, `firstValue`, `lastValue` alanlarını içerir. Detaylı yapı için [Script API — Variable API](/tr/platform/scripts/variable-api/) sayfasına bakın.
+The statistics response includes the fields `avgValue`, `minValue`, `maxValue`, `sumValue`, `countValue`, `medianValue`, `firstValue`, `lastValue`. For the detailed structure, see the [Script API — Variable API](/tr/platform/scripts/variable-api/) page.
 :::
 
 ### GET /api/variables/loggedValues/stats/hourly
 
-Saatlik gruplanmış istatistikler.
+Hourly grouped statistics.
 
 ### GET /api/variables/loggedValues/stats/daily
 
-Günlük gruplanmış istatistikler.
+Daily grouped statistics.
 
-## Değişken CRUD
+## Variable CRUD
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/variables?projectId=X` | Değişken listesi |
-| GET | `/api/variables/{id}` | Değişken detayı |
-| POST | `/api/variables` | Yeni değişken oluştur |
-| PUT | `/api/variables/{id}` | Değişken güncelle |
-| DELETE | `/api/variables/{id}` | Değişken sil |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/variables?projectId=X` | Variable list |
+| GET | `/api/variables/{id}` | Variable details |
+| POST | `/api/variables` | Create a new variable |
+| PUT | `/api/variables/{id}` | Update a variable |
+| DELETE | `/api/variables/{id}` | Delete a variable |
 
-### Değişken Listesi Yanıtı
+### Variable List Response
 
 ```bash
 curl -b cookies.txt "http://localhost:8081/api/variables?projectId=153" \
   -H "X-Space: claude"
 ```
 
-Yanıt (kısaltılmış):
+Response (abbreviated):
 ```json
 [
   {

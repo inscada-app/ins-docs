@@ -1,48 +1,48 @@
 ---
 title: "REST API Client"
-description: "inSCADA'da REST API Client — ins.rest() ile harici HTTP servislerine erişim"
+description: "REST API Client in inSCADA — accessing external HTTP services with ins.rest()"
 sidebar:
   order: 11
 ---
 
-REST API Client, inSCADA'nın yakında eklenecek bir protokol bağlantı tipidir. Bu protokol ile harici REST/HTTP servislerinden periyodik olarak veri çekilebilecek ve inSCADA variable'larına yazılabilecektir.
+REST API Client is an upcoming connection type for inSCADA. With this protocol, data can be periodically fetched from external REST/HTTP services and written to inSCADA variables.
 
-:::note[Yakında]
-REST API Client protokolü geliştirme aşamasındadır. Mevcut sürümde henüz bir Connection tipi olarak kullanılamamaktadır.
+:::note[Coming Soon]
+The REST API Client protocol is under development. It is not yet available as a Connection type in the current version.
 :::
 
-## Mevcut Alternatif: ins.rest() Script API
+## Current Alternative: ins.rest() Script API
 
-REST API Client protokolü hazır olana kadar, benzer ihtiyaçlar için **Script Engine** üzerinden `ins.rest()` fonksiyonu kullanılabilir. Bu fonksiyon, zamanlanmış script'ler içinden herhangi bir HTTP servisine istek göndermenizi sağlar.
+Until the REST API Client protocol is ready, the `ins.rest()` function via the **Script Engine** can be used for similar needs. This function allows you to send HTTP requests to any external service from within scheduled scripts.
 
-### ins.rest() Kullanımı
+### ins.rest() Usage
 
-`ins.rest()` fonksiyonu iki farklı imza ile kullanılabilir:
+The `ins.rest()` function can be used with two different signatures:
 
-**İmza 1 — Content-Type ile:**
+**Signature 1 — With Content-Type:**
 ```javascript
 ins.rest(httpMethod, url, contentType, body)
 ```
 
-**İmza 2 — Özel Header'lar ile:**
+**Signature 2 — With Custom Headers:**
 ```javascript
 ins.rest(httpMethod, url, headers, body)
 ```
 
-| Parametre | Tip | Açıklama |
-|-----------|-----|----------|
+| Parameter | Type | Description |
+|-----------|------|-------------|
 | **httpMethod** | String | `"GET"`, `"POST"`, `"PUT"`, `"DELETE"` |
-| **url** | String | Hedef URL |
-| **contentType** | String | İçerik tipi (ör. `"application/json"`) |
-| **headers** | Map | Özel HTTP header'ları |
-| **body** | Object | İstek gövdesi (POST/PUT için) |
+| **url** | String | Target URL |
+| **contentType** | String | Content type (e.g., `"application/json"`) |
+| **headers** | Map | Custom HTTP headers |
+| **body** | Object | Request body (for POST/PUT) |
 
-**Dönen değer:** `{statusCode, body, headers}` yapısında bir Map
+**Return value:** A Map with the structure `{statusCode, body, headers}`
 
-### Örnek 1: Hava Durumu API'sinden Veri Çekme
+### Example 1: Fetching Data from a Weather API
 
 ```javascript
-// Zamanlanmış script (ör. her 5 dakikada bir)
+// Scheduled script (e.g., every 5 minutes)
 var response = ins.rest("GET",
     "https://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid=YOUR_KEY&units=metric",
     "application/json", null);
@@ -55,10 +55,10 @@ if (response.statusCode == 200) {
 }
 ```
 
-### Örnek 2: IoT Platform'a Veri Gönderme
+### Example 2: Sending Data to an IoT Platform
 
 ```javascript
-// Zamanlanmış script — inSCADA verilerini harici sisteme gönder
+// Scheduled script — send inSCADA data to an external system
 var temp = ins.getVariableValue("temperature").value;
 var press = ins.getVariableValue("pressure").value;
 
@@ -76,11 +76,11 @@ var response = ins.rest("POST",
     "application/json", payload);
 
 if (response.statusCode != 200) {
-    ins.consoleLog("Telemetry gönderimi başarısız: " + response.statusCode);
+    ins.consoleLog("Telemetry submission failed: " + response.statusCode);
 }
 ```
 
-### Örnek 3: Özel Header'lar ile API Çağrısı
+### Example 3: API Call with Custom Headers
 
 ```javascript
 var headers = {
@@ -97,10 +97,10 @@ var data = JSON.parse(response.body);
 ins.setVariableValue("api_value", {value: data.result});
 ```
 
-### Örnek 4: ERP Entegrasyonu — Üretim Verisi Gönderme
+### Example 4: ERP Integration — Sending Production Data
 
 ```javascript
-// Her saat başı üretim verilerini ERP'ye gönder
+// Send production data to ERP every hour
 var production = ins.getVariableValue("production_count").value;
 var energy = ins.getVariableValue("energy_consumption").value;
 
@@ -115,19 +115,19 @@ var payload = JSON.stringify({
 ins.rest("POST", "https://erp.company.com/api/production", "application/json", payload);
 ```
 
-## Script Zamanlama
+## Script Scheduling
 
-`ins.rest()` fonksiyonunu periyodik olarak çalıştırmak için inSCADA'nın **Script** modülünde bir script oluşturun ve zamanlama tipini seçin:
+To run the `ins.rest()` function periodically, create a script in inSCADA's **Script** module and select the scheduling type:
 
-| Zamanlama Tipi | Parametreler | Açıklama |
-|----------------|-------------|----------|
-| **Periodic** | Period (ms), Offset (ms) | Sabit aralıkla tekrarlayan çalıştırma. Ör: Period = 300000 → her 5 dakikada |
-| **Daily** | Saat:Dakika | Her gün belirli bir saatte çalıştırma. Ör: 08:00 |
-| **Once** | Gecikme (ms) | Tek seferlik çalıştırma. Script bir kez çalışır ve durur |
-| **None** | — | Otomatik zamanlama yok. Script yalnızca API üzerinden veya manuel tetiklenir |
+| Scheduling Type | Parameters | Description |
+|-----------------|------------|-------------|
+| **Periodic** | Period (ms), Offset (ms) | Recurring execution at fixed intervals. E.g.: Period = 300000 → every 5 minutes |
+| **Daily** | Hour:Minute | Execution at a specific time every day. E.g.: 08:00 |
+| **Once** | Delay (ms) | One-time execution. The script runs once and stops |
+| **None** | — | No automatic scheduling. The script is only triggered via API or manually |
 
-Bu sayede REST API Client protokolü olmadan da periyodik HTTP veri toplama ve gönderme işlemleri gerçekleştirilebilir.
+This way, periodic HTTP data collection and submission operations can be performed even without the REST API Client protocol.
 
 :::tip
-`ins.rest()` ile yapılan HTTP çağrıları sunucu tarafında çalışır — tarayıcıdaki CORS kısıtlamalarından etkilenmez. Herhangi bir harici API'ye erişilebilir.
+HTTP calls made with `ins.rest()` run on the server side — they are not affected by browser CORS restrictions. Any external API can be accessed.
 :::

@@ -1,66 +1,66 @@
 ---
 title: "Configuration"
-description: "application.yml parametreleri, dizin yapısı, NSSM servis kurulumu ve SSL sertifika yönetimi"
+description: "application.yml parameters, directory structure, NSSM service setup, and SSL certificate management"
 sidebar:
   order: 0
 ---
 
-inSCADA tek bir **JAR dosyası** olarak dağıtılır. Tüm yapılandırma parametreleri JAR içindeki `application.yml` dosyasında varsayılan değerleriyle gömülüdür.
+inSCADA is distributed as a single **JAR file**. All configuration parameters are embedded within the JAR's `application.yml` file with their default values.
 
-## Kurulum Dizin Yapısı
+## Installation Directory Structure
 
-Windows kurulumu sonrası dizin yapısı:
+Directory structure after Windows installation:
 
 ```
 C:\Program Files\inSCADA\
-├── inscada.jar                          ← platform (tek dosya)
-├── inscada-keystore.p12                 ← SSL sertifika
-├── inscada.cer                          ← dışa aktarılmış public sertifika
-├── application.yml                      ← özelleştirilmiş yapılandırma (opsiyonel)
-├── inSCADA_Service_Install.bat          ← NSSM servis kurulum scripti
-├── inSCADA_TimeserisDB_Service_Install.bat ← InfluxDB servis kurulum scripti
-├── firewallsettings.bat                 ← Windows Firewall kural scripti
-├── create-cert.bat                      ← SSL sertifika oluşturma (interaktif)
-├── auto-create-cert.bat                 ← SSL sertifika oluşturma (otomatik)
-├── files\                               ← dosya depolama (SVG, rapor, ekler)
-├── logs\                                ← uygulama logları
+├── inscada.jar                          ← platform (single file)
+├── inscada-keystore.p12                 ← SSL certificate
+├── inscada.cer                          ← exported public certificate
+├── application.yml                      ← customized configuration (optional)
+├── inSCADA_Service_Install.bat          ← NSSM service installation script
+├── inSCADA_TimeserisDB_Service_Install.bat ← InfluxDB service installation script
+├── firewallsettings.bat                 ← Windows Firewall rule script
+├── create-cert.bat                      ← SSL certificate creation (interactive)
+├── auto-create-cert.bat                 ← SSL certificate creation (automatic)
+├── files\                               ← file storage (SVG, reports, attachments)
+├── logs\                                ← application logs
 │   └── log.log
-└── influxdb-1.8.3-1\                   ← InfluxDB zaman serisi veritabanı
+└── influxdb-1.8.3-1\                   ← InfluxDB time series database
     ├── influxd.exe
     ├── influx.exe
     ├── influxdb.conf
-    └── TimeseriesData\                  ← tarihsel veri dosyaları
+    └── TimeseriesData\                  ← historical data files
 
 C:\Program Files\OpenJDK\
 └── jdk-11.0.18.10-hotspot\              ← Java 11 runtime
     └── bin\java.exe
 
-C:\Program Files\PostgreSQL\12\          ← PostgreSQL veritabanı
+C:\Program Files\PostgreSQL\12\          ← PostgreSQL database
     └── bin\
 ```
 
-## Yapılandırmayı Özelleştirme
+## Customizing the Configuration
 
-Varsayılan ayarları değiştirmenin iki yolu vardır:
+There are two ways to change the default settings:
 
-### 1. Harici application.yml (opsiyonel)
+### 1. External application.yml (optional)
 
-JAR'ın yanına (aynı dizine) bir `application.yml` dosyası koyarsanız, Spring Boot harici dosyayı otomatik algılar ve JAR içindeki varsayılanların üzerine yazar. Yalnızca değiştirmek istediğiniz parametreleri yazmanız yeterlidir:
+If you place an `application.yml` file next to the JAR (in the same directory), Spring Boot automatically detects the external file and overrides the defaults inside the JAR. You only need to write the parameters you want to change:
 
 ```yaml
 # C:\Program Files\inSCADA\application.yml
 spring:
   datasource:
     url: jdbc:postgresql://192.168.1.100:5432/promis
-    password: guclu_sifre
+    password: strong_password
 server:
   http:
     redirect: true
 ```
 
-### 2. JVM -D parametreleri (NSSM ile)
+### 2. JVM -D parameters (with NSSM)
 
-Kurulum scripti bu yöntemi kullanır — parametreler doğrudan NSSM üzerinden `-D` flag'leri ile geçirilir:
+The installation script uses this method — parameters are passed directly via `-D` flags through NSSM:
 
 ```
 -Dserver.ssl.key-store="C:\Program Files\inSCADA\inscada-keystore.p12"
@@ -73,15 +73,15 @@ Kurulum scripti bu yöntemi kullanır — parametreler doğrudan NSSM üzerinden
 ```
 
 :::tip
-`-D` parametreleri `application.yml` dosyasındaki değerlerin üzerine yazar. Her iki yöntem birlikte de kullanılabilir.
-Yapılandırma değişikliklerinin uygulanması için servis yeniden başlatılmalıdır.
+`-D` parameters override values in the `application.yml` file. Both methods can be used together.
+The service must be restarted for configuration changes to take effect.
 :::
 
 ---
 
-## application.yml Parametreleri
+## application.yml Parameters
 
-### Veritabanı (PostgreSQL)
+### Database (PostgreSQL)
 
 ```yaml
 spring:
@@ -94,13 +94,13 @@ spring:
     maximum-pool-size: 25
 ```
 
-| Parametre | Varsayılan | Açıklama |
-|-----------|-----------|----------|
-| **url** | `jdbc:postgresql://localhost:5432/promis` | PostgreSQL bağlantı URL'si. Uzak sunucu için `localhost` yerine IP yazın |
-| **username** | `postgres` | Veritabanı kullanıcı adı |
-| **password** | `1907` | Veritabanı şifresi |
-| **minimum-idle** | `10` | Havuzdaki minimum boş bağlantı sayısı |
-| **maximum-pool-size** | `25` | Maksimum eşzamanlı bağlantı sayısı |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| **url** | `jdbc:postgresql://localhost:5432/promis` | PostgreSQL connection URL. Replace `localhost` with IP for remote server |
+| **username** | `postgres` | Database username |
+| **password** | `1907` | Database password |
+| **minimum-idle** | `10` | Minimum idle connections in the pool |
+| **maximum-pool-size** | `25` | Maximum concurrent connections |
 
 ```yaml
   jpa:
@@ -117,14 +117,14 @@ spring:
       ddl-auto: none
 ```
 
-| Parametre | Varsayılan | Açıklama |
-|-----------|-----------|----------|
-| **default_schema** | `inscada` | PostgreSQL şema adı |
-| **show_sql** | `false` | SQL sorgularını loga yaz (debug için) |
-| **batch_size** | `20` | Toplu INSERT/UPDATE batch boyutu |
-| **ddl-auto** | `none` | Şema otomatik oluşturma kapalı (Flyway yönetir) |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| **default_schema** | `inscada` | PostgreSQL schema name |
+| **show_sql** | `false` | Log SQL queries (for debugging) |
+| **batch_size** | `20` | Bulk INSERT/UPDATE batch size |
+| **ddl-auto** | `none` | Schema auto-creation disabled (managed by Flyway) |
 
-### Zaman Serisi Veritabanı (InfluxDB)
+### Time Series Database (InfluxDB)
 
 ```yaml
 spring:
@@ -135,26 +135,26 @@ spring:
     password: 19051905
 ```
 
-| Parametre | Varsayılan | Açıklama |
-|-----------|-----------|----------|
-| **url** | `http://localhost:8086` | InfluxDB HTTP API adresi |
-| **database** | `inscada` | InfluxDB veritabanı adı |
-| **username** | `inscada` | InfluxDB kullanıcı adı |
-| **password** | — | InfluxDB şifresi |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| **url** | `http://localhost:8086` | InfluxDB HTTP API address |
+| **database** | `inscada` | InfluxDB database name |
+| **username** | `inscada` | InfluxDB username |
+| **password** | — | InfluxDB password |
 
-InfluxDB 1.8 kullanılır ve kurulum dizini altında (`influxdb-1.8.3-1/`) yer alır. Değişken logları (tarihsel veriler) burada tutulur.
+InfluxDB 1.8 is used and located under the installation directory (`influxdb-1.8.3-1/`). Variable logs (historical data) are stored here.
 
-#### InfluxDB Retention Policy'leri
+#### InfluxDB Retention Policies
 
-Kurulum sırasında otomatik oluşturulan saklama politikaları:
+Retention policies automatically created during installation:
 
-| Retention Policy | Süre | Veri Tipi |
-|-----------------|------|-----------|
-| **autogen** | Sınırsız | Varsayılan |
-| **variable_value_rp** | 365 gün | Değişken değerleri |
-| **event_log_rp** | 14 gün | Olay logları |
-| **fired_alarm_rp** | 365 gün | Alarm geçmişi |
-| **auth_attempt_rp** | 365 gün | Giriş denemeleri |
+| Retention Policy | Duration | Data Type |
+|-----------------|----------|-----------|
+| **autogen** | Unlimited | Default |
+| **variable_value_rp** | 365 days | Variable values |
+| **event_log_rp** | 14 days | Event logs |
+| **fired_alarm_rp** | 365 days | Alarm history |
+| **auth_attempt_rp** | 365 days | Login attempts |
 
 ### Cache (Redis)
 
@@ -165,14 +165,14 @@ spring:
     port: 6379
 ```
 
-| Parametre | Varsayılan | Açıklama |
-|-----------|-----------|----------|
-| **host** | `localhost` | Redis sunucu adresi |
-| **port** | `6379` | Redis port numarası |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| **host** | `localhost` | Redis server address |
+| **port** | `6379` | Redis port number |
 
-Redis, anlık değişken değerlerinin cache'lenmesi ve gerçek zamanlı veri dağıtımı için kullanılır.
+Redis is used for caching live variable values and real-time data distribution.
 
-### Sunucu & Port Ayarları
+### Server & Port Settings
 
 ```yaml
 server:
@@ -188,27 +188,27 @@ server:
     port: 8081
 ```
 
-| Parametre | Varsayılan | Açıklama |
-|-----------|-----------|----------|
-| **server.port** | `8082` | HTTPS port numarası |
-| **server.http.port** | `8081` | HTTP port numarası |
-| **server.http.redirect** | `false` | HTTP → HTTPS yönlendirme |
-| **ssl.enabled** | `true` | SSL/TLS etkin |
-| **ssl.key-alias** | `inscada` | Sertifika alias'ı |
-| **ssl.key-store** | — | SSL sertifika dosyası (PKCS12) yolu |
-| **ssl.key-store-password** | — | Keystore şifresi |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| **server.port** | `8082` | HTTPS port number |
+| **server.http.port** | `8081` | HTTP port number |
+| **server.http.redirect** | `false` | HTTP → HTTPS redirect |
+| **ssl.enabled** | `true` | SSL/TLS enabled |
+| **ssl.key-alias** | `inscada` | Certificate alias |
+| **ssl.key-store** | — | SSL certificate file (PKCS12) path |
+| **ssl.key-store-password** | — | Keystore password |
 
-#### Port Tablosu
+#### Port Table
 
-| Port | Protokol | Kullanım |
-|------|----------|----------|
-| **8081** | HTTP | Web arayüzü ve REST API |
-| **8082** | HTTPS | Web arayüzü ve REST API (şifreli) |
-| **8086** | HTTP | InfluxDB API (dahili) |
-| **5432** | TCP | PostgreSQL (dahili) |
-| **6379** | TCP | Redis (dahili) |
+| Port | Protocol | Usage |
+|------|----------|-------|
+| **8081** | HTTP | Web interface and REST API |
+| **8082** | HTTPS | Web interface and REST API (encrypted) |
+| **8086** | HTTP | InfluxDB API (internal) |
+| **5432** | TCP | PostgreSQL (internal) |
+| **6379** | TCP | Redis (internal) |
 
-### Platform Ayarları (ins.*)
+### Platform Settings (ins.*)
 
 ```yaml
 ins:
@@ -231,17 +231,17 @@ ins:
         size: 300
 ```
 
-| Parametre | Varsayılan | Açıklama |
-|-----------|-----------|----------|
-| **ins.node.id** | `ins01` | Node tanımlayıcı (cluster ortamında benzersiz olmalı) |
-| **ins.files.path** | `./fs` | Dosya depolama dizini (SVG, rapor, ek dosyalar) |
-| **ins.jwt.secret** | _(otomatik)_ | JWT token imzalama anahtarı. Boş bırakılırsa rastgele üretilir |
-| **ins.accessToken.duration** | `5` | Access token süresi (dakika) |
-| **ins.refreshToken.duration** | `1` | Refresh token süresi (gün) |
-| **ins.job.executor.max-threads** | `1000` | Maksimum eşzamanlı iş parçacığı (script, bağlantı, rapor vb.) |
-| **ins.variable.value.list.size** | `300` | Değişken son değer listesi boyutu |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| **ins.node.id** | `ins01` | Node identifier (must be unique in cluster environments) |
+| **ins.files.path** | `./fs` | File storage directory (SVG, reports, attachments) |
+| **ins.jwt.secret** | _(auto)_ | JWT token signing key. If left empty, a random key is generated |
+| **ins.accessToken.duration** | `5` | Access token duration (minutes) |
+| **ins.refreshToken.duration** | `1` | Refresh token duration (days) |
+| **ins.job.executor.max-threads** | `1000` | Maximum concurrent threads (scripts, connections, reports, etc.) |
+| **ins.variable.value.list.size** | `300` | Variable recent values list size |
 
-### Mesaj Kuyruğu (Apache Artemis)
+### Message Queue (Apache Artemis)
 
 ```yaml
 spring:
@@ -256,18 +256,18 @@ spring:
           port: 61616
 ```
 
-| Parametre | Varsayılan | Açıklama |
-|-----------|-----------|----------|
-| **artemis.enabled** | `false` | Dahili Artemis broker. Tek makine kurulumunda `false` |
-| **artemis.mode** | `NATIVE` | Broker modu |
-| **remote.broker.enabled** | `false` | Uzak broker kullanımı (cluster/HA yapılandırması) |
-| **remote.broker.list** | — | Uzak broker listesi (host + port) |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| **artemis.enabled** | `false` | Built-in Artemis broker. `false` for single-machine installations |
+| **artemis.mode** | `NATIVE` | Broker mode |
+| **remote.broker.enabled** | `false` | Remote broker usage (cluster/HA configuration) |
+| **remote.broker.list** | — | Remote broker list (host + port) |
 
 :::note
-Artemis, yalnızca yedekli mimari (HA) veya cluster yapılandırmasında etkinleştirilir. Tek makine kurulumunda dahili in-memory mesajlaşma kullanılır.
+Artemis is only enabled in redundant architecture (HA) or cluster configurations. Single-machine installations use built-in in-memory messaging.
 :::
 
-### Cluster Yapılandırması
+### Cluster Configuration
 
 ```yaml
 ins:
@@ -278,9 +278,9 @@ ins:
         enabled: false
 ```
 
-Cluster yapılandırması hakkında detaylı bilgi için [Yedekli Mimari](/docs/tr/deployment/redundancy/) sayfasına bakın.
+For detailed information about cluster configuration, see the [Redundant Architecture](/docs/tr/deployment/redundancy/) page.
 
-### Dosya Yükleme Limiti
+### File Upload Limit
 
 ```yaml
 spring:
@@ -290,20 +290,20 @@ spring:
       max-request-size: 256MB
 ```
 
-| Parametre | Varsayılan | Açıklama |
-|-----------|-----------|----------|
-| **max-file-size** | `256MB` | Tekil dosya maksimum boyutu |
-| **max-request-size** | `256MB` | İstek başına maksimum boyut |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| **max-file-size** | `256MB` | Maximum single file size |
+| **max-request-size** | `256MB` | Maximum size per request |
 
-### Zaman Dilimi
+### Time Zone
 
 ```
 -Duser.timezone=Europe/Istanbul
 ```
 
-Servis kurulum scriptinde JVM parametresi olarak belirtilir. Tarih/saat gösterimleri ve zamanlama işlemleri bu zaman dilimine göre çalışır.
+Specified as a JVM parameter in the service installation script. Date/time displays and scheduling operations run according to this time zone.
 
-### Veritabanı Migrasyon (Flyway)
+### Database Migration (Flyway)
 
 ```yaml
 spring:
@@ -312,19 +312,19 @@ spring:
     table: schema_version
 ```
 
-Flyway, veritabanı şemasını otomatik yönetir. Güncelleme sırasında yeni migration'lar otomatik uygulanır. Manuel müdahale gerekmez.
+Flyway manages the database schema automatically. New migrations are applied automatically during updates. No manual intervention is required.
 
 ---
 
-## Profiller
+## Profiles
 
-inSCADA üç yapılandırma profili destekler:
+inSCADA supports three configuration profiles:
 
-### Varsayılan (default)
+### Default
 
-Özel profil belirtilmediğinde kullanılır.
+Used when no specific profile is specified.
 
-### dev (Geliştirme)
+### dev (Development)
 
 ```yaml
 spring:
@@ -337,7 +337,7 @@ spring:
         format_sql: true
 ```
 
-SQL logları etkinleşir. Geliştirme ve hata ayıklama için kullanılır. **Kurulum scriptinde varsayılan olarak `dev` profili ayarlıdır.**
+SQL logs are enabled. Used for development and debugging. **The `dev` profile is set by default in the installation script.**
 
 ### test (Test)
 
@@ -357,7 +357,7 @@ spring:
       nodes: 192.168.2.154:26379, 192.168.2.118:26379, 192.168.2.136:26379
 ```
 
-InfluxDB Relay, Redis Sentinel ve uzak veritabanı ile yüksek erişilebilirlik test ortamı.
+High availability test environment with InfluxDB Relay, Redis Sentinel, and remote database.
 
 ### production
 
@@ -368,41 +368,41 @@ spring:
     gzip: true
 ```
 
-InfluxDB GZIP sıkıştırma etkinleşir. Ağ trafiğini azaltır.
+InfluxDB GZIP compression is enabled. Reduces network traffic.
 
-### Profil Değiştirme
+### Changing Profiles
 
 ```bat
-:: NSSM ile profil değiştirme
+:: Change profile with NSSM
 nssm set inSCADA AppParameters "... -Dspring.profiles.active=production ..."
 
-:: Veya komut satırından
+:: Or from the command line
 java -jar inscada.jar --spring.profiles.active=production
 ```
 
 ---
 
-## NSSM ile Windows Servis Kurulumu
+## Windows Service Installation with NSSM
 
-**NSSM** (Non-Sucking Service Manager), inSCADA'yı Windows servisi olarak çalıştırır. Platform, bilgisayar açıldığında otomatik başlar ve arka planda çalışır.
+**NSSM** (Non-Sucking Service Manager) runs inSCADA as a Windows service. The platform starts automatically when the computer boots and runs in the background.
 
-### Hazır Kurulum Scripti
+### Ready-Made Installation Script
 
-Kurulum dizininde `inSCADA_Service_Install.bat` dosyası bulunur. Yönetici olarak çalıştırmanız yeterlidir:
+The `inSCADA_Service_Install.bat` file is located in the installation directory. Simply run it as administrator:
 
 ```bat
-:: Yönetici olarak çalıştırın
+:: Run as administrator
 "C:\Program Files\inSCADA\inSCADA_Service_Install.bat"
 ```
 
-Bu script şunları yapar:
-1. Mevcut inSCADA servisini durdurur ve kaldırır (varsa)
-2. Yeni servisi NSSM ile oluşturur
-3. Tüm JVM ve yapılandırma parametrelerini ayarlar
-4. Otomatik başlatma ve hata durumunda yeniden başlatma yapılandırır
-5. Servisi başlatır
+This script does the following:
+1. Stops and removes the existing inSCADA service (if any)
+2. Creates a new service with NSSM
+3. Sets all JVM and configuration parameters
+4. Configures automatic startup and restart on failure
+5. Starts the service
 
-### Servis Scripti İçeriği
+### Service Script Contents
 
 ```bat
 @echo off
@@ -444,42 +444,42 @@ nssm start %SERVICE_NAME%
 ```
 
 :::note
-Script, hata durumunda servisi 5 saniye bekleyerek otomatik yeniden başlatır (`AppExit Default Restart`, `AppRestartDelay 5000`).
+The script automatically restarts the service with a 5-second delay on failure (`AppExit Default Restart`, `AppRestartDelay 5000`).
 :::
 
-### InfluxDB Servis Kurulumu
+### InfluxDB Service Installation
 
-InfluxDB de ayrı bir Windows servisi olarak çalışır:
+InfluxDB also runs as a separate Windows service:
 
 ```bat
-:: Yönetici olarak çalıştırın
+:: Run as administrator
 "C:\Program Files\inSCADA\inSCADA_TimeserisDB_Service_Install.bat"
 ```
 
-Bu script `inSCADA TimeSeries DB` adında bir servis oluşturur:
+This script creates a service named `inSCADA TimeSeries DB`:
 
-| Ayar | Değer |
-|------|-------|
+| Setting | Value |
+|---------|-------|
 | **Executable** | `C:\Program Files\inSCADA\influxdb-1.8.3-1\influxd.exe` |
 | **Config** | `influxdb-1.8.3-1\influxdb.conf` |
-| **Start** | Otomatik |
-| **Restart** | Hata durumunda otomatik (5s gecikme) |
+| **Start** | Automatic |
+| **Restart** | Automatic on failure (5s delay) |
 
-### Manuel Servis Oluşturma
+### Manual Service Creation
 
-Özel parametrelerle servis kurmak isterseniz:
+If you want to create a service with custom parameters:
 
 ```bat
-:: NSSM'i indirin: https://nssm.cc/download
-:: nssm.exe'yi PATH'e ekleyin veya tam yol ile çalıştırın
+:: Download NSSM: https://nssm.cc/download
+:: Add nssm.exe to PATH or run with full path
 
-:: Servisi oluştur
+:: Create the service
 nssm install inSCADA "C:\Program Files\OpenJDK\jdk-11.0.18.10-hotspot\bin\java.exe"
 
-:: Çalışma dizini
+:: Working directory
 nssm set inSCADA AppDirectory "C:\Program Files\inSCADA"
 
-:: JVM parametreleri — ihtiyaca göre düzenleyin
+:: JVM parameters — adjust as needed
 nssm set inSCADA AppParameters ^
   "-Xms512m -Xmx4096m ^
   -Dserver.ssl.key-alias=inscada ^
@@ -489,139 +489,139 @@ nssm set inSCADA AppParameters ^
   -Duser.timezone=Europe/Istanbul ^
   -jar \"C:\Program Files\inSCADA\inscada.jar\""
 
-:: Otomatik başlatma & hata yönetimi
+:: Automatic startup & error handling
 nssm set inSCADA DisplayName "inSCADA Service"
 nssm set inSCADA Start SERVICE_AUTO_START
 nssm set inSCADA AppExit Default Restart
 nssm set inSCADA AppRestartDelay 5000
 
-:: Başlat
+:: Start
 nssm start inSCADA
 ```
 
-### JVM Bellek Parametreleri
+### JVM Memory Parameters
 
-| Parametre | Açıklama | Önerilen |
-|-----------|----------|----------|
-| **-Xms** | Başlangıç heap belleği | `512m` |
-| **-Xmx** | Maksimum heap belleği | `2048m` (2 GB) |
+| Parameter | Description | Recommended |
+|-----------|-------------|-------------|
+| **-Xms** | Initial heap memory | `512m` |
+| **-Xmx** | Maximum heap memory | `2048m` (2 GB) |
 
-Büyük projeler (1000+ değişken, çok sayıda bağlantı) için:
+For large projects (1000+ variables, many connections):
 
 ```
 -Xms1024m -Xmx4096m
 ```
 
-### Servis Yönetimi
+### Service Management
 
 ```bat
-:: Servisi başlat / durdur / yeniden başlat
+:: Start / stop / restart the service
 nssm start inSCADA
 nssm stop inSCADA
 nssm restart inSCADA
 
-:: Durum kontrol
+:: Check status
 nssm status inSCADA
 
-:: Yapılandırmayı düzenle (GUI)
+:: Edit configuration (GUI)
 nssm edit inSCADA
 
-:: Servisi kaldır
+:: Remove the service
 nssm remove inSCADA confirm
 ```
 
-Windows standart komutları ile:
+With standard Windows commands:
 
 ```bat
 net start inSCADA
 net stop inSCADA
 sc query inSCADA
 
-:: veya services.msc ile grafiksel yönetim
+:: or graphical management via services.msc
 ```
 
 ---
 
-## SSL Sertifika Yönetimi
+## SSL Certificate Management
 
-### Otomatik Sertifika Oluşturma
+### Automatic Certificate Creation
 
-Kurulum dizinindeki `auto-create-cert.bat` scripti:
-- Self-signed PKCS12 keystore oluşturur
-- SAN (Subject Alternative Name) ile localhost, bilgisayar adı ve IP ekler
-- Public sertifikayı `inscada.cer` olarak dışa aktarır
-- Sertifikayı Windows Trusted Root'a otomatik ekler
+The `auto-create-cert.bat` script in the installation directory:
+- Creates a self-signed PKCS12 keystore
+- Adds localhost, computer name, and IP with SAN (Subject Alternative Name)
+- Exports the public certificate as `inscada.cer`
+- Automatically adds the certificate to Windows Trusted Root
 
 ```bat
-:: Yönetici olarak çalıştırın
+:: Run as administrator
 "C:\Program Files\inSCADA\auto-create-cert.bat"
 ```
 
-### İnteraktif Sertifika Oluşturma
+### Interactive Certificate Creation
 
-`create-cert.bat` scripti özel değerler girmenizi sağlar:
+The `create-cert.bat` script allows you to enter custom values:
 
 ```bat
 "C:\Program Files\inSCADA\create-cert.bat"
-:: Keystore dosya adı, şifre, CN, IP ve hostname sorar
+:: Prompts for keystore file name, password, CN, IP, and hostname
 ```
 
-### Özel Sertifika Kullanımı
+### Using a Custom Certificate
 
-Kendi CA sertifikanızı kullanmak için:
+To use your own CA certificate:
 
 ```bash
-# PEM'den PKCS12 oluşturun
+# Create PKCS12 from PEM
 keytool -importkeystore -srckeystore my-cert.pfx \
   -srcstoretype PKCS12 -destkeystore inscada-keystore.p12 \
   -deststoretype PKCS12 -alias inscada
 
-# Veya OpenSSL ile
+# Or with OpenSSL
 openssl pkcs12 -export \
   -in certificate.crt -inkey private.key \
   -out inscada-keystore.p12 -name inscada
 ```
 
-Sonra NSSM parametrelerini güncelleyin:
+Then update the NSSM parameters:
 
 ```bat
-nssm set inSCADA AppParameters "... -Dserver.ssl.key-store=\"C:\Program Files\inSCADA\inscada-keystore.p12\" -Dserver.ssl.key-store-password=yeni_sifre ..."
+nssm set inSCADA AppParameters "... -Dserver.ssl.key-store=\"C:\Program Files\inSCADA\inscada-keystore.p12\" -Dserver.ssl.key-store-password=new_password ..."
 nssm restart inSCADA
 ```
 
 ---
 
-## Windows Firewall Kuralları
+## Windows Firewall Rules
 
-Kurulum dizinindeki `firewallsettings.bat` scripti gerekli port kurallarını ekler:
+The `firewallsettings.bat` script in the installation directory adds the required port rules:
 
 ```bat
-:: Yönetici olarak çalıştırın
+:: Run as administrator
 "C:\Program Files\inSCADA\firewallsettings.bat"
 ```
 
-Eklenen kurallar:
+Added rules:
 
-| Kural | Yön | Port | Protokol |
-|-------|-----|------|----------|
-| inSCADA HTTP (8081) | Gelen + Giden | 8081 | TCP |
-| inSCADA HTTPS (8082) | Gelen + Giden | 8082 | TCP |
+| Rule | Direction | Port | Protocol |
+|------|-----------|------|----------|
+| inSCADA HTTP (8081) | Inbound + Outbound | 8081 | TCP |
+| inSCADA HTTPS (8082) | Inbound + Outbound | 8082 | TCP |
 
 ---
 
-## Yapılandırma Kontrol Listesi
+## Configuration Checklist
 
-Yeni kurulum sonrası kontrol edilmesi gereken parametreler:
+Parameters to check after a new installation:
 
-| Parametre | Kontrol |
-|-----------|---------|
-| `spring.datasource.password` | Varsayılan şifre değiştirildi mi? |
-| `server.ssl.key-store-password` | Sertifika şifresi güçlü mü? |
-| `spring.influxdb.password` | InfluxDB şifresi güvenli mi? |
-| `ins.jwt.secret` | Üretim ortamında güçlü bir secret tanımlandı mı? |
-| `ins.accessToken.duration` | Güvenlik gereksinimlerine uygun mu? (varsayılan: 5 dk) |
-| `server.http.redirect` | Üretimde `true` olarak ayarlandı mı? |
-| `user.timezone` | Doğru zaman dilimi ayarlı mı? |
-| JVM `-Xmx` | Proje boyutuna uygun bellek ayrıldı mı? |
-| Firewall | `firewallsettings.bat` çalıştırıldı mı? |
-| SSL Sertifika | Sertifika Trusted Root'a eklendi mi? |
+| Parameter | Check |
+|-----------|-------|
+| `spring.datasource.password` | Has the default password been changed? |
+| `server.ssl.key-store-password` | Is the certificate password strong? |
+| `spring.influxdb.password` | Is the InfluxDB password secure? |
+| `ins.jwt.secret` | Has a strong secret been defined for production? |
+| `ins.accessToken.duration` | Does it meet security requirements? (default: 5 min) |
+| `server.http.redirect` | Is it set to `true` in production? |
+| `user.timezone` | Is the correct time zone configured? |
+| JVM `-Xmx` | Has adequate memory been allocated for the project size? |
+| Firewall | Has `firewallsettings.bat` been run? |
+| SSL Certificate | Has the certificate been added to Trusted Root? |

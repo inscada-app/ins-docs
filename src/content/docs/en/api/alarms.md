@@ -1,23 +1,23 @@
 ---
 title: "Alarm API"
-description: "Aktif alarmlar, alarm geçmişi, onaylama ve zorla kapatma endpoint'leri"
+description: "Active alarms, alarm history, acknowledgment, and force-off endpoints"
 sidebar:
   order: 6
 ---
 
-Alarm API, aktif alarm sorgulama, alarm geçmişi ve alarm yönetimi sağlar.
+The Alarm API provides active alarm queries, alarm history, and alarm management.
 
-## Aktif Alarmlar
+## Active Alarms
 
 ### GET /api/alarms/fired-alarms
 
-Aktif (tetiklenmiş) alarmları sayfalı olarak listeler.
+Lists active (triggered) alarms with pagination.
 
-| Parametre | Tip | Açıklama |
-|-----------|-----|----------|
-| **projectId** | Integer | Proje ID'si |
-| **page** | Integer | Sayfa numarası (varsayılan: 0) |
-| **size** | Integer | Sayfa boyutu (varsayılan: 20) |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| **projectId** | Integer | Project ID |
+| **page** | Integer | Page number (default: 0) |
+| **size** | Integer | Page size (default: 20) |
 
 ```bash
 curl -b cookies.txt \
@@ -25,7 +25,7 @@ curl -b cookies.txt \
   -H "X-Space: claude"
 ```
 
-Yanıt:
+Response:
 ```json
 {
   "content": [],
@@ -40,21 +40,21 @@ Yanıt:
 ```
 
 :::note
-Aktif alarm olmadığında `content` boş dizi döner.
+When there are no active alarms, `content` returns an empty array.
 :::
 
 ### GET /api/alarms/fired-alarms/all
 
-Tüm alarm geçmişini listeler (kapanmış alarmlar dahil).
+Lists the entire alarm history (including closed alarms).
 
-## Alarm Yönetimi
+## Alarm Management
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| POST | `/api/alarms/fired-alarms/acknowledge` | Alarm onayla (acknowledge) |
-| POST | `/api/alarms/fired-alarms/force-off` | Alarm zorla kapat |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/alarms/fired-alarms/acknowledge` | Acknowledge an alarm |
+| POST | `/api/alarms/fired-alarms/force-off` | Force-close an alarm |
 
-### Alarm Onaylama
+### Alarm Acknowledgment
 
 ```bash
 curl -b cookies.txt -X POST \
@@ -63,22 +63,22 @@ curl -b cookies.txt -X POST \
   -d '{"id": 12345}'
 ```
 
-## Alarm Tanımı CRUD
+## Alarm Definition CRUD
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/alarms?projectId=X` | Alarm tanım listesi |
-| POST | `/api/alarms` | Yeni alarm tanımla |
-| PUT | `/api/alarms/{id}` | Alarm güncelle |
-| DELETE | `/api/alarms/{id}` | Alarm sil |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/alarms?projectId=X` | List alarm definitions |
+| POST | `/api/alarms` | Create a new alarm definition |
+| PUT | `/api/alarms/{id}` | Update an alarm |
+| DELETE | `/api/alarms/{id}` | Delete an alarm |
 
-## Alarm Grupları
+## Alarm Groups
 
-| Metod | Endpoint | Açıklama |
-|-------|----------|----------|
-| GET | `/api/alarm-groups?projectId=X` | Alarm grubu listesi |
-| POST | `/api/alarm-groups` | Yeni grup oluştur |
-| PUT | `/api/alarm-groups/{id}` | Grup güncelle |
-| DELETE | `/api/alarm-groups/{id}` | Grup sil |
-| POST | `/api/alarm-groups/{id}/activate` | Grubu etkinleştir |
-| POST | `/api/alarm-groups/{id}/deactivate` | Grubu devre dışı bırak |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/alarm-groups?projectId=X` | List alarm groups |
+| POST | `/api/alarm-groups` | Create a new group |
+| PUT | `/api/alarm-groups/{id}` | Update a group |
+| DELETE | `/api/alarm-groups/{id}` | Delete a group |
+| POST | `/api/alarm-groups/{id}/activate` | Activate a group |
+| POST | `/api/alarm-groups/{id}/deactivate` | Deactivate a group |

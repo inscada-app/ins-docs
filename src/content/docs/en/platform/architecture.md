@@ -5,306 +5,306 @@ sidebar:
   order: 0
 ---
 
-inSCADA, saha cihazlarından veri toplamak, işlemek, görselleştirmek ve otomasyon kurmak için tasarlanmış bir SCADA platformudur. Tek bir uygulama olarak çalışır — tüm bileşenler tek dosyada birleşiktir.
+inSCADA is a SCADA platform designed to collect, process, visualize, and automate data from field devices. It runs as a single application — all components are bundled in a single file.
 
-## Veri Hiyerarşisi
+## Data Hierarchy
 
-inSCADA'daki tüm veriler aşağıdaki hiyerarşik yapıda organize edilir:
+All data in inSCADA is organized in the following hierarchical structure:
 
 ```
-Space (Çalışma Alanı)
+Space
 │
-├── [Space Seviyesi Bileşenler]
-│   ├── Custom Menu (Özel Menü)
-│   ├── Dashboard (Pano)
-│   ├── Expression (Paylaşımlı Formüller)
-│   └── Symbol (SVG Sembol Kütüphanesi)
+├── [Space-Level Components]
+│   ├── Custom Menu
+│   ├── Dashboard
+│   ├── Expression (Shared Formulas)
+│   └── Symbol (SVG Symbol Library)
 │
-└── Project (Proje)
+└── Project
     │
-    ├── [Haberleşme]
-    │   └── Connection (Bağlantı)
-    │       └── Device (Cihaz)
-    │           └── Frame (Veri Çerçevesi)
-    │               └── Variable (Değişken)
+    ├── [Communication]
+    │   └── Connection
+    │       └── Device
+    │           └── Frame (Data Frame)
+    │               └── Variable
     │
-    ├── [İzleme & Alarm]
-    │   ├── Alarm Group (Alarm Grubu)
-    │   │   └── Alarm Definition (Alarm Tanımı)
-    │   └── Trend (Trend Grafiği)
+    ├── [Monitoring & Alarm]
+    │   ├── Alarm Group
+    │   │   └── Alarm Definition
+    │   └── Trend (Trend Chart)
     │       └── Trend Tag
     │
-    ├── [Otomasyon]
-    │   ├── Script (Otomasyon Scripti)
-    │   └── Data Transfer (Veri Aktarımı)
+    ├── [Automation]
+    │   ├── Script (Automation Script)
+    │   └── Data Transfer
     │
-    ├── [Görselleştirme]
-    │   ├── Animation (SVG Ekran)
-    │   └── Faceplate (Tekrar Kullanılabilir Bileşen)
+    ├── [Visualization]
+    │   ├── Animation (SVG Screen)
+    │   └── Faceplate (Reusable Component)
     │
-    └── [Raporlama]
-        └── Report (Rapor)
+    └── [Reporting]
+        └── Report
 ```
 
 :::note[Space vs. Project]
-**Custom Menu**, **Dashboard**, **Expression** ve **Symbol** space seviyesinde tanımlanır — tüm projeler tarafından ortaklaşa kullanılabilir. Diğer tüm bileşenler bir projeye bağlıdır.
+**Custom Menu**, **Dashboard**, **Expression**, and **Symbol** are defined at the space level — they can be shared across all projects. All other components are bound to a project.
 :::
 
-### Space (Çalışma Alanı)
+### Space
 
-Space, en üst seviye izolasyon birimidir. Her space kendi proje, kullanıcı ve yapılandırma setine sahiptir. Farklı space'ler birbirinden tamamen bağımsızdır.
+Space is the top-level isolation unit. Each space has its own set of projects, users, and configurations. Different spaces are completely independent of each other.
 
-Kullanım senaryoları:
-- **Müşteri izolasyonu** — her müşteri için ayrı space
-- **Ortam ayrımı** — geliştirme, test, üretim
-- **Departman ayrımı** — enerji, su, bina otomasyonu
+Use cases:
+- **Customer isolation** — a separate space for each customer
+- **Environment separation** — development, testing, production
+- **Department separation** — energy, water, building automation
 
-### Project (Proje)
+### Project
 
-Proje, bir tesis, saha veya mantıksal birim temsil eder. Bir space altında birden fazla proje olabilir. Projedeki tüm bileşenler (bağlantı, alarm, script, ekran vb.) proje kapsamında çalışır.
+A project represents a facility, site, or logical unit. There can be multiple projects under a space. All components within a project (connections, alarms, scripts, screens, etc.) operate within the project scope.
 
-Örnek projeler:
-- "Ankara Fabrika" — bir üretim tesisi
-- "GES-01" — bir güneş enerji santrali
-- "Bina-A HVAC" — bir binanın iklimlendirme sistemi
+Example projects:
+- "Ankara Factory" — a manufacturing facility
+- "SPP-01" — a solar power plant
+- "Building-A HVAC" — a building's HVAC system
 
-Her projenin opsiyonel olarak **enlem/boylam** koordinatları olabilir ve harita ekranında görselleştirilebilir.
+Each project can optionally have **latitude/longitude** coordinates and can be visualized on the map screen.
 
-### Connection (Bağlantı)
+### Connection
 
-Bağlantı, bir saha cihazına veya sisteme olan haberleşme kanalıdır. Her bağlantı bir protokol kullanır.
+A connection is the communication channel to a field device or system. Each connection uses a protocol.
 
-Desteklenen protokoller:
+Supported protocols:
 
-| Grup | Protokoller |
-|------|------------|
-| **Endüstriyel** | MODBUS TCP/UDP/RTU, S7, EtherNet/IP, Fatek |
-| **Enerji** | DNP3, IEC 60870-5-104, IEC 61850 |
-| **Açık Standart** | OPC UA, OPC DA, OPC XML, MQTT |
-| **Yerel** | LOCAL (simülasyon / dahili hesaplama) |
+| Group | Protocols |
+|-------|-----------|
+| **Industrial** | MODBUS TCP/UDP/RTU, S7, EtherNet/IP, Fatek |
+| **Energy** | DNP3, IEC 60870-5-104, IEC 61850 |
+| **Open Standard** | OPC UA, OPC DA, OPC XML, MQTT |
+| **Local** | LOCAL (simulation / internal calculation) |
 
-Her bağlantı bağımsız olarak başlatılıp durdurulabilir ve durumu izlenebilir (Connected, Disconnected, Error).
+Each connection can be started and stopped independently, and its status can be monitored (Connected, Disconnected, Error).
 
-### Device (Cihaz)
+### Device
 
-Cihaz, bir bağlantı üzerindeki fiziksel veya mantıksal birimi temsil eder. Örneğin bir MODBUS bağlantısı üzerinde birden fazla slave cihaz olabilir.
+A device represents a physical or logical unit on a connection. For example, there can be multiple slave devices on a single MODBUS connection.
 
-### Frame (Veri Çerçevesi)
+### Frame (Data Frame)
 
-Frame, bir cihazdan okunan veri bloğudur. Her frame belirli bir adres aralığını ve okuma periyodunu tanımlar.
+A frame is a data block read from a device. Each frame defines a specific address range and read period.
 
-| Parametre | Açıklama |
-|-----------|----------|
-| **Başlangıç Adresi** | Okunacak ilk adres |
-| **Miktar** | Okunacak register/nokta sayısı |
-| **Periyot** | Okuma sıklığı (ms) |
+| Parameter | Description |
+|-----------|-------------|
+| **Start Address** | The first address to read |
+| **Quantity** | Number of registers/points to read |
+| **Period** | Read frequency (ms) |
 
 :::tip
-Frame, performans optimizasyonu için kritiktir. Ardışık adresleri tek bir frame'de toplamak, ayrı ayrı okumaktan çok daha verimlidir.
+Frame is critical for performance optimization. Grouping consecutive addresses into a single frame is much more efficient than reading them individually.
 :::
 
-### Variable (Değişken)
+### Variable
 
-Değişken, platformdaki en temel veri birimidir. Bir sıcaklık ölçümü, bir motor durumu, bir sayaç değeri — her biri bir değişkendir.
+A variable is the most fundamental data unit in the platform. A temperature measurement, a motor status, a counter value — each one is a variable.
 
-Her değişkenin temel özellikleri:
+Key properties of each variable:
 
-| Özellik | Açıklama |
-|---------|----------|
-| **Name** | Benzersiz ad (proje içinde) |
+| Property | Description |
+|----------|-------------|
+| **Name** | Unique name (within the project) |
 | **Type** | Float, Integer, Boolean, String |
-| **Unit** | Mühendislik birimi (°C, kW, bar, V, A...) |
-| **Ölçekleme** | Raw → Engineering dönüşümü (engZeroScale, engFullScale) |
-| **Loglama** | Tarihsel veri kayıt tipi ve periyodu |
-| **Expression** | Özel değer hesaplama formülü |
+| **Unit** | Engineering unit (°C, kW, bar, V, A...) |
+| **Scaling** | Raw → Engineering conversion (engZeroScale, engFullScale) |
+| **Logging** | Historical data recording type and period |
+| **Expression** | Custom value calculation formula |
 
-#### Ölçekleme (Scaling)
+#### Scaling
 
-Ham (raw) değer, mühendislik değerine lineer olarak dönüştürülür:
+The raw value is linearly converted to the engineering value:
 
 ```
 Engineering = engZeroScale + (raw - rawZeroScale) ×
               (engFullScale - engZeroScale) / (rawFullScale - rawZeroScale)
 ```
 
-Örnek: 4-20mA sensör → 0-100°C ölçekleme:
+Example: 4-20mA sensor → 0-100°C scaling:
 - Raw: 4mA → 0°C, 20mA → 100°C
 - engZeroScale=0, engFullScale=100, rawZeroScale=4, rawFullScale=20
 
-#### Loglama Tipleri
+#### Logging Types
 
-| Tip | Açıklama |
-|-----|----------|
-| **Periodically** | Sabit aralıkla kayıt (logPeriod saniye) |
-| **When Changed** | Değer değiştiğinde kayıt |
-| **None** | Kayıt yok |
+| Type | Description |
+|------|-------------|
+| **Periodically** | Records at fixed intervals (logPeriod seconds) |
+| **When Changed** | Records when the value changes |
+| **None** | No recording |
 
 #### Value Expression
 
-Değişkene özel bir hesaplama formülü atanabilir. Her okuma döngüsünde bu formül çalışır ve sonucu değişkenin değeri olur:
+A custom calculation formula can be assigned to a variable. This formula runs on every read cycle, and its result becomes the variable's value:
 
 ```javascript
-// Örnek: Sinüs dalga simülasyonu
+// Example: Sine wave simulation
 var t = new Date().getTime() / 1000;
 return (Math.sin(t / 60) * 150 + 450).toFixed(2) * 1;
 ```
 
 ---
 
-## Alarm Sistemi
+## Alarm System
 
-### Alarm Grubu
+### Alarm Group
 
-Alarmlar grup halinde organize edilir. Her alarm grubu bir proje altındadır ve toplu olarak etkinleştirilebilir/devre dışı bırakılabilir.
+Alarms are organized in groups. Each alarm group belongs to a project and can be enabled/disabled as a whole.
 
 ```
 Project
-└── Alarm Group (örn: "Sıcaklık Alarmları")
-    ├── Alarm: Temperature_C > 60°C (Yüksek Sıcaklık)
-    ├── Alarm: Temperature_C > 80°C (Kritik Sıcaklık)
-    └── Alarm: Temperature_C < 10°C (Düşük Sıcaklık)
+└── Alarm Group (e.g., "Temperature Alarms")
+    ├── Alarm: Temperature_C > 60°C (High Temperature)
+    ├── Alarm: Temperature_C > 80°C (Critical Temperature)
+    └── Alarm: Temperature_C < 10°C (Low Temperature)
 ```
 
-### Alarm Tipleri
+### Alarm Types
 
-| Tip | Açıklama | Parametreler |
-|-----|----------|-------------|
-| **Analog** | Sayısal değer eşik kontrolü | High, High-High, Low, Low-Low |
-| **Digital** | Boolean durum kontrolü | ON → Alarm, OFF → Normal |
-| **Custom** | Script tabanlı özel koşul | JavaScript expression |
+| Type | Description | Parameters |
+|------|-------------|------------|
+| **Analog** | Numeric value threshold check | High, High-High, Low, Low-Low |
+| **Digital** | Boolean state check | ON → Alarm, OFF → Normal |
+| **Custom** | Script-based custom condition | JavaScript expression |
 
-### Alarm Yaşam Döngüsü
+### Alarm Lifecycle
 
 ```
-Normal → Fired (tetiklendi) → Acknowledged (onaylandı) → Off (kapandı)
+Normal → Fired → Acknowledged → Off
 ```
 
-Her alarm olayı tarihsel olarak kaydedilir: tetiklenme zamanı, kapanma zamanı, onaylayan kullanıcı, süre.
+Every alarm event is recorded historically: fire time, off time, acknowledging user, duration.
 
 ---
 
 ## Script Engine
 
-Script'ler platformun otomasyon motorudur. Sunucu tarafında çalışır ve tüm platform verilerine erişebilir.
+Scripts are the platform's automation engine. They run server-side and can access all platform data.
 
-### Script Kullanım Alanları
+### Script Use Cases
 
-| Alan | Açıklama | Örnek |
-|------|----------|-------|
-| **Zamanlanmış görev** | Periyodik veya saatli çalışma | Her 10 saniyede enerji hesaplama |
-| **Değişken formülü** | Değer dönüşümü | İki değişkenden üçüncüyü türetme |
-| **Alarm koşulu** | Özel alarm mantığı | Birden fazla değişkene bağlı koşul |
-| **Veri entegrasyonu** | REST API çağrısı | Hava durumu API'sinden veri çekme |
-| **Raporlama** | Otomatik rapor | Her sabah PDF rapor e-posta ile gönderme |
-| **Bildirim** | Olay bazlı bildirim | Alarm tetiklenince SMS gönderme |
+| Area | Description | Example |
+|------|-------------|---------|
+| **Scheduled task** | Periodic or timed execution | Energy calculation every 10 seconds |
+| **Variable formula** | Value transformation | Deriving a third variable from two others |
+| **Alarm condition** | Custom alarm logic | Condition dependent on multiple variables |
+| **Data integration** | REST API call | Fetching data from a weather API |
+| **Reporting** | Automated report | Sending a PDF report by email every morning |
+| **Notification** | Event-based notification | Sending an SMS when an alarm fires |
 
-### Zamanlama Tipleri
+### Schedule Types
 
-| Tip | Kullanım |
-|-----|----------|
-| **Periodic** | Her X milisaniyede bir çalışır |
-| **Daily** | Her gün belirli saatte çalışır |
-| **Once** | Bir kez çalışıp durur |
-| **None** | Yalnızca manuel veya API ile tetiklenir |
+| Type | Usage |
+|------|-------|
+| **Periodic** | Runs every X milliseconds |
+| **Daily** | Runs at a specific time every day |
+| **Once** | Runs once and stops |
+| **None** | Triggered only manually or via API |
 
-Detaylı bilgi: [Script Engine →](/docs/tr/platform/scripts/)
+Details: [Script Engine →](/docs/tr/platform/scripts/)
 
 ---
 
-## Görselleştirme Bileşenleri
+## Visualization Components
 
-### Animation (SVG Ekran) — Proje Seviyesi
+### Animation (SVG Screen) — Project Level
 
 ![SVG Animation — Energy Monitoring Dashboard](../../../../assets/docs/variable-tracking.png)
 
-SVG tabanlı interaktif SCADA ekranları. Değişken değerleri ekran üzerinde gerçek zamanlı olarak gösterilir: renk değişimi, hareket, sayısal gösterim, açma/kapama kontrolleri.
+SVG-based interactive SCADA screens. Variable values are displayed in real time on the screen: color changes, motion, numeric display, on/off controls.
 
-### Faceplate — Proje Seviyesi
+### Faceplate — Project Level
 
-Tekrar kullanılabilir SVG bileşenleri. Bir motor, vana, pompa gibi sık kullanılan görsel öğeler faceplate olarak tanımlanıp birden fazla animation ekranında kullanılabilir.
+Reusable SVG components. Frequently used visual elements such as motors, valves, and pumps can be defined as faceplates and used across multiple animation screens.
 
-### Symbol (SVG Sembol Kütüphanesi) — Space Seviyesi
+### Symbol (SVG Symbol Library) — Space Level
 
-Space genelinde paylaşılan SVG sembol kütüphanesi. Tüm projelerdeki animation ve faceplate'ler bu sembolleri kullanabilir.
+SVG symbol library shared across the space. Animations and faceplates in all projects can use these symbols.
 
-### Dashboard (Pano) — Space Seviyesi
+### Dashboard — Space Level
 
-Farklı projelerden verileri tek bir panoda birleştirmek için kullanılır. Space seviyesinde tanımlandığı için projeler arası veri karşılaştırması yapılabilir.
+Used to combine data from different projects into a single dashboard. Since it is defined at the space level, cross-project data comparison is possible.
 
-### Trend Grafiği — Proje Seviyesi
+### Trend Chart — Project Level
 
-Değişkenlerin zaman içindeki değişimini gösteren grafikler. Birden fazla değişken aynı grafikte gösterilebilir (Trend Tag). Geçmişe dönük veri inceleme ve karşılaştırma için kullanılır.
+Charts showing the change of variables over time. Multiple variables can be shown on the same chart (Trend Tag). Used for historical data review and comparison.
 
-### Custom Menu (Özel Menü) — Space Seviyesi
+### Custom Menu — Space Level
 
-Kullanıcıya özel menü yapısı oluşturmak için kullanılır. Space seviyesinde tanımlanır — farklı roller için farklı menüler atanabilir. Operatör yalnızca izleme ekranlarını, yönetici raporları, mühendis yapılandırma sayfalarını görür.
+Used to create custom menu structures for users. Defined at the space level — different menus can be assigned to different roles. An operator sees only monitoring screens, a manager sees reports, and an engineer sees configuration pages.
 
-### Report (Rapor) — Proje Seviyesi
+### Report — Project Level
 
-Rapor sistemi, PDF ve Excel formatında çıktı üretir. Zamanlanabilir, e-posta ile gönderilebilir, dosyaya kaydedilebilir.
+The reporting system produces output in PDF and Excel formats. Reports can be scheduled, sent by email, or saved to file.
 
-### Expression (Paylaşımlı Formül) — Space Seviyesi
+### Expression (Shared Formula) — Space Level
 
-Space genelinde paylaşılan hesaplama formülleri. Birden fazla değişken veya alarm tarafından ortak kullanılabilir. Tekrarlanan formülleri merkezi olarak yönetmeyi sağlar.
+Calculation formulas shared across the space. Can be used by multiple variables or alarms. Enables centralized management of repeated formulas.
 
-### Project Map (Harita)
+### Project Map
 
 ![Project Map](../../../../assets/docs/rt-project-map.png)
 
-GIS harita üzerinde projelerin coğrafi konumlarını gösterir. Her proje noktasında anlık değerler, alarm durumu ve bağlantı durumu popup olarak görüntülenir.
+Displays the geographic locations of projects on a GIS map. At each project point, real-time values, alarm status, and connection status are shown as a popup.
 
 ---
 
-## Veritabanı Yapısı
+## Database Structure
 
-inSCADA üç farklı veritabanı katmanı kullanır. Her biri farklı bir veri tipine optimize edilmiştir:
+inSCADA uses three different database layers. Each is optimized for a different data type:
 
-### Yapılandırma Veritabanı
+### Configuration Database
 
-Proje tanımları, değişken ayarları, kullanıcılar, roller, alarm tanımları, script kodları — kısaca platformun tüm yapılandırma verileri burada tutulur.
+Project definitions, variable settings, users, roles, alarm definitions, script code — all platform configuration data is stored here.
 
-Bu veriler nadiren değişir, ilişkisel yapıdadır ve tutarlılık (consistency) önceliklidir.
+This data rarely changes, has a relational structure, and consistency is the priority.
 
-### Zaman Serisi Veritabanı
+### Time Series Database
 
-Değişken tarihsel değerleri, alarm geçmişi, olay logları, giriş denemeleri — zaman damgalı tüm veriler burada tutulur.
+Variable historical values, alarm history, event logs, login attempts — all time-stamped data is stored here.
 
-Bu veriler sürekli yazılır, nadiren güncellenir ve zaman aralığına göre sorgulanır. Saklama politikaları (retention policy) ile eski veriler otomatik temizlenebilir.
+This data is continuously written, rarely updated, and queried by time range. Old data can be automatically cleaned up with retention policies.
 
-| Veri Tipi | Varsayılan Saklama |
+| Data Type | Default Retention |
 |-----------|-------------------|
-| Değişken değerleri | 365 gün |
-| Alarm geçmişi | 365 gün |
-| Olay logları | 14 gün |
-| Giriş denemeleri | 365 gün |
+| Variable values | 365 days |
+| Alarm history | 365 days |
+| Event logs | 14 days |
+| Login attempts | 365 days |
 
-### Anlık Değer Cache
+### Real-Time Value Cache
 
-Tüm değişkenlerin **son güncel değerleri** bellekte (cache) tutulur. `ins.getVariableValue()` veya REST API ile değer okunduğunda cache'ten döner — veritabanına gitmez.
+The **latest current values** of all variables are kept in memory (cache). When a value is read via `ins.getVariableValue()` or the REST API, it returns from the cache — no database query is needed.
 
-Bu sayede:
-- Anlık değer okuma < 1ms
-- Binlerce değişken eşzamanlı okunabilir
-- Web arayüzü ve script'ler aynı güncel veriye erişir
+This provides:
+- Real-time value read < 1ms
+- Thousands of variables can be read simultaneously
+- Web interface and scripts access the same up-to-date data
 
 ---
 
-## Veri Akışı
+## Data Flow
 
-Bir saha cihazından web ekranına kadar verinin izlediği yol:
+The path data follows from a field device to the web screen:
 
 ```
 ┌─────────┐    ┌──────────┐    ┌─────────┐    ┌────────┐    ┌────────┐
-│  Saha   │───▶│ Bağlantı │───▶│  Frame   │───▶│ Ham    │───▶│Ölçekle │
-│ Cihazı  │    │(Protokol)│    │ (Okuma)  │    │ Değer  │    │  me    │
+│  Field   │───▶│Connection│───▶│  Frame   │───▶│  Raw   │───▶│Scaling │
+│ Device   │    │(Protocol)│    │ (Read)   │    │ Value  │    │        │
 └─────────┘    └──────────┘    └─────────┘    └────────┘    └───┬────┘
                                                                 │
                     ┌───────────────────────────────────────────┘
                     │
                     ▼
               ┌──────────┐    ┌──────────┐    ┌──────────┐
-              │  Cache   │───▶│ Loglama  │    │  Alarm   │
-              │(Anlık)   │    │(Tarihsel)│    │ Kontrol  │
+              │  Cache   │───▶│ Logging  │    │  Alarm   │
+              │(Real-time)│   │(History) │    │  Check   │
               └────┬─────┘    └──────────┘    └──────────┘
                    │
           ┌────────┼────────┐
@@ -315,60 +315,60 @@ Bir saha cihazından web ekranına kadar verinin izlediği yol:
      └────────┘└────────┘└────────┘
 ```
 
-1. **Saha Cihazı** — PLC, RTU, sensör, sayaç vb.
-2. **Bağlantı** — Belirlenen protokol ile cihaza bağlanır
-3. **Frame Okuma** — Tanımlı periyotta adres bloğunu okur
-4. **Ham Değer** — Cihazdan gelen raw veri
-5. **Ölçekleme** — Raw → Engineering dönüşümü (varsa)
-6. **Cache** — Güncel değer bellek cache'ine yazılır
-7. **Loglama** — Loglama tipine göre zaman serisi veritabanına kayıt
-8. **Alarm Kontrol** — Alarm tanımlarına göre eşik kontrolü
-9. **Tüketim** — Web UI (WebSocket), Script Engine, REST API aynı cache'ten okur
+1. **Field Device** — PLC, RTU, sensor, meter, etc.
+2. **Connection** — Connects to the device using the specified protocol
+3. **Frame Read** — Reads the address block at the defined period
+4. **Raw Value** — Raw data received from the device
+5. **Scaling** — Raw → Engineering conversion (if applicable)
+6. **Cache** — Current value is written to the in-memory cache
+7. **Logging** — Records to the time series database based on logging type
+8. **Alarm Check** — Threshold check based on alarm definitions
+9. **Consumption** — Web UI (WebSocket), Script Engine, REST API all read from the same cache
 
-### Yazma Akışı (Komut Gönderme)
+### Write Flow (Sending Commands)
 
 ```
-UI / Script / API → Cache Güncelleme → Bağlantı → Protokol Yazma → Saha Cihazı
+UI / Script / API → Cache Update → Connection → Protocol Write → Field Device
 ```
 
-`ins.setVariableValue()` veya UI üzerinden değer yazıldığında, komut bağlantı üzerinden saha cihazına iletilir.
+When a value is written via `ins.setVariableValue()` or the UI, the command is sent to the field device through the connection.
 
 ---
 
-## Çoklu Çalışma Alanı (Multi-Tenant)
+## Multi-Tenant (Multiple Workspaces)
 
 ```
 inSCADA Instance
-├── Space: "enerji"
-│   ├── Project: "GES-01"
-│   ├── Project: "GES-02"
-│   └── Project: "RES-01"
+├── Space: "energy"
+│   ├── Project: "SPP-01"
+│   ├── Project: "SPP-02"
+│   └── Project: "WPP-01"
 │
-├── Space: "bina"
-│   ├── Project: "Merkez Ofis"
-│   └── Project: "Depo"
+├── Space: "building"
+│   ├── Project: "Head Office"
+│   └── Project: "Warehouse"
 │
-└── Space: "su"
-    ├── Project: "Arıtma Tesisi"
-    └── Project: "Pompa İstasyonları"
+└── Space: "water"
+    ├── Project: "Treatment Plant"
+    └── Project: "Pump Stations"
 ```
 
-Her space:
-- Kendi proje seti
-- Kendi kullanıcı yetkileri
-- Birbirinden bağımsız veri
+Each space has:
+- Its own set of projects
+- Its own user permissions
+- Data independent from other spaces
 
-Kullanıcılar birden fazla space'e erişebilir ve oturum sırasında space değiştirebilir.
+Users can access multiple spaces and switch between spaces during a session.
 
 ---
 
-## Erişim ve Portlar
+## Access and Ports
 
-| Port | Kullanım |
-|------|----------|
-| **8081** | HTTP — Web arayüzü ve REST API |
-| **8082** | HTTPS — Web arayüzü ve REST API (şifreli) |
+| Port | Usage |
+|------|-------|
+| **8081** | HTTP — Web interface and REST API |
+| **8082** | HTTPS — Web interface and REST API (encrypted) |
 
-Web arayüzü herhangi bir modern tarayıcıdan erişilebilir. Mobil cihazlardan da (tablet, telefon) responsive olarak çalışır. Ek bir istemci yazılımı kurulumu gerekmez.
+The web interface is accessible from any modern browser. It also works responsively on mobile devices (tablets, phones). No additional client software installation is required.
 
-Yapılandırma detayları: [Yapılandırma →](/docs/tr/deployment/configuration/)
+Configuration details: [Configuration →](/docs/tr/deployment/configuration/)

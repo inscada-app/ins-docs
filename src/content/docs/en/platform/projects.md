@@ -5,24 +5,24 @@ sidebar:
   order: 1
 ---
 
-Proje, inSCADA'daki temel organizasyon birimidir. Bir tesis, saha veya mantıksal birim temsil eder. Tüm bağlantılar, değişkenler, alarmlar, script'ler ve ekranlar bir projeye bağlıdır.
+A project is the fundamental organizational unit in inSCADA. It represents a facility, site, or logical unit. All connections, variables, alarms, scripts, and screens are bound to a project.
 
-![Proje Listesi](../../../../assets/docs/dev-projects.png)
+![Project List](../../../../assets/docs/dev-projects.png)
 
-## Proje Oluşturma
+## Creating a Project
 
-**Menü:** System → Projects → Yeni Proje
+**Menu:** System → Projects → New Project
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Name** | Evet | Proje adı (space içinde benzersiz) |
-| **Description** | Hayır | Açıklama |
-| **Latitude / Longitude** | Hayır | GIS harita koordinatları |
-| **Active** | Evet | Aktif/pasif durumu |
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Name** | Yes | Project name (unique within the space) |
+| **Description** | No | Description |
+| **Latitude / Longitude** | No | GIS map coordinates |
+| **Active** | Yes | Active/inactive status |
 
-## Proje Durumu
+## Project Status
 
-Her projenin bileşen bazlı çalışma durumu izlenebilir:
+The operational status of each project can be monitored on a per-component basis:
 
 ```json
 {
@@ -34,53 +34,53 @@ Her projenin bileşen bazlı çalışma durumu izlenebilir:
 }
 ```
 
-| Bileşen | Olası Durumlar |
-|---------|---------------|
+| Component | Possible States |
+|-----------|----------------|
 | **Connection** | Connected, Disconnected, Error |
 | **Script** | Running, Not Scheduled, Error |
 | **Data Transfer** | Running, Not Scheduled |
 | **Report** | Scheduled, Not Scheduled |
 | **Alarm Group** | Active, Inactive |
 
-## Proje Yapısı
+## Project Structure
 
-Bir proje oluşturulduktan sonra içine eklenen bileşenler:
+Components added to a project after creation:
 
 ```
 Project: "Energy Monitoring Demo"
-├── Connection: LOCAL-Energy (LOCAL protokol)
+├── Connection: LOCAL-Energy (LOCAL protocol)
 │   └── Device: Energy-Device
 │       └── Frame: Energy-Frame
 │           ├── Variable: ActivePower_kW
 │           ├── Variable: Voltage_V
 │           ├── Variable: Current_A
-│           └── ... (10 değişken)
+│           └── ... (10 variables)
 ├── Script: Chart_ActiveReactivePower
 ├── Script: Test_LoggedValues
-├── Animation: (SVG ekranlar)
-├── Trend: (grafik tanımları)
-└── Report: (rapor tanımları)
+├── Animation: (SVG screens)
+├── Trend: (trend definitions)
+└── Report: (report definitions)
 ```
 
-## Proje Haritası
+## Project Map
 
-Projelere koordinat atanırsa, **Project Map** ekranında harita üzerinde görselleştirilebilir:
+If coordinates are assigned to projects, they can be visualized on the map in the **Project Map** screen:
 
-| Alan | Örnek |
-|------|-------|
+| Field | Example |
+|-------|---------|
 | **Latitude** | 37.9 |
 | **Longitude** | 32.5 |
 
-Harita üzerinde her proje noktası tıklandığında popup ile anlık durum bilgisi gösterilir.
+Clicking on a project point on the map displays a popup with real-time status information.
 
-## Script ile Proje Yönetimi
+## Managing Projects with Scripts
 
 ```javascript
-// Tüm projeleri listele
+// List all projects
 var projects = ins.getProjects();
 
-// Proje konumunu güncelle
+// Update project location
 ins.updateProjectLocation(41.0082, 28.9784);
 ```
 
-Detaylı API: [Project API →](/docs/tr/platform/scripts/project-api/) | [REST API →](/docs/tr/api/projects/)
+Detailed API: [Project API →](/docs/tr/platform/scripts/project-api/) | [REST API →](/docs/tr/api/projects/)

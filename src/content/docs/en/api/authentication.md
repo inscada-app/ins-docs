@@ -1,34 +1,34 @@
 ---
 title: "Authentication"
-description: "inSCADA REST API kimlik doğrulama — login, token yönetimi ve güvenlik"
+description: "inSCADA REST API authentication — login, token management, and security"
 sidebar:
   order: 2
 ---
 
-inSCADA REST API, form tabanlı login ve cookie tabanlı JWT token ile kimlik doğrulama kullanır.
+The inSCADA REST API uses form-based login and cookie-based JWT token authentication.
 
 ## Login
 
-### İstek
+### Request
 
 ```
 POST /login
 Content-Type: multipart/form-data
 ```
 
-| Alan | Değer |
-|------|-------|
-| **username** | Kullanıcı adı |
-| **password** | Şifre |
+| Field | Value |
+|-------|-------|
+| **username** | Username |
+| **password** | Password |
 
-### Yanıt
+### Response
 
-Başarılı login, yanıt header'ında iki cookie set eder:
+A successful login sets two cookies in the response header:
 
-| Cookie | Açıklama | Süre |
-|--------|----------|------|
-| **ins_access_token** | Erişim token'ı | Kısa (dakikalar) |
-| **ins_refresh_token** | Yenileme token'ı | Uzun (saatler) |
+| Cookie | Description | Duration |
+|--------|-------------|----------|
+| **ins_access_token** | Access token | Short (minutes) |
+| **ins_refresh_token** | Refresh token | Long (hours) |
 
 ```
 HTTP/1.1 200 OK
@@ -39,25 +39,25 @@ Content-Type: application/json
 {"expire-seconds":300,"spaces":["default_space","production"]}
 ```
 
-Yanıt gövdesi access token süresini (saniye) ve erişilebilir space listesini döndürür.
+The response body returns the access token duration (in seconds) and the list of accessible spaces.
 
-### cURL Örneği
+### cURL Example
 
 ```bash
 # Login
 curl -c cookies.txt -X POST https://localhost:8082/login \
   -F "username=admin" -F "password=admin"
 
-# API çağrısı (cookie ile)
+# API call (with cookie)
 curl -b cookies.txt https://localhost:8082/api/projects \
   -H "X-Space: default_space"
 ```
 
-## Token Yenileme
+## Token Renewal
 
-Access token süresi dolduğunda, refresh token ile otomatik yenilenir. İstemci tarafında ek işlem gerekmez — tarayıcı cookie'leri otomatik gönderir.
+When the access token expires, it is automatically renewed using the refresh token. No additional action is required on the client side — the browser sends cookies automatically.
 
-Programatik erişimde cookie'leri saklayıp sonraki isteklerde gönderin:
+For programmatic access, store the cookies and send them with subsequent requests:
 
 ```javascript
 // JavaScript (fetch)
@@ -82,29 +82,29 @@ projects = session.get('https://inscada:8082/api/projects',
 
 ## X-Space Header
 
-Çoklu çalışma alanı (multi-tenant) yapısında, API isteklerinde hangi space'te çalışıldığını belirtmek için `X-Space` header'ı kullanılır:
+In the multi-workspace (multi-tenant) architecture, the `X-Space` header is used to specify which space the API request operates in:
 
 ```
 X-Space: default_space
 ```
 
-Bu header her API isteğinde gönderilmelidir. Gönderilmezse varsayılan space kullanılır.
+This header should be sent with every API request. If omitted, the default space is used.
 
-## Güvenlik
+## Security
 
-### Brute-Force Koruması
+### Brute-Force Protection
 
-- **5 başarısız giriş** → hesap **10 dakika** kilitlenir
-- Kilitlenen hesaplar `/api/auth/lockedUsers` endpoint'inden görüntülenebilir
+- **5 failed login attempts** → account is **locked for 10 minutes**
+- Locked accounts can be viewed at the `/api/auth/lockedUsers` endpoint
 
-### IP Filtreleme
+### IP Filtering
 
-Platform yöneticisi, whitelist/blacklist tabanlı IP filtreleme yapılandırabilir. Filtreleme aktifken yalnızca izin verilen IP adreslerinden API erişimi mümkündür.
+The platform administrator can configure whitelist/blacklist-based IP filtering. When filtering is active, API access is only possible from allowed IP addresses.
 
-### OTP / İki Faktörlü Doğrulama
+### OTP / Two-Factor Authentication
 
-Etkinleştirildiğinde, login sonrası OTP (One-Time Password) doğrulaması da gerekir. TOTP uyumlu mobil uygulamalar (Google Authenticator, Authy vb.) ile kullanılır.
+When enabled, OTP (One-Time Password) verification is also required after login. It is used with TOTP-compatible mobile applications (Google Authenticator, Authy, etc.).
 
 ### HTTPS
 
-Tüm API trafiği **HTTPS** üzerinden şifrelenmelidir. HTTP (port 8081) yalnızca geliştirme ortamında kullanılmalıdır.
+All API traffic should be encrypted over **HTTPS**. HTTP (port 8081) should only be used in development environments.

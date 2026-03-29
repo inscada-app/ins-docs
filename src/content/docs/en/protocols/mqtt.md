@@ -1,120 +1,120 @@
 ---
 title: "MQTT"
-description: "inSCADA'da MQTT protokolü — Subscribe/Publish yapılandırması ve script tabanlı mesaj ayrıştırma"
+description: "MQTT protocol in inSCADA — Subscribe/Publish configuration and script-based message parsing"
 sidebar:
   order: 8
 ---
 
-MQTT (Message Queuing Telemetry Transport), hafif, publish/subscribe tabanlı bir mesajlaşma protokolüdür. IoT ve IIoT uygulamalarında sensörler, gateway'ler ve bulut platformları arasında veri iletimi için yaygın olarak kullanılır. TCP/IP üzerinde çalışır ve varsayılan olarak port **1883** (veya TLS ile 8883) kullanır.
+MQTT (Message Queuing Telemetry Transport) is a lightweight, publish/subscribe-based messaging protocol. It is widely used in IoT and IIoT applications for data transmission between sensors, gateways, and cloud platforms. It runs over TCP/IP and uses port **1883** by default (or 8883 with TLS).
 
-inSCADA, MQTT protokolünü **Client** rolünde destekler — hem **Subscribe** (veri alma) hem de **Publish** (veri gönderme) yapılabilir.
+inSCADA supports the MQTT protocol in **Client** role — both **Subscribe** (receiving data) and **Publish** (sending data) are possible.
 
-## MQTT'nin Farkı: Script Tabanlı Mesaj İşleme
+## What Makes MQTT Different: Script-Based Message Processing
 
-inSCADA'daki MQTT implementasyonu diğer protokollerden farklı bir yaklaşım kullanır. MODBUS veya IEC 104 gibi protokollerde veri yapısı sabittir (register, IOA adresi vb.). MQTT'de ise mesaj payload'ı tamamen serbest formattadır — JSON, XML, düz metin veya binary olabilir.
+The MQTT implementation in inSCADA uses a different approach from other protocols. In protocols like MODBUS or IEC 104, the data structure is fixed (registers, IOA addresses, etc.). In MQTT, the message payload is completely free-form — it can be JSON, XML, plain text, or binary.
 
-Bu nedenle inSCADA, MQTT mesajlarını **Frame seviyesinde tanımlanan JavaScript scriptleri** ile parse eder. Her Frame'de iki script alanı bulunur:
+For this reason, inSCADA parses MQTT messages using **JavaScript scripts defined at the Frame level**. Each Frame has two script fields:
 
-- **Subscribe Expression:** Gelen mesajı parse edip variable değerlerine dönüştüren script
-- **Publish Expression:** Variable değerlerini MQTT mesajına dönüştüren script
+- **Subscribe Expression:** A script that parses incoming messages and converts them to variable values
+- **Publish Expression:** A script that converts variable values into MQTT messages
 
-Bu yaklaşım sayesinde herhangi bir formattaki MQTT mesajını inSCADA variable'larına map'leyebilirsiniz.
+With this approach, you can map MQTT messages in any format to inSCADA variables.
 
-## Veri Modeli
+## Data Model
 
 ```
-Connection (Bağlantı — Broker IP, port, kimlik bilgileri)
-└── Device (Cihaz — Base topic)
-    └── Frame (Veri Bloğu — Topic + Subscribe/Publish scriptleri)
-        └── Variable (Değişken — Script çıktısındaki anahtar)
+Connection (Broker IP, port, credentials)
+└── Device (Base topic)
+    └── Frame (Data Block — Topic + Subscribe/Publish scripts)
+        └── Variable (Key in script output)
 ```
 
-## Yapılandırma
+## Configuration
 
 ### Connection
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Protocol** | MQTT | Protokol seçimi |
-| **IP Address** | 192.168.1.200 | MQTT Broker IP adresi |
-| **Port** | 1883 | Broker portu (1883: TCP, 8883: TLS) |
-| **Identifier** | `inscada-client-1` | Client tanımlayıcı (benzersiz olmalı) |
-| **Username** | (opsiyonel) | Broker kimlik doğrulama |
-| **Password** | (opsiyonel) | Broker şifresi |
-| **Use SSL** | false | TLS/SSL şifreleme |
-| **Clean Session** | true | Temiz oturum (kalıcı abonelik yok) |
-| **Keep Alive** | 60000 ms | Canlılık kontrolü periyodu |
-| **Initial Delay** | 1000 ms | İlk bağlantı bekleme süresi |
-| **Max Delay** | 60000 ms | Maksimum yeniden bağlanma bekleme süresi |
-| **Pool Size** | 1 | Bağlantı havuzu |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Protocol** | MQTT | Protocol selection |
+| **IP Address** | 192.168.1.200 | MQTT Broker IP address |
+| **Port** | 1883 | Broker port (1883: TCP, 8883: TLS) |
+| **Identifier** | `inscada-client-1` | Client identifier (must be unique) |
+| **Username** | (optional) | Broker authentication |
+| **Password** | (optional) | Broker password |
+| **Use SSL** | false | TLS/SSL encryption |
+| **Clean Session** | true | Clean session (no persistent subscriptions) |
+| **Keep Alive** | 60000 ms | Keep-alive check period |
+| **Initial Delay** | 1000 ms | Initial connection wait time |
+| **Max Delay** | 60000 ms | Maximum reconnection wait time |
+| **Pool Size** | 1 | Connection pool |
 
 ### Device
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Base Topic** | `factory/line1` | Temel topic yolu (Frame topic'lerinin öneki) |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Base Topic** | `factory/line1` | Base topic path (prefix for Frame topics) |
 
 ### Frame
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Topic** | `sensors/temperature` | MQTT topic (subscribe veya publish) |
-| **QoS** | 1 | Quality of Service (0, 1 veya 2) |
-| **Subscribe Expression** | (JavaScript kodu) | Gelen mesajı parse eden script |
-| **Publish Expression** | (JavaScript kodu) | Giden mesajı oluşturan script |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Topic** | `sensors/temperature` | MQTT topic (subscribe or publish) |
+| **QoS** | 1 | Quality of Service (0, 1, or 2) |
+| **Subscribe Expression** | (JavaScript code) | Script that parses incoming messages |
+| **Publish Expression** | (JavaScript code) | Script that creates outgoing messages |
 
-#### QoS Seviyeleri
+#### QoS Levels
 
-| QoS | Açıklama |
-|-----|----------|
-| **0** | At most once — mesaj en fazla bir kez iletilir, kayıp olabilir |
-| **1** | At least once — mesaj en az bir kez iletilir, tekrar olabilir |
-| **2** | Exactly once — mesaj tam bir kez iletilir, garanti |
+| QoS | Description |
+|-----|-------------|
+| **0** | At most once — the message is delivered at most once, loss possible |
+| **1** | At least once — the message is delivered at least once, duplicates possible |
+| **2** | Exactly once — the message is delivered exactly once, guaranteed |
 
 ### Variable
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Name** | `temperature` | Değişken adı (script çıktısındaki key ile eşleşmeli) |
-| **Type** | Float | Veri tipi |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Name** | `temperature` | Variable name (must match the key in script output) |
+| **Type** | Float | Data type |
 
-#### Desteklenen Veri Tipleri
+#### Supported Data Types
 
-| Veri Tipi | Açıklama |
-|-----------|----------|
-| **Boolean** | Tek bit değer |
-| **Byte** | 8-bit tam sayı |
-| **Short** | 16-bit tam sayı |
-| **Integer** | 32-bit tam sayı |
-| **Long** | 64-bit tam sayı |
-| **Float** | 32-bit kayan nokta |
-| **Double** | 64-bit kayan nokta |
-| **String** | Karakter dizisi |
+| Data Type | Description |
+|-----------|-------------|
+| **Boolean** | Single bit value |
+| **Byte** | 8-bit integer |
+| **Short** | 16-bit integer |
+| **Integer** | 32-bit integer |
+| **Long** | 64-bit integer |
+| **Float** | 32-bit floating point |
+| **Double** | 64-bit floating point |
+| **String** | Character string |
 
-## Subscribe Expression (Mesaj Alma)
+## Subscribe Expression (Receiving Messages)
 
-Bir MQTT mesajı geldiğinde inSCADA, Frame'deki **Subscribe Expression** scriptini çalıştırır. Script'e aşağıdaki nesneler binding olarak verilir:
+When an MQTT message arrives, inSCADA executes the **Subscribe Expression** script in the Frame. The following objects are provided to the script as bindings:
 
-| Binding | Tip | Açıklama |
-|---------|-----|----------|
-| **message** | Object | Gelen MQTT mesajı |
-| **message.topic** | String | Mesajın geldiği topic |
-| **message.payload** | String | Mesaj içeriği (string olarak) |
-| **message.qos** | Integer | QoS seviyesi |
-| **message.retained** | Boolean | Retained mesaj mı |
-| **frame** | Object | Frame özet bilgisi |
+| Binding | Type | Description |
+|---------|------|-------------|
+| **message** | Object | Incoming MQTT message |
+| **message.topic** | String | Topic the message arrived from |
+| **message.payload** | String | Message content (as string) |
+| **message.qos** | Integer | QoS level |
+| **message.retained** | Boolean | Whether it is a retained message |
+| **frame** | Object | Frame summary information |
 
-Script, bir **JavaScript Map (Object)** döndürmelidir. Map'in key'leri Variable isimleriyle eşleşmelidir. inSCADA, dönen map'teki her key-value çiftini ilgili Variable'a yazar.
+The script must return a **JavaScript Map (Object)**. The Map's keys must match Variable names. inSCADA writes each key-value pair from the returned map to the corresponding Variable.
 
-### Örnek 1: JSON Payload Parse
+### Example 1: JSON Payload Parse
 
-Gelen mesaj: `{"temperature": 25.4, "humidity": 62.1, "status": true}`
+Incoming message: `{"temperature": 25.4, "humidity": 62.1, "status": true}`
 
 ```javascript
 // Subscribe Expression
 var data = JSON.parse(message.payload);
 
-// Variable isimleriyle eşleşen bir object döndür
+// Return an object matching Variable names
 var result = {};
 result.temperature = data.temperature;
 result.humidity = data.humidity;
@@ -122,14 +122,14 @@ result.status = data.status;
 return result;
 ```
 
-Bu script çalıştığında:
-- `temperature` variable'ına `25.4` yazılır
-- `humidity` variable'ına `62.1` yazılır
-- `status` variable'ına `true` yazılır
+When this script runs:
+- `25.4` is written to the `temperature` variable
+- `62.1` is written to the `humidity` variable
+- `true` is written to the `status` variable
 
-### Örnek 2: İç İçe JSON Parse
+### Example 2: Nested JSON Parse
 
-Gelen mesaj: `{"device": {"id": "sensor-01", "readings": {"temp": 72.5, "press": 3.2}}}`
+Incoming message: `{"device": {"id": "sensor-01", "readings": {"temp": 72.5, "press": 3.2}}}`
 
 ```javascript
 var data = JSON.parse(message.payload);
@@ -140,9 +140,9 @@ result.press = data.device.readings.press;
 return result;
 ```
 
-### Örnek 3: Düz Metin Parse (CSV)
+### Example 3: Plain Text Parse (CSV)
 
-Gelen mesaj: `25.4;62.1;1;1024`
+Incoming message: `25.4;62.1;1;1024`
 
 ```javascript
 var parts = message.payload.split(';');
@@ -154,7 +154,7 @@ result.pressure = parseFloat(parts[3]);
 return result;
 ```
 
-### Örnek 4: Topic'e Göre Koşullu Parse
+### Example 4: Conditional Parse by Topic
 
 ```javascript
 var data = JSON.parse(message.payload);
@@ -169,19 +169,19 @@ if (message.topic.indexOf('temperature') > -1) {
 return result;
 ```
 
-### Örnek 5: ins.* API Kullanımı (Cross-Variable Erişim)
+### Example 5: Using ins.* API (Cross-Variable Access)
 
-Subscribe script içinde `ins` API'si ile diğer variable'lara erişebilirsiniz:
+You can access other variables within the subscribe script using the `ins` API:
 
 ```javascript
 var data = JSON.parse(message.payload);
 var result = {};
 result.temperature = data.temp;
 
-// Başka bir variable'ın güncel değerini oku
+// Read the current value of another variable
 var currentSetpoint = ins.getVariableValue('setpoint_temp');
 if (currentSetpoint != null) {
-    // Fark hesapla ve başka bir variable'a yaz
+    // Calculate the difference and write to another variable
     var diff = data.temp - currentSetpoint.value;
     result.temp_deviation = diff;
 }
@@ -189,20 +189,20 @@ if (currentSetpoint != null) {
 return result;
 ```
 
-## Publish Expression (Mesaj Gönderme)
+## Publish Expression (Sending Messages)
 
-Bir Variable'a değer yazıldığında (set value) inSCADA, Frame'deki **Publish Expression** scriptini çalıştırır. Script'e aşağıdaki nesneler binding olarak verilir:
+When a value is written (set value) to a Variable, inSCADA executes the **Publish Expression** script in the Frame. The following objects are provided to the script as bindings:
 
-| Binding | Tip | Açıklama |
-|---------|-----|----------|
-| **frame** | Object | Frame özet bilgisi |
-| **setValueRequests** | Array | Yazılmak istenen variable ve değer listesi |
-| **setValueRequests[n].variable** | Object | Variable bilgisi (name, type) |
-| **setValueRequests[n].value** | Object | Yazılacak değer |
+| Binding | Type | Description |
+|---------|------|-------------|
+| **frame** | Object | Frame summary information |
+| **setValueRequests** | Array | List of variables and values to be written |
+| **setValueRequests[n].variable** | Object | Variable information (name, type) |
+| **setValueRequests[n].value** | Object | Value to write |
 
-Script, MQTT broker'a publish edilecek **String** payload döndürmelidir.
+The script must return a **String** payload to be published to the MQTT broker.
 
-### Örnek: JSON Publish
+### Example: JSON Publish
 
 ```javascript
 var payload = {};
@@ -213,9 +213,9 @@ for (var i = 0; i < setValueRequests.length; i++) {
 return JSON.stringify(payload);
 ```
 
-Bu script, `{"temperature": 25.0, "setpoint": 30.0}` gibi bir JSON string üretir ve broker'a publish eder.
+This script produces a JSON string like `{"temperature": 25.0, "setpoint": 30.0}` and publishes it to the broker.
 
-### Örnek: Komut Publish
+### Example: Command Publish
 
 ```javascript
 var req = setValueRequests[0];
@@ -228,42 +228,42 @@ var command = {
 return JSON.stringify(command);
 ```
 
-## ins.* Script API Referansı
+## ins.* Script API Reference
 
-MQTT script'leri içinde kullanılabilecek temel `ins` API fonksiyonları:
+Key `ins` API functions available within MQTT scripts:
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| `ins.getVariableValue(name)` | Variable'ın anlık değerini oku (aynı proje) |
-| `ins.getVariableValue(project, name)` | Farklı projedeki variable'ı oku |
-| `ins.getVariableValues(names[])` | Birden fazla variable'ı toplu oku |
-| `ins.setVariableValue(name, {value: X})` | Variable'a değer yaz |
-| `ins.setVariableValues({name: {value: X}, ...})` | Birden fazla variable'a toplu yaz |
-| `ins.mapVariableValue(src, dest)` | Bir variable'ın değerini başka birine kopyala |
-| `ins.toggleVariableValue(name)` | Boolean variable'ı toggle et |
-| `ins.sparkplugDecode(payload)` | Sparkplug B Protobuf payload'ını decode et |
-| `ins.sparkplugEncode(metrics)` | Sparkplug B Protobuf payload'ı oluştur |
+| Function | Description |
+|----------|-------------|
+| `ins.getVariableValue(name)` | Read the live value of a Variable (same project) |
+| `ins.getVariableValue(project, name)` | Read a variable from a different project |
+| `ins.getVariableValues(names[])` | Read multiple variables in bulk |
+| `ins.setVariableValue(name, {value: X})` | Write a value to a Variable |
+| `ins.setVariableValues({name: {value: X}, ...})` | Write values to multiple variables in bulk |
+| `ins.mapVariableValue(src, dest)` | Copy a variable's value to another |
+| `ins.toggleVariableValue(name)` | Toggle a Boolean variable |
+| `ins.sparkplugDecode(payload)` | Decode a Sparkplug B Protobuf payload |
+| `ins.sparkplugEncode(metrics)` | Create a Sparkplug B Protobuf payload |
 
 :::tip
-`ins.getVariableValue()` dönen nesne `{value, date}` yapısındadır. Değere erişmek için `.value` kullanın: `ins.getVariableValue('temp').value`
+The object returned by `ins.getVariableValue()` has the structure `{value, date}`. Use `.value` to access the value: `ins.getVariableValue('temp').value`
 :::
 
-## Sparkplug B Desteği
+## Sparkplug B Support
 
-[Sparkplug B](https://www.eclipse.org/tahu/), MQTT üzerinde endüstriyel SCADA verisi taşımak için Eclipse Foundation tarafından standartlaştırılmış bir payload spesifikasyonudur. Standart MQTT'nin üzerine şunları ekler:
+[Sparkplug B](https://www.eclipse.org/tahu/) is a payload specification standardized by the Eclipse Foundation for carrying industrial SCADA data over MQTT. It adds the following on top of standard MQTT:
 
-- **Standart topic yapısı:** `spBv1.0/{group}/{message_type}/{edge_node}/{device}` formatında sabit hiyerarşi
-- **Birth/Death sertifikaları:** Cihaz bağlandığında NBIRTH, ayrıldığında NDEATH mesajı — SCADA tarafı cihazın çevrimiçi/çevrimdışı olduğunu anında bilir
-- **Auto-discovery:** Cihaz, değişken listesini ve veri tiplerini BIRTH mesajıyla gönderir — manuel tag tanımı gerekmez
-- **Report by exception:** Yalnızca değişen değerler gönderilir — bant genişliği optimize edilir
-- **Endüstriyel veri tipleri:** Integer, Float, Boolean, DateTime, String, Dataset, Template
+- **Standard topic structure:** A fixed hierarchy in the format `spBv1.0/{group}/{message_type}/{edge_node}/{device}`
+- **Birth/Death certificates:** NBIRTH message when a device connects, NDEATH when it disconnects — the SCADA side instantly knows whether the device is online/offline
+- **Auto-discovery:** The device sends its variable list and data types with the BIRTH message — no manual tag definition needed
+- **Report by exception:** Only changed values are sent — bandwidth is optimized
+- **Industrial data types:** Integer, Float, Boolean, DateTime, String, Dataset, Template
 
-Sparkplug B mesajları **Protobuf (Protocol Buffers)** formatında kodlanır — binary formattadır, JSON gibi düz metin değildir. inSCADA, `ins.sparkplugDecode()` ve `ins.sparkplugEncode()` API fonksiyonları ile Sparkplug B Protobuf mesajlarını doğrudan script içinde decode/encode edebilir.
+Sparkplug B messages are encoded in **Protobuf (Protocol Buffers)** format — a binary format, not plain text like JSON. inSCADA can directly decode/encode Sparkplug B Protobuf messages within scripts using the `ins.sparkplugDecode()` and `ins.sparkplugEncode()` API functions.
 
 ### Subscribe — Sparkplug B Decode
 
 ```javascript
-// Sparkplug B mesajını decode et
+// Decode Sparkplug B message
 var decoded = ins.sparkplugDecode(message.payload);
 var result = {};
 
@@ -276,12 +276,12 @@ for (var i = 0; i < metrics.length; i++) {
 return result;
 ```
 
-Bu script, Sparkplug B DDATA veya DBIRTH mesajındaki tüm metric'leri parse edip ilgili variable'lara yazar.
+This script parses all metrics from a Sparkplug B DDATA or DBIRTH message and writes them to the corresponding variables.
 
 ### Publish — Sparkplug B Encode
 
 ```javascript
-// Variable değerlerinden Sparkplug B payload oluştur
+// Create Sparkplug B payload from variable values
 var metrics = [];
 for (var i = 0; i < setValueRequests.length; i++) {
     var req = setValueRequests[i];
@@ -294,53 +294,53 @@ for (var i = 0; i < setValueRequests.length; i++) {
 return ins.sparkplugEncode(metrics);
 ```
 
-### Sparkplug B Topic Yapısı
+### Sparkplug B Topic Structure
 
-| Topic | Mesaj Tipi | Açıklama |
-|-------|-----------|----------|
-| `spBv1.0/group/NBIRTH/edge_node` | Node Birth | Edge node çevrimiçi oldu |
-| `spBv1.0/group/NDEATH/edge_node` | Node Death | Edge node çevrimdışı oldu |
-| `spBv1.0/group/DBIRTH/edge_node/device` | Device Birth | Cihaz çevrimiçi + metric listesi |
-| `spBv1.0/group/DDATA/edge_node/device` | Device Data | Canlı veri (değişen metric'ler) |
-| `spBv1.0/group/DCMD/edge_node/device` | Device Command | Cihaza komut gönderme |
+| Topic | Message Type | Description |
+|-------|-------------|-------------|
+| `spBv1.0/group/NBIRTH/edge_node` | Node Birth | Edge node came online |
+| `spBv1.0/group/NDEATH/edge_node` | Node Death | Edge node went offline |
+| `spBv1.0/group/DBIRTH/edge_node/device` | Device Birth | Device online + metric list |
+| `spBv1.0/group/DDATA/edge_node/device` | Device Data | Live data (changed metrics) |
+| `spBv1.0/group/DCMD/edge_node/device` | Device Command | Sending commands to device |
 
-### Yapılandırma Örneği
+### Configuration Example
 
-Sparkplug B kullanan bir MQTT Frame yapılandırması:
+An MQTT Frame configuration using Sparkplug B:
 
-| Parametre | Değer |
+| Parameter | Value |
 |-----------|-------|
 | **Topic** | `spBv1.0/factory/DDATA/gateway-01/plc-01` |
 | **QoS** | 0 |
-| **Subscribe Expression** | Yukarıdaki decode scripti |
+| **Subscribe Expression** | The decode script above |
 
 :::tip
-Sparkplug B'de DBIRTH mesajı cihazın tüm metric tanımlarını içerir. Yeni bir cihaz entegre ederken önce DBIRTH mesajını inceleyerek hangi metric'lerin geleceğini ve veri tiplerini öğrenin, ardından inSCADA variable'larını buna göre oluşturun.
+In Sparkplug B, the DBIRTH message contains all metric definitions of the device. When integrating a new device, first examine the DBIRTH message to learn which metrics will arrive and their data types, then create inSCADA variables accordingly.
 :::
 
-## Tipik Kullanım Senaryoları
+## Typical Use Scenarios
 
-### IoT Gateway Entegrasyonu
+### IoT Gateway Integration
 
 ```
-IoT Sensörler ──(MQTT)──► Broker ──(MQTT)──► inSCADA
-                                              (Subscribe + Parse)
+IoT Sensors ──(MQTT)──► Broker ──(MQTT)──► inSCADA
+                                            (Subscribe + Parse)
 ```
 
-inSCADA, IoT gateway veya sensörlerden gelen MQTT mesajlarını subscribe eder, script ile parse edip variable'lara yazar. Böylece MQTT tabanlı IoT cihazları doğrudan SCADA sistemine entegre olur.
+inSCADA subscribes to MQTT messages from IoT gateways or sensors, parses them with scripts, and writes to variables. This way, MQTT-based IoT devices are directly integrated into the SCADA system.
 
-### Bulut Platform Entegrasyonu
+### Cloud Platform Integration
 
 ```
 inSCADA ──(MQTT Publish)──► Broker ──► Azure IoT Hub / AWS IoT / Google Cloud IoT
 ```
 
-inSCADA, topladığı saha verilerini publish expression ile JSON formatına dönüştürüp MQTT broker üzerinden bulut platformlarına iletir.
+inSCADA converts the collected field data to JSON format with a publish expression and forwards it to cloud platforms via the MQTT broker.
 
-### Özel Protokol Dönüşümü
+### Custom Protocol Conversion
 
-MQTT'nin script tabanlı yapısı sayesinde, standart dışı veya özel formattaki mesajları da işleyebilirsiniz. Binary payload'ları JavaScript ile decode edebilir, birden fazla topic'i tek bir frame'de birleştirebilir veya koşullu lojik uygulayabilirsiniz.
+Thanks to MQTT's script-based architecture, you can also process non-standard or custom format messages. You can decode binary payloads with JavaScript, combine multiple topics in a single frame, or apply conditional logic.
 
 :::caution
-Subscribe ve Publish expression'ları her mesajda çalıştırıldığı için performans açısından scriptlerin mümkün olduğunca basit ve verimli tutulması önerilir. Ağır hesaplamalar veya çok sayıda `ins.*` API çağrısı mesaj işleme süresini artırabilir.
+Since subscribe and publish expressions run with every message, it is recommended to keep scripts as simple and efficient as possible for performance reasons. Heavy computations or numerous `ins.*` API calls can increase message processing time.
 :::

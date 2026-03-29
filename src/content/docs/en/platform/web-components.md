@@ -1,18 +1,18 @@
 ---
 title: "Web Components"
-description: "Zero-dependency SCADA bileşenleri — tek HTML tag ile canlı veri gösterimi"
+description: "Zero-dependency SCADA components — live data display with a single HTML tag"
 sidebar:
   order: 23
 ---
 
-inSCADA Web Components, Custom Menu ve Faceplate içinde canlı SCADA verilerini tek bir HTML tag'i ile göstermeyi sağlayan sıfır bağımlılıklı bileşen kütüphanesidir.
+inSCADA Web Components is a zero-dependency component library that allows displaying live SCADA data with a single HTML tag inside Custom Menus and Faceplates.
 
-## Neden Web Components?
+## Why Web Components?
 
-Custom Menu içinde değişken değerlerini göstermek için geleneksel yöntem `fetch` API kullanmaktır:
+The traditional method for displaying variable values inside a Custom Menu is using the `fetch` API:
 
 ```javascript
-// Geleneksel yöntem: 15+ satır JavaScript
+// Traditional method: 15+ lines of JavaScript
 async function loadValue() {
   const resp = await fetch('/api/variables/values?projectId=153&names=ActivePower_kW', {
     credentials: 'include'
@@ -23,26 +23,26 @@ async function loadValue() {
 setInterval(loadValue, 2000);
 ```
 
-Web Components ile aynı işlem:
+The same operation with Web Components:
 
 ```html
-<!-- 1 satır HTML -->
+<!-- 1 line of HTML -->
 <ins-live-value project="153" variable="ActivePower_kW"
                 unit="kW" decimals="1">
 </ins-live-value>
 ```
 
-**Avantajlar:**
-- JavaScript yazmaya gerek yok
-- Otomatik periyodik güncelleme (polling)
-- Aynı projeden okuyan bileşenler tek API çağrısında birleştirilir (batching)
-- Veri gelmediğinde otomatik solma (stale detection)
-- Eşik bazlı renk değişimi (threshold coloring)
-- Shadow DOM ile stil izolasyonu
+**Advantages:**
+- No need to write JavaScript
+- Automatic periodic updates (polling)
+- Components reading from the same project are merged into a single API call (batching)
+- Automatic fading when data is not received (stale detection)
+- Threshold-based color changes (threshold coloring)
+- Style isolation with Shadow DOM
 
-## Kurulum
+## Installation
 
-Web Components kütüphanesini Custom Menu HTML içeriğine ekleyin:
+Add the Web Components library to your Custom Menu HTML content:
 
 ```html
 <script src="/libs/ins-components.min.js"></script>
@@ -50,93 +50,93 @@ Web Components kütüphanesini Custom Menu HTML içeriğine ekleyin:
 
 ## `<ins-live-value>`
 
-Bir değişkenin canlı değerini gösterir.
+Displays a variable's live value.
 
 ### Attributes
 
-| Attribute | Tip | Zorunlu | Açıklama |
-|-----------|-----|---------|----------|
-| **project** | Number | Evet | Proje ID'si |
-| **variable** | String | Evet | Değişken adı |
-| **unit** | String | Hayır | Birim etiketi (°C, kW, bar, V, A...) |
-| **label** | String | Hayır | Başlık etiketi |
-| **decimals** | Number | Hayır | Ondalık basamak sayısı |
-| **thresholds** | String | Hayır | Renk eşikleri (format: `"0:blue,30:green,60:orange,80:red"`) |
-| **format** | String | Hayır | `"raw"` — formatsız gösterim |
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| **project** | Number | Yes | Project ID |
+| **variable** | String | Yes | Variable name |
+| **unit** | String | No | Unit label (°C, kW, bar, V, A...) |
+| **label** | String | No | Title label |
+| **decimals** | Number | No | Number of decimal places |
+| **thresholds** | String | No | Color thresholds (format: `"0:blue,30:green,60:orange,80:red"`) |
+| **format** | String | No | `"raw"` — unformatted display |
 
-### Temel Kullanım
+### Basic Usage
 
 ```html
-<!-- Sadece değer -->
+<!-- Value only -->
 <ins-live-value project="153" variable="ActivePower_kW"></ins-live-value>
 
-<!-- Birim ve ondalık -->
+<!-- Unit and decimals -->
 <ins-live-value project="153" variable="Temperature_C"
                 unit="°C" decimals="1">
 </ins-live-value>
 
-<!-- Başlık ile -->
+<!-- With label -->
 <ins-live-value project="153" variable="Voltage_V"
-                unit="V" label="Gerilim" decimals="1">
+                unit="V" label="Voltage" decimals="1">
 </ins-live-value>
 ```
 
-### Eşik Bazlı Renk Değişimi
+### Threshold-Based Color Changes
 
-`thresholds` attribute'u ile değere göre otomatik renk değişimi:
+Automatic color changes based on value using the `thresholds` attribute:
 
 ```html
 <ins-live-value project="153" variable="Temperature_C"
-                unit="°C" label="Sıcaklık" decimals="1"
+                unit="°C" label="Temperature" decimals="1"
                 thresholds="0:#2196F3,30:#4CAF50,60:#FF9800,80:#F44336">
 </ins-live-value>
 ```
 
-| Değer Aralığı | Renk | Anlam |
-|---------------|------|-------|
-| 0 - 29 | Mavi (#2196F3) | Soğuk |
-| 30 - 59 | Yeşil (#4CAF50) | Normal |
-| 60 - 79 | Turuncu (#FF9800) | Uyarı |
-| 80+ | Kırmızı (#F44336) | Kritik |
+| Value Range | Color | Meaning |
+|-------------|-------|---------|
+| 0 - 29 | Blue (#2196F3) | Cold |
+| 30 - 59 | Green (#4CAF50) | Normal |
+| 60 - 79 | Orange (#FF9800) | Warning |
+| 80+ | Red (#F44336) | Critical |
 
-### CSS Özelleştirme
+### CSS Customization
 
 ```css
 ins-live-value {
-  --value-color: #333;      /* Değer metin rengi */
-  --label-color: #888;      /* Başlık metin rengi */
-  --unit-color: #888;       /* Birim metin rengi */
-  --stale-opacity: 0.4;     /* Veri gelmiyor ise saydamlık */
+  --value-color: #333;      /* Value text color */
+  --label-color: #888;      /* Label text color */
+  --unit-color: #888;       /* Unit text color */
+  --stale-opacity: 0.4;     /* Opacity when data is not received */
 }
 ```
 
-## InsDataBus (Veri Yönetimi)
+## InsDataBus (Data Management)
 
-Arka planda çalışan singleton sınıf. Birden fazla `<ins-live-value>` bileşeni aynı projeden veri okuyorsa, tek bir API çağrısında birleştirir.
+A singleton class running in the background. If multiple `<ins-live-value>` components are reading data from the same project, it merges them into a single API call.
 
-### Yapılandırma
+### Configuration
 
 ```javascript
-// Polling aralığını değiştir (varsayılan: 2000ms, minimum: 500ms)
+// Change polling interval (default: 2000ms, minimum: 500ms)
 InsDataBus.instance.refreshMs = 3000;
 
-// Space değiştir (varsayılan: "default_space")
+// Change space (default: "default_space")
 InsDataBus.instance.space = "production";
 ```
 
-### Abonelik API'si
+### Subscription API
 
-Bileşenler otomatik abone olur, ancak programatik kullanım da mümkündür:
+Components subscribe automatically, but programmatic usage is also possible:
 
 ```javascript
 InsDataBus.instance.subscribe(153, 'ActivePower_kW', (value) => {
-  console.log('Yeni değer:', value);
+  console.log('New value:', value);
 });
 ```
 
-## Örnek: Enerji İzleme Sayfası
+## Example: Energy Monitoring Page
 
-Custom Menu içinde tam bir enerji izleme sayfası:
+A complete energy monitoring page inside a Custom Menu:
 
 ```html
 <script src="/libs/ins-components.min.js"></script>
@@ -150,60 +150,60 @@ Custom Menu içinde tam bir enerji izleme sayfası:
 <div class="grid">
   <div class="card">
     <ins-live-value project="153" variable="ActivePower_kW"
-                    unit="kW" label="Aktif Güç" decimals="1"
+                    unit="kW" label="Active Power" decimals="1"
                     thresholds="0:#2196F3,200:#4CAF50,500:#FF9800,800:#F44336">
     </ins-live-value>
   </div>
 
   <div class="card">
     <ins-live-value project="153" variable="Voltage_V"
-                    unit="V" label="Gerilim" decimals="1"
+                    unit="V" label="Voltage" decimals="1"
                     thresholds="200:#F44336,215:#FF9800,225:#4CAF50,245:#FF9800,260:#F44336">
     </ins-live-value>
   </div>
 
   <div class="card">
     <ins-live-value project="153" variable="Current_A"
-                    unit="A" label="Akım" decimals="2">
+                    unit="A" label="Current" decimals="2">
     </ins-live-value>
   </div>
 
   <div class="card">
     <ins-live-value project="153" variable="Frequency_Hz"
-                    unit="Hz" label="Frekans" decimals="2"
+                    unit="Hz" label="Frequency" decimals="2"
                     thresholds="49:#F44336,49.5:#FF9800,49.8:#4CAF50,50.2:#FF9800,50.5:#F44336">
     </ins-live-value>
   </div>
 
   <div class="card">
     <ins-live-value project="153" variable="PowerFactor"
-                    label="Güç Faktörü" decimals="3"
+                    label="Power Factor" decimals="3"
                     thresholds="0:#F44336,0.8:#FF9800,0.9:#4CAF50">
     </ins-live-value>
   </div>
 
   <div class="card">
     <ins-live-value project="153" variable="Temperature_C"
-                    unit="°C" label="Panel Sıcaklık" decimals="1"
+                    unit="°C" label="Panel Temperature" decimals="1"
                     thresholds="0:#2196F3,30:#4CAF50,60:#FF9800,80:#F44336">
     </ins-live-value>
   </div>
 </div>
 ```
 
-## Stale Data Algılama
+## Stale Data Detection
 
-Bileşen 3 ardışık polling döngüsünde veri alamazsa (varsayılan: 6 saniye) otomatik olarak soluklâşır. Bu, haberleşme kesintilerini görsel olarak bildirir.
+If a component fails to receive data for 3 consecutive polling cycles (default: 6 seconds), it automatically fades out. This visually indicates communication interruptions.
 
-Normal durum → `opacity: 1.0`
-Stale durum → `opacity: 0.4` (CSS `--stale-opacity` ile özelleştirilebilir)
+Normal state → `opacity: 1.0`
+Stale state → `opacity: 0.4` (customizable with CSS `--stale-opacity`)
 
-## Faceplate Kapsülleme (Planlanan)
+## Faceplate Encapsulation (Planned)
 
-İlerleyen sürümlerde Faceplate'ler Web Component olarak kapsüllenecek:
+In future versions, Faceplates will be encapsulated as Web Components:
 
 ```html
-<!-- Planlanan kullanım -->
+<!-- Planned usage -->
 <ins-motor project="153"
            speed-var="Motor1_Speed"
            status-var="Motor1_Status"
@@ -211,4 +211,4 @@ Stale durum → `opacity: 0.4` (CSS `--stale-opacity` ile özelleştirilebilir)
 </ins-motor>
 ```
 
-Bu sayede bir Faceplate, Custom Menu HTML sayfalarında doğrudan embed edilebilecek.
+This will allow a Faceplate to be directly embedded in Custom Menu HTML pages.

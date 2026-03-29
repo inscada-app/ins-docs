@@ -1,89 +1,89 @@
 ---
 title: "OPC XML-DA"
-description: "inSCADA'da OPC XML-DA Client bağlantı yapılandırması"
+description: "OPC XML-DA Client connection configuration in inSCADA"
 sidebar:
   order: 6
 ---
 
-OPC XML-DA (XML Data Access), OPC DA'nın web servisleri (SOAP/XML) tabanlı versiyonudur. COM/DCOM yerine HTTP üzerinden çalıştığı için platform bağımsızdır ve firewall dostu bir yapıya sahiptir.
+OPC XML-DA (XML Data Access) is the web services (SOAP/XML) based version of OPC DA. Since it runs over HTTP instead of COM/DCOM, it is platform independent and has a firewall-friendly architecture.
 
-inSCADA, OPC XML-DA protokolünü yalnızca **Client** rolünde destekler.
+inSCADA supports the OPC XML-DA protocol in **Client** role only.
 
 ## OPC XML-DA vs OPC DA vs OPC UA
 
-| Özellik | OPC DA | OPC XML-DA | OPC UA |
+| Feature | OPC DA | OPC XML-DA | OPC UA |
 |---------|--------|------------|--------|
-| **Platform** | Yalnızca Windows | Platform bağımsız | Platform bağımsız |
+| **Platform** | Windows only | Platform independent | Platform independent |
 | **Transport** | COM/DCOM | HTTP/SOAP | TCP, HTTP, WebSocket |
-| **Performans** | Yüksek | Orta (XML overhead) | Yüksek |
-| **Firewall** | Sorunlu (DCOM) | Kolay (HTTP) | Kolay |
-| **Durum** | Eski | Eski | Aktif |
+| **Performance** | High | Medium (XML overhead) | High |
+| **Firewall** | Problematic (DCOM) | Easy (HTTP) | Easy |
+| **Status** | Legacy | Legacy | Active |
 
 :::note
-OPC XML-DA, OPC DA'nın platform bağımsız bir alternatifi olarak geliştirilmiştir ancak OPC UA tarafından büyük ölçüde yerini almıştır. Yeni projelerde [OPC UA](/docs/tr/protocols/opc-ua/) tercih edilmelidir. OPC XML-DA, yalnızca OPC UA desteklemeyen eski sistemlerle entegrasyonda kullanılmalıdır.
+OPC XML-DA was developed as a platform-independent alternative to OPC DA but has been largely superseded by OPC UA. For new projects, [OPC UA](/docs/en/protocols/opc-ua/) should be preferred. OPC XML-DA should only be used for integration with legacy systems that do not support OPC UA.
 :::
 
-## Veri Modeli
+## Data Model
 
 ```
-Connection (Bağlantı — HTTP URL)
-└── Device (Cihaz)
-    └── Frame (Veri Bloğu — Subscription grubu)
-        └── Variable (Değişken — Item Name)
+Connection (HTTP URL)
+└── Device
+    └── Frame (Data Block — Subscription group)
+        └── Variable (Item Name)
 ```
 
-## Yapılandırma
+## Configuration
 
 ### Connection
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Protocol** | OPC XML | Protokol seçimi |
-| **IP Address** | 192.168.1.100 | OPC XML-DA sunucu IP adresi |
-| **Port** | 8080 | HTTP portu |
-| **Path** | `/OpcXmlDaService` | Web servis yolu (endpoint) |
-| **Connect Timeout** | 5000 ms | Bağlantı kurma timeout'u |
-| **Request Timeout** | 5000 ms | İstek timeout'u |
-| **Max Depth** | 12 | Tag ağacı tarama derinliği |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Protocol** | OPC XML | Protocol selection |
+| **IP Address** | 192.168.1.100 | OPC XML-DA server IP address |
+| **Port** | 8080 | HTTP port |
+| **Path** | `/OpcXmlDaService` | Web service path (endpoint) |
+| **Connect Timeout** | 5000 ms | Connection establishment timeout |
+| **Request Timeout** | 5000 ms | Request timeout |
+| **Max Depth** | 12 | Tag tree browse depth |
 
 ### Device
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Scan Time** | 1000 ms | Tarama periyodu |
-| **Scan Type** | PERIODIC | `PERIODIC` veya `FIXED_DELAY` |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Scan Time** | 1000 ms | Scan period |
+| **Scan Type** | PERIODIC | `PERIODIC` or `FIXED_DELAY` |
 
 ### Frame
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Use Subscription Mode** | true | Subscription tabanlı veri alma |
-| **Percent Deadband** | 0.5 | Analog değer değişim eşiği (%) |
-| **Hold Time** | 0 ms | Sunucunun yanıtı tutma süresi |
-| **Wait Time** | 0 ms | Sunucunun değişiklik bekleme süresi |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Use Subscription Mode** | true | Subscription-based data retrieval |
+| **Percent Deadband** | 0.5 | Analog value change threshold (%) |
+| **Hold Time** | 0 ms | Server response hold duration |
+| **Wait Time** | 0 ms | Server change wait duration |
 
-**Hold Time ve Wait Time:** OPC XML-DA'nın subscription mekanizmasını kontrol eder. Sunucu, `Wait Time` süresince değer değişikliği bekler, `Hold Time` süresince yanıtı tutar. Her iki değer de 0 olduğunda anlık polling yapılır.
+**Hold Time and Wait Time:** Control the OPC XML-DA subscription mechanism. The server waits for value changes during the `Wait Time` and holds the response during the `Hold Time`. When both values are 0, immediate polling is performed.
 
 ### Variable
 
-| Parametre | Örnek | Açıklama |
-|-----------|-------|----------|
-| **Name** | `Random.Int1` | Item adı (OPC XML-DA item path) |
-| **Type** | Float | Veri tipi |
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| **Name** | `Random.Int1` | Item name (OPC XML-DA item path) |
+| **Type** | Float | Data type |
 
-### Desteklenen Veri Tipleri
+### Supported Data Types
 
-| Veri Tipi | Açıklama |
-|-----------|----------|
-| **Boolean** | Tek bit değer |
-| **SByte** | İşaretli 8-bit tam sayı |
-| **Byte** | İşaretsiz 8-bit tam sayı |
-| **Int16** | İşaretli 16-bit tam sayı |
-| **UInt16** | İşaretsiz 16-bit tam sayı |
-| **Int32** | İşaretli 32-bit tam sayı |
-| **UInt32** | İşaretsiz 32-bit tam sayı |
-| **Int64** | İşaretli 64-bit tam sayı |
-| **Float** | 32-bit kayan nokta |
-| **Double** | 64-bit kayan nokta |
-| **String** | Karakter dizisi |
-| **DateTime** | Zaman damgası |
+| Data Type | Description |
+|-----------|-------------|
+| **Boolean** | Single bit value |
+| **SByte** | Signed 8-bit integer |
+| **Byte** | Unsigned 8-bit integer |
+| **Int16** | Signed 16-bit integer |
+| **UInt16** | Unsigned 16-bit integer |
+| **Int32** | Signed 32-bit integer |
+| **UInt32** | Unsigned 32-bit integer |
+| **Int64** | Signed 64-bit integer |
+| **Float** | 32-bit floating point |
+| **Double** | 64-bit floating point |
+| **String** | Character string |
+| **DateTime** | Timestamp |

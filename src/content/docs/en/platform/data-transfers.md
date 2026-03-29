@@ -1,88 +1,88 @@
 ---
 title: "Data Transfers"
-description: "Projeler arası değişken veri aktarımı ve istatistik hesaplama"
+description: "Inter-project variable data transfer and statistical calculation"
 sidebar:
   order: 8
 ---
 
-Data Transfer, bir projedeki değişken değerlerini başka bir projedeki değişkenlere periyodik olarak aktarır. Kaynak değişkenden istatistiksel hesaplama yaparak hedef değişkene yazmayı sağlar.
+Data Transfer periodically transfers variable values from one project to variables in another project. It performs statistical calculations from the source variable and writes the result to the target variable.
 
 ![Data Transfers](../../../../assets/docs/dev-data-transfers.png)
 
-## Data Transfer Oluşturma
+## Creating a Data Transfer
 
-**Menü:** Development → Data Transfers → Yeni Transfer
+**Menu:** Development → Data Transfers → New Transfer
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Name** | Evet | Transfer adı |
-| **Project** | Evet | Bağlı proje |
-| **Period** | Evet | Çalışma periyodu (ms, min: 1000) |
-| **Description** | Hayır | Açıklama |
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Name** | Yes | Transfer name |
+| **Project** | Yes | Associated project |
+| **Period** | Yes | Execution period (ms, min: 1000) |
+| **Description** | No | Description |
 
-## Transfer Detayları
+## Transfer Details
 
-Her Data Transfer birden fazla **transfer detayı** (satır) içerir. Her satır bir kaynak-hedef eşleşmesidir:
+Each Data Transfer contains multiple **transfer details** (rows). Each row is a source-target mapping:
 
-| Alan | Açıklama |
-|------|----------|
-| **Source Variable** | Kaynak değişken |
-| **Target Variable** | Hedef değişken |
-| **Calculation Type** | İstatistik hesaplama tipi |
-| **Range Type** | Zaman aralığı tipi |
-| **Threshold** | Eşik değeri (opsiyonel) |
+| Field | Description |
+|-------|-------------|
+| **Source Variable** | Source variable |
+| **Target Variable** | Target variable |
+| **Calculation Type** | Statistical calculation type |
+| **Range Type** | Time range type |
+| **Threshold** | Threshold value (optional) |
 
-### Hesaplama Tipleri
+### Calculation Types
 
-| Tip | Açıklama |
-|-----|----------|
-| **LAST** | Son değer |
-| **AVG** | Ortalama |
+| Type | Description |
+|------|-------------|
+| **LAST** | Last value |
+| **AVG** | Average |
 | **MIN** | Minimum |
-| **MAX** | Maksimum |
-| **SUM** | Toplam |
-| **COUNT** | Kayıt sayısı |
-| **DIFF** | İlk ve son değer farkı |
+| **MAX** | Maximum |
+| **SUM** | Sum |
+| **COUNT** | Record count |
+| **DIFF** | Difference between first and last value |
 
-### Zaman Aralığı Tipleri
+### Time Range Types
 
-| Tip | Açıklama |
-|-----|----------|
-| **CURRENT** | Son periyot aralığındaki veriler |
-| **PREVIOUS** | Bir önceki periyot aralığı |
+| Type | Description |
+|------|-------------|
+| **CURRENT** | Data within the last period interval |
+| **PREVIOUS** | The previous period interval |
 
-## Kullanım Senaryoları
+## Use Cases
 
-### Saatlik Enerji Tüketimi
+### Hourly Energy Consumption
 
-Bir enerji sayacından saatlik tüketim hesaplayıp başka bir değişkene yazma:
-- Kaynak: `Energy_kWh` (kümülatif sayaç)
-- Hedef: `Hourly_Consumption`
-- Hesaplama: DIFF (son - ilk = saatlik tüketim)
-- Periyot: 3600000 ms (1 saat)
+Calculating hourly consumption from an energy meter and writing it to another variable:
+- Source: `Energy_kWh` (cumulative meter)
+- Target: `Hourly_Consumption`
+- Calculation: DIFF (last - first = hourly consumption)
+- Period: 3600000 ms (1 hour)
 
-### Günlük Ortalama Sıcaklık
+### Daily Average Temperature
 
-- Kaynak: `Temperature_C`
-- Hedef: `DailyAvg_Temperature`
-- Hesaplama: AVG
-- Periyot: 86400000 ms (24 saat)
+- Source: `Temperature_C`
+- Target: `DailyAvg_Temperature`
+- Calculation: AVG
+- Period: 86400000 ms (24 hours)
 
-### Projeler Arası Veri Toplama
+### Cross-Project Data Aggregation
 
-Birden fazla sahadaki güç değerlerini merkezi bir projeye toplama:
-- Kaynak (Proje A): `Site1_Power_kW`
-- Hedef (Merkez Proje): `Total_Power`
-- Hesaplama: LAST
+Aggregating power values from multiple sites into a central project:
+- Source (Project A): `Site1_Power_kW`
+- Target (Central Project): `Total_Power`
+- Calculation: LAST
 
-## Script ile Yönetim
+## Management via Script
 
 ```javascript
-// Transfer görevini başlat
+// Start a transfer job
 ins.scheduleDataTransfer("hourly_energy_calc");
 
-// Transfer görevini iptal et
+// Cancel a transfer job
 ins.cancelDataTransfer("hourly_energy_calc");
 ```
 
-Detaylı API: [Data Transfer API →](/docs/tr/platform/scripts/datatransfer-api/)
+Detailed API: [Data Transfer API →](/docs/tr/platform/scripts/datatransfer-api/)

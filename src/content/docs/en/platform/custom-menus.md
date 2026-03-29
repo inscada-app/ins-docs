@@ -1,53 +1,53 @@
 ---
 title: "Custom Menus"
-description: "Özel HTML menüler — rol bazlı arayüz, iframe entegrasyonu ve Web Components"
+description: "Custom HTML menus — role-based interfaces, iframe integration, and Web Components"
 sidebar:
   order: 22
 ---
 
-Custom Menu, space seviyesinde tanımlanan özel menü sayfalarıdır. HTML, CSS ve JavaScript ile tamamen özelleştirilmiş arayüzler oluşturabilirsiniz. Farklı kullanıcı rolleri için farklı menüler atanabilir.
+Custom Menu is a custom menu page defined at the space level. You can create fully customized interfaces using HTML, CSS, and JavaScript. Different menus can be assigned to different user roles.
 
-## Custom Menu Oluşturma
+## Creating a Custom Menu
 
-**Menü:** Development → Custom Menus → Dev Custom Menus
+**Menu:** Development → Custom Menus → Dev Custom Menus
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Name** | Evet | Menü adı |
-| **Icon** | Hayır | FontAwesome ikon sınıfı (örn: `fas fa-chart-bar`) |
-| **Content Type** | Evet | İçerik tipi |
-| **Content** | Evet | HTML kodu veya URL |
-| **Target** | Hayır | Hedef frame |
-| **Position** | Hayır | Menü konumu |
-| **Menu Order** | Hayır | Sıralama |
-| **Parent** | Hayır | Üst menü (alt menü oluşturmak için) |
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Name** | Yes | Menu name |
+| **Icon** | No | FontAwesome icon class (e.g., `fas fa-chart-bar`) |
+| **Content Type** | Yes | Content type |
+| **Content** | Yes | HTML code or URL |
+| **Target** | No | Target frame |
+| **Position** | No | Menu position |
+| **Menu Order** | No | Sort order |
+| **Parent** | No | Parent menu (for creating sub-menus) |
 
-## İçerik Tipleri
+## Content Types
 
-| Tip | Açıklama | Kullanım |
-|-----|----------|----------|
-| **HTML** | Satır içi HTML kodu | Özel dashboard, form, rapor sayfası |
-| **URL** | Harici URL (iframe) | Grafana, Kibana, harici web uygulaması |
+| Type | Description | Usage |
+|------|-------------|-------|
+| **HTML** | Inline HTML code | Custom dashboard, form, report page |
+| **URL** | External URL (iframe) | Grafana, Kibana, external web application |
 
-## Menü Hiyerarşisi
+## Menu Hierarchy
 
-Custom Menu'ler 3 seviyeye kadar iç içe yapılandırılabilir:
+Custom Menus can be nested up to 3 levels deep:
 
 ```
-Custom Menu (1. Seviye)
-├── Sub Menu (2. Seviye)
-│   ├── Sub-Sub Menu (3. Seviye)
-│   └── Sub-Sub Menu (3. Seviye)
-└── Sub Menu (2. Seviye)
+Custom Menu (Level 1)
+├── Sub Menu (Level 2)
+│   ├── Sub-Sub Menu (Level 3)
+│   └── Sub-Sub Menu (Level 3)
+└── Sub Menu (Level 2)
 ```
 
-## HTML İçerik ile Özel Sayfalar
+## Custom Pages with HTML Content
 
-### Değişken Değeri Gösterme (Fetch API)
+### Displaying Variable Values (Fetch API)
 
 ```html
 <div id="power-display" style="font-size: 48px; text-align: center; padding: 40px;">
-  Yükleniyor...
+  Loading...
 </div>
 
 <script>
@@ -66,27 +66,27 @@ setInterval(loadValue, 5000);
 </script>
 ```
 
-### Web Components Alternatifi
+### Web Components Alternative
 
-Aynı işlem, fetch yerine inSCADA Web Components kullanılarak çok daha kısa yazılabilir:
+The same operation can be written much more concisely using inSCADA Web Components instead of fetch:
 
 ```html
-<!-- Tek satırda değişken değeri gösterme -->
+<!-- Display variable value in a single line -->
 <ins-value variable="ActivePower_kW" project="Energy Monitoring Demo"
            space="claude" suffix=" kW" decimals="1"
            style="font-size: 48px; font-weight: bold;">
 </ins-value>
 ```
 
-Web Components avantajları:
-- Otomatik WebSocket bağlantısı — periyodik fetch gerekmez
-- Gerçek zamanlı güncelleme
-- Deklaratif sözdizimi — JavaScript yazmaya gerek yok
-- Birden fazla bileşen aynı sayfada bağımsız çalışır
+Web Components advantages:
+- Automatic WebSocket connection — no periodic fetch required
+- Real-time updates
+- Declarative syntax — no need to write JavaScript
+- Multiple components work independently on the same page
 
-Detaylı bilgi: [Web Components →](/docs/tr/platform/web-components/)
+Detailed information: [Web Components →](/docs/tr/platform/web-components/)
 
-### Çoklu Değişken Tablosu
+### Multi-Variable Table
 
 ```html
 <style>
@@ -96,42 +96,42 @@ Detaylı bilgi: [Web Components →](/docs/tr/platform/web-components/)
 </style>
 
 <table>
-  <tr><th>Değişken</th><th>Değer</th><th>Birim</th></tr>
+  <tr><th>Variable</th><th>Value</th><th>Unit</th></tr>
   <tr>
-    <td>Aktif Güç</td>
+    <td>Active Power</td>
     <td><ins-value variable="ActivePower_kW" decimals="2"></ins-value></td>
     <td>kW</td>
   </tr>
   <tr>
-    <td>Gerilim</td>
+    <td>Voltage</td>
     <td><ins-value variable="Voltage_V" decimals="1"></ins-value></td>
     <td>V</td>
   </tr>
   <tr>
-    <td>Akım</td>
+    <td>Current</td>
     <td><ins-value variable="Current_A" decimals="2"></ins-value></td>
     <td>A</td>
   </tr>
 </table>
 ```
 
-### Harici URL Entegrasyonu
+### External URL Integration
 
-Content Type = URL ile harici web uygulamalarını iframe olarak gömmek:
+Embed external web applications as an iframe using Content Type = URL:
 
 ```
 https://grafana.company.com/d/energy-dashboard?orgId=1&kiosk
 ```
 
-## Rol Bazlı Menü Atama
+## Role-Based Menu Assignment
 
-Custom Menu'ler space seviyesinde tanımlanır, ardından roller aracılığıyla kullanıcılara atanır:
+Custom Menus are defined at the space level, then assigned to users through roles:
 
-1. **Custom Menu oluştur** — Development → Custom Menus
-2. **Role menü ata** — User Menu → Roles → Role Menus bölümüne ilgili custom menu'yü ekle
-3. **Kullanıcıya rol ata** — ilgili rolü kullanıcıya ver
+1. **Create the Custom Menu** — Development → Custom Menus
+2. **Assign the menu to a role** — User Menu → Roles → Add the custom menu to the Role Menus section
+3. **Assign the role to a user** — Assign the relevant role to the user
 
-Bu sayede:
-- **Operatör:** Yalnızca izleme sayfalarını görür
-- **Mühendis:** Yapılandırma + izleme sayfalarını görür
-- **Yönetici:** Rapor ve analiz sayfalarını görür
+This way:
+- **Operator:** Sees only monitoring pages
+- **Engineer:** Sees configuration + monitoring pages
+- **Administrator:** Sees report and analysis pages

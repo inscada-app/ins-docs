@@ -1,55 +1,55 @@
 ---
 title: "Logs & Audit"
-description: "Olay logları, giriş denemeleri ve script logları"
+description: "Event logs, login attempts, and script logs"
 sidebar:
   order: 9
 ---
 
-inSCADA, platform üzerindeki tüm önemli olayları otomatik olarak kaydeder. Loglar zaman serisi veritabanında tutulur ve tarih aralığına göre sorgulanabilir.
+inSCADA automatically records all significant events on the platform. Logs are stored in a time-series database and can be queried by date range.
 
-## Olay Logları (Event Log)
+## Event Logs
 
-**Menü:** Logs → Log
+**Menu:** Logs → Log
 
 ![Event Log](../../../../assets/docs/log-event.png)
 
-Her olay kaydı aşağıdaki bilgileri içerir:
+Each event record contains the following information:
 
-| Alan | Açıklama |
-|------|----------|
-| **activity** | İşlem adı |
-| **msg** | Log mesajı |
-| **logSeverity** | Seviye: Information, Warning, Error |
-| **dttm** | Zaman damgası |
-| **projectId** | İlgili proje |
+| Field | Description |
+|-------|-------------|
+| **activity** | Operation name |
+| **msg** | Log message |
+| **logSeverity** | Level: Information, Warning, Error |
+| **dttm** | Timestamp |
+| **projectId** | Related project |
 
-### Otomatik Kaydedilen Olaylar
+### Automatically Recorded Events
 
-| Olay | Seviye | Açıklama |
-|------|--------|----------|
-| Script hatası | Error | Script çalışma hataları ve stack trace |
-| Bağlantı değişikliği | Information | Bağlantı başlatma/durdurma |
-| Yapılandırma değişikliği | Information | Proje, değişken, alarm CRUD işlemleri |
-| Kullanıcı işlemi | Information | Giriş, çıkış, şifre değişikliği |
+| Event | Level | Description |
+|-------|-------|-------------|
+| Script error | Error | Script execution errors and stack trace |
+| Connection change | Information | Connection start/stop |
+| Configuration change | Information | Project, variable, alarm CRUD operations |
+| User action | Information | Login, logout, password change |
 
-### Script ile Log Yazma
+### Writing Logs from Scripts
 
-Script'ler içinden manuel log kaydı oluşturulabilir:
+Log entries can be created manually from within scripts:
 
 ```javascript
-ins.writeLog("INFO", "Otomasyon", "Vardiya değişimi tamamlandı");
+ins.writeLog("INFO", "Automation", "Shift change completed");
 // → OK
 ```
 
-### Log Sorgulama
+### Querying Logs
 
 ```javascript
 var end = ins.now();
-var start = ins.getDate(end.getTime() - 3600000); // 1 saat
+var start = ins.getDate(end.getTime() - 3600000); // 1 hour
 var logs = ins.getLogsByPage(start, end, 0, 10);
 ```
 
-Yanıt:
+Response:
 ```json
 [
   {
@@ -62,17 +62,17 @@ Yanıt:
 ]
 ```
 
-### Saklama Süresi
+### Retention Period
 
-Olay logları varsayılan olarak **14 gün** tutulur. Bu süre InfluxDB retention policy (`event_log_rp`) ile belirlenir.
+Event logs are retained for **14 days** by default. This duration is determined by the InfluxDB retention policy (`event_log_rp`).
 
 ---
 
-## Giriş Denemeleri (Auth Log)
+## Login Attempts (Auth Log)
 
-**Menü:** System → Auth Log
+**Menu:** System → Auth Log
 
-Tüm giriş denemeleri (başarılı ve başarısız) kaydedilir:
+All login attempts (successful and failed) are recorded:
 
 ```json
 {
@@ -84,18 +84,18 @@ Tüm giriş denemeleri (başarılı ve başarısız) kaydedilir:
 }
 ```
 
-| Alan | Açıklama |
-|------|----------|
-| **username** | Giriş deneyen kullanıcı |
-| **ip** | İstemci IP adresi |
-| **isSuccessful** | Başarılı mı |
-| **msg** | Detay mesajı |
-| **date** | Zaman damgası |
+| Field | Description |
+|-------|-------------|
+| **username** | User who attempted to log in |
+| **ip** | Client IP address |
+| **isSuccessful** | Whether it was successful |
+| **msg** | Detail message |
+| **date** | Timestamp |
 
-### Güvenlik İzleme
+### Security Monitoring
 
 ```javascript
-// Başarısız giriş denemelerini kontrol et
+// Check failed login attempts
 var attempts = ins.getLastAuthAttempts();
 var failed = 0;
 for (var i = 0; i < attempts.size(); i++) {
@@ -104,30 +104,30 @@ for (var i = 0; i < attempts.size(); i++) {
     }
 }
 if (failed > 5) {
-    ins.notify("error", "Güvenlik",
-        failed + " başarısız giriş denemesi!");
+    ins.notify("error", "Security",
+        failed + " failed login attempts!");
 }
 ```
 
-### Saklama Süresi
+### Retention Period
 
-Giriş denemeleri **365 gün** tutulur (`auth_attempt_rp`).
-
----
-
-## Çevrimiçi Kullanıcılar
-
-**Menü:** System → Auth Log → Online Users
-
-Şu anda oturum açmış kullanıcıları gösterir. Yönetici, aktif oturumları sonlandırabilir.
+Login attempts are retained for **365 days** (`auth_attempt_rp`).
 
 ---
 
-## Script Logları
+## Online Users
 
-Script'lerin `log: true` ayarı açıksa, her çalıştırma sonucu otomatik olarak loglanır:
-- Başarılı çalışma süresi
-- Hata durumunda hata mesajı ve stack trace
+**Menu:** System → Auth Log → Online Users
+
+Displays the currently logged-in users. Administrators can terminate active sessions.
+
+---
+
+## Script Logs
+
+If a script has the `log: true` setting enabled, each execution result is automatically logged:
+- Successful execution duration
+- Error message and stack trace in case of failure
 
 ```json
 {
@@ -141,12 +141,12 @@ Script'lerin `log: true` ayarı açıksa, her çalıştırma sonucu otomatik ola
 
 ## Console Log
 
-`ins.consoleLog()` ile debug amaçlı log yazılabilir:
+Debug logs can be written using `ins.consoleLog()`:
 
 ```javascript
 ins.consoleLog("Debug: power = " + power + " kW");
 ```
 
-Bu loglar sunucu konsol çıktısında görünür (stdout).
+These logs appear in the server console output (stdout).
 
-Detaylı API: [Log API →](/docs/tr/platform/scripts/log-api/)
+Detailed API: [Log API →](/docs/tr/platform/scripts/log-api/)
