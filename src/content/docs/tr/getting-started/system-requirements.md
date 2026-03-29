@@ -55,9 +55,9 @@ inSCADA sunucusu aşağıdaki işletim sistemlerinde çalışır:
 
 | İşletim Sistemi | inSCADA | İstemci (Viewer) |
 |-----------------|--------|-----------------|
-| Windows Server 2022 | ✓ | — |
-| Windows Server 2019 | ✓ | — |
-| Windows Server 2016 | ✓ | — |
+| Windows Server 2022 | ✓ | ✓ |
+| Windows Server 2019 | ✓ | ✓ |
+| Windows Server 2016 | ✓ | ✓ |
 | Windows 11 (64-bit) | ✓ | ✓ |
 | Windows 10 (64-bit) | ✓ | ✓ |
 

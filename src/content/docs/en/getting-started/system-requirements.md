@@ -55,9 +55,9 @@ The inSCADA server runs on the following operating systems:
 
 | Operating System | inSCADA | Client (Viewer) |
 |-----------------|--------|-----------------|
-| Windows Server 2022 | ✓ | — |
-| Windows Server 2019 | ✓ | — |
-| Windows Server 2016 | ✓ | — |
+| Windows Server 2022 | ✓ | ✓ |
+| Windows Server 2019 | ✓ | ✓ |
+| Windows Server 2016 | ✓ | ✓ |
 | Windows 11 (64-bit) | ✓ | ✓ |
 | Windows 10 (64-bit) | ✓ | ✓ |
 
