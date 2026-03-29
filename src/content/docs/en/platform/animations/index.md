@@ -16,6 +16,18 @@ SVG Animation, inSCADA'nın temel görselleştirme bileşenidir. Her animation b
 
 ![Animation Dev](../../../../../assets/docs/dev-animation-dev.png)
 
+### Animation Yapılandırma Paneli
+
+Sağ üstteki kalem (✏️) ikonuna tıklayarak animation'ın genel ayarlarını düzenleyebilirsiniz:
+
+![Animation Yapılandırma](../../../../../assets/docs/editor-anim-config.png)
+
+### Preview (Ön İzleme)
+
+Roket (🚀) ikonuna tıklayarak animation'ı canlı olarak önizleyebilirsiniz:
+
+![Preview Animation](../../../../../assets/docs/editor-preview.png)
+
 ## Animation Oluşturma
 
 | Alan | Zorunlu | Açıklama |
