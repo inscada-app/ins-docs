@@ -2,7 +2,7 @@
 title: "Element Editor"
 description: "Animation Element Editor — SVG üzerinde obje seçerek animation binding yapılandırma"
 sidebar:
-  order: 1
+  order: 2
   label: "Element Editor"
 ---
 

@@ -74,42 +74,13 @@ Roket ikonuna tıklayarak animation'ı canlı olarak önizleyebilirsiniz:
 
 ![Preview Animation](../../../../../assets/docs/editor-preview.png)
 
-### Animation Yapılandırma Paneli
+### Animation Yapılandırma
 
-Kalem ikonuna tıklayarak animation'ın genel ayarlarını düzenleyebilirsiniz:
+Kalem ikonuna tıklayarak animation'ın ayarlarını düzenleyebilirsiniz — Duration, Play Order, Main, Color, Alignment, erişim rolleri ve Pre/Post scripts:
 
 ![Animation Yapılandırma](../../../../../assets/docs/editor-anim-config.png)
 
-| Alan | Zorunlu | Açıklama |
-|------|---------|----------|
-| **Name** | Evet | Ekran adı (proje içinde benzersiz) |
-| **Duration** | Evet | Güncelleme bekleme süresi (ms, min: 100). Bir tarama tamamlandıktan sonra bir sonraki taramaya kadar geçecek bekleme süresi |
-| **Play Order** | Evet | Visualization ekranındaki sıralama numarası |
-| **Main** | Evet | Visualization menüsünde görünsün mü |
-| **Color** | Hayır | Ekranın arka plan rengi (Inkscape'teki arka plan aktarılmaz, buradan ayarlanır) |
-| **Alignment** | Hayır | SVG'nin ekrana hizalama modu |
-| **Description** | Hayır | Açıklama |
-
-### Main ve Play Order
-
-**Runtime → Visualization** menüsü, projedeki **Main** işaretli animation'ları otomatik olarak listeler. Bu ekranda alt kısımda sayfa geçiş butonları yer alır ve animation'lar **Play Order** numarasına göre soldan sağa sıralanır.
-
-```
-Visualization Ekranı
-┌──────────────────────────────────────────────────┐
-│                                                  │
-│          [ Aktif Animation İçeriği ]             │
-│                                                  │
-├──────────────────────────────────────────────────┤
-│  ⚡ Energy Overview  │  📈 Power Chart  │  ...   │  ← Play Order sırası
-└──────────────────────────────────────────────────┘
-```
-
-- **Main = true** → Animation, Visualization menüsünde görünür
-- **Main = false** → Animation yalnızca Development ekranında düzenleme için erişilebilir, Visualization'da listelenmez (örn: Open ile açılan alt ekranlar, popup'lar)
-- **Play Order = 1** → En solda, **Play Order = 2** → Bir sonraki, ...
-
-Örneğin yukarıdaki screenshot'ta "Energy Overview" (Play Order: 1) ve "Power Chart" (Play Order: 2) butonları alt kısımda görünmektedir.
+Detaylı bilgi: [Animation Yapılandırma →](/docs/tr/platform/animations/configuration/)
 
 ## Animation Yapısı
 
@@ -228,99 +199,29 @@ Her animation element'te değerin nasıl hesaplanacağını belirler:
 | **Custom Menu** | Custom menu referansı |
 | **Tetra Color** | Dört renkli durum gösterimi (alarm renkleri) |
 
-## Animation Scripts
+## Animation Scripts ve Tarama Döngüsü
 
-Her animation'a Pre ve Post script bağlanabilir. Runtime'da her döngüde (her `duration` ms'de) çalışma sırası şöyledir:
+Her animation'a Pre ve Post script bağlanabilir. Tüm kodlar **her tarama döngüsünde tekrar çalışır**:
 
 ```
-Her döngüde tekrar eder:
-┌─────────────────────────┐
-│ 1. Pre-Animation Code   │
-│ 2. Animation Elements   │
-│ 3. Post-Animation Code  │
-└────────┬────────────────┘
-         │ duration ms sonra
-         └──── tekrar başa dön
+Her döngüde:  Pre-Animation → Elements → Post-Animation → bekleme (duration ms) → tekrar
 ```
 
-| Script | Çalışma Zamanı | Kullanım |
-|--------|---------------|----------|
-| **Pre-Animation Code** | Her döngüde, element'lerden önce | Ön hesaplama, veri hazırlama |
-| **Post-Animation Code** | Her döngüde, element'lerden sonra | Son işlemler, temizlik |
-
-Tüm bu kodlar **her döngüde tekrar çalışır**. Yalnızca ilk açılışta bir kez çalışması gereken kod varsa `__firstScan` değişkeni kullanılır.
-
-### Yerleşik Sistem Değişkenleri
-
-Animation script'leri ve element expression'ları içinde kullanılabilen yerleşik değişkenler:
-
-| Değişken | Tip | Açıklama |
-|----------|-----|----------|
-| `__firstScan` | Boolean | İlk çalışma döngüsünde `true`, sonraki döngülerde `false` |
-| `__animName` | String | Çalışan animation'ın adı |
-| `__parameters` | String | Animation'a geçirilen placeholder parametreleri |
-
-### `__firstScan` Kullanımı
-
-`__firstScan`, animation ekranı açıldığında sadece **ilk döngüde** `true` olur. Yalnızca bir kez çalışması gereken kodları (tarihsel veri çekme, tablo başlangıç doldurma, tek seferlik API çağrısı vb.) bu değişkenle kontrol edebilirsiniz:
+İlk açılışta bir kez çalışması gereken kod için `__firstScan` değişkeni kullanılır:
 
 ```javascript
 if (__firstScan) {
-    // Sadece ekran ilk açıldığında çalışır
-    var end = ins.now();
-    var start = ins.getDate(end.getTime() - 3600000);
+    // Sadece ilk döngüde çalışır
     var logs = ins.getLoggedVariableValuesByPage(
         ['ActivePower_kW'],
-        start, end, 0, 100
+        ins.getDate(ins.now().getTime() - 3600000),
+        ins.now(), 0, 100
     );
-    // Tabloya veya grafiğe ilk verileri yükle...
 }
 
-// Bu kısım her döngüde çalışır
+// Her döngüde çalışır
 var power = ins.getVariableValue("ActivePower_kW").value;
 return power.toFixed(1);
 ```
 
-### `__animName` ve `__parameters` Kullanımı
-
-Parametrik ekranlarda (placeholder ile açılan animation'lar) hangi animation'ın çalıştığını ve geçirilen parametreleri okumak için kullanılır:
-
-```javascript
-// Hangi animation çalışıyor
-var name = __animName; // "Motor_Detail"
-
-// Geçirilen parametreler
-var params = __parameters; // "motor_id=3&motor_name=Motor 3"
-```
-
-## Gerçek Zamanlı Güncelleme
-
-Animation açıldığında WebSocket bağlantısı kurulur ve tarama döngüsü başlar.
-
-### Duration ve Tarama Döngüsü
-
-Duration, iki tarama arasındaki **bekleme süresidir** — tarama periyodu değil. Gerçek güncelleme süresi şöyledir:
-
-```
-Toplam Döngü = Tarama Süresi + Duration (bekleme)
-```
-
-1. Sunucu tüm element expression'larını çalıştırır ve sonuçları döndürür → **tarama süresi**
-2. Tarama tamamlandıktan sonra `duration` ms kadar beklenir
-3. Yeni tarama başlar
-
-Örnek: Tarama 200ms sürüyorsa ve Duration 500ms ise, ekran yaklaşık her 700ms'de güncellenir.
-
-:::caution[Duration Çok Küçük Olursa]
-Duration değeri çok küçük ayarlandığında (örn: 100ms), element sayısı fazla veya expression'lar ağır ise bir önceki tarama tamamlanmadan yeni tarama başlayabilir. Bu durum tarayıcıda **arayüz donması/tıkanması** oluşturabilir. Önerilen minimum değerler:
-
-| Senaryo | Önerilen Duration |
-|---------|------------------|
-| Az element (< 20), basit expression | 200 - 500 ms |
-| Orta element (20-50), karışık expression | 500 - 1000 ms |
-| Çok element (50+), ağır hesaplama | 1000 - 2000 ms |
-:::
-
-## Placeholder (Parametrik Ekran)
-
-Animation'lara placeholder tanımlanabilir. Aynı SVG tasarımı farklı parametrelerle (farklı cihaz, farklı değişken seti) tekrar kullanılabilir.
+Detaylı bilgi: [Animation Yapılandırma → Pre/Post Scripts](/docs/tr/platform/animations/configuration/)
