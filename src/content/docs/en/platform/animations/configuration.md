@@ -226,7 +226,7 @@ return formatValue(power, 1, "kW");
 |-------|---------|
 | Script'te fonksiyon **tanımlı ama çağrılmamış** | Fonksiyon çalışmaz, sadece tanım olarak animation'a eklenir. Element expression'larından çağrılmayı bekler |
 | Script'te fonksiyon **tanımlı ve çağrılmış** | Fonksiyon her tarama döngüsünde otomatik çalışır (arka plan görevi) |
-| Script'in Schedule Type'ı | **None** olarak ayarlayın — script bağımsız zamanlamada çalışmaz, yalnızca animation kütüphanesi olarak kullanılır |
+| Script'in Schedule Type'ı | **None** olarak ayarlayın — aksi halde script hem animation döngüsünde hem de kendi zamanlamasıyla (Periodic/Daily) bağımsız olarak arka planda çalışır ki bu gereksiz bir kaynak tüketimidir |
 
 :::tip[Kütüphane Yaklaşımı]
 Sık kullanılan yardımcı fonksiyonları (veri formatlama, grafik hazırlama, hesaplama) ayrı bir script'te toplayıp birden fazla animation'a bağlayabilirsiniz. Fonksiyonu bir kez yazarsınız, tüm animation'larda kullanırsınız.
