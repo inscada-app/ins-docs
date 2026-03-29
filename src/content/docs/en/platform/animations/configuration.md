@@ -93,9 +93,46 @@ SVG içeriğinin ekrandaki konumunu belirler:
 | **bottom-right** | Sağ alt |
 | **none** | Hizalama yok |
 
-### Join (Animation Zincirleme)
+### Join (Katman Birleştirme)
 
-Bir animation'ı başka bir animation ile zincirleyerek sıralı geçiş oluşturur. Join alanında aynı projedeki diğer animation'lar listelenir.
+Join, **tepegöz asetat** mantığında çalışır — bir animation'ı başka bir animation'ın **arka planına** sabit katman olarak bağlar. Join ile bağlanan animation, ana animation'ın arkasında her zaman görünür kalır.
+
+Bu sayede her sayfada tekrar eden ortak öğeleri (üst bar, alt bar, alarm banner, navigasyon menüsü, logo, saat, durum göstergeleri) tek bir animation'da tasarlayıp tüm sayfalara katman olarak bağlayabilirsiniz.
+
+```
+┌──────────────────────────────────────────┐
+│  ▸ Üst Bar: Logo, Saat, Alarm Sayacı    │  ← Join Animation (arka katman)
+├──────────────────────────────────────────┤
+│                                          │
+│     [ Ana Animation İçeriği ]            │  ← Ana Animation (ön katman)
+│     Sayfa bazlı değişen içerik           │
+│                                          │
+├──────────────────────────────────────────┤
+│  ▸ Alt Bar: Navigasyon Butonları         │  ← Join Animation (arka katman)
+└──────────────────────────────────────────┘
+```
+
+#### Kullanım Senaryosu
+
+1. **"Common_Layout" animation'ı oluşturun** (Main = false):
+   - Üst kısım: Şirket logosu, tarih/saat, aktif alarm sayacı
+   - Alt kısım: Sayfa geçiş butonları, bağlantı durumu göstergesi
+   - Bu animation tek başına Visualization'da görünmez
+
+2. **Her sayfa animation'ında Join alanından "Common_Layout" seçin:**
+   - "Energy Overview" → Join: Common_Layout
+   - "Motor Detail" → Join: Common_Layout
+   - "Alarm Panel" → Join: Common_Layout
+
+3. **Sonuç:** Tüm sayfalar açıldığında Common_Layout arka katmanda sabit kalır, sayfa içeriği önde değişir. Ortak öğeleri **tek bir yerde** güncellemeniz yeterlidir.
+
+#### Join ve Alignment Birlikte Kullanımı
+
+Join animation'ın Alignment ayarı, arka katmanın ekrandaki konumunu belirler. Ana animation'ın Alignment ayarı ise ön katmanın konumunu belirler. İkisi birlikte ekran düzenini oluşturur.
+
+:::tip
+Join animation'ı genellikle **Main = false** olarak ayarlanır — Visualization'da bağımsız sayfa olarak listelenmez, yalnızca diğer animation'ların arka katmanı olarak çalışır.
+:::
 
 ---
 
