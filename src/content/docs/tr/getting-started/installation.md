@@ -158,4 +158,4 @@ Docker kurulumunda veritabanları container içinde çalışır. Üretim ortamla
 
 ## Kurulum Sonrası
 
-Kurulum tamamlandıktan sonra [İlk Proje](/docs/tr/getting-started/first-project/) rehberine geçerek ilk projenizi oluşturabilirsiniz.
+Kurulum tamamlandıktan sonra [Platform Mimarisi](/docs/tr/platform/architecture/) sayfasına geçerek inSCADA'nın yapısını öğrenebilirsiniz.

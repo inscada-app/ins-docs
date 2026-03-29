@@ -158,4 +158,4 @@ In a Docker installation, databases run inside the container. For production env
 
 ## After Installation
 
-Once installation is complete, proceed to the [First Project](/docs/en/getting-started/first-project/) guide to create your first project.
+Once installation is complete, proceed to the [Platform Architecture](/docs/en/platform/architecture/) page to learn about inSCADA's structure.
