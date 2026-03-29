@@ -157,14 +157,14 @@ ins.toggleVariableValue("GridStatus");
 
 ### ins.getLoggedVariableValuesByPage(names, startDate, endDate, page, pageSize)
 
-Tarihsel veri kayıtlarını sayfalı olarak sorgular. `names` parametresi `Java.to()` ile Java string dizisine dönüştürülmelidir.
+Tarihsel veri kayıtlarını sayfalı olarak sorgular.
 
 ```javascript
 var end = ins.now();
 var start = ins.getDate(end.getTime() - 300000); // 5 dakika önce
 
 var logs = ins.getLoggedVariableValuesByPage(
-    Java.to(["ActivePower_kW"], "java.lang.String[]"),
+    ["ActivePower_kW"],
     start, end,
     0,   // sayfa numarası
     5    // sayfa boyutu
@@ -210,7 +210,7 @@ var end = ins.now();
 var start = ins.getDate(end.getTime() - 3600000); // 1 saat önce
 
 var stats = ins.getLoggedVariableValueStats(
-    Java.to(["ActivePower_kW"], "java.lang.String[]"),
+    ["ActivePower_kW"],
     start, end
 );
 ```
@@ -252,7 +252,7 @@ Saatlik veya günlük gruplanmış istatistikler.
 
 ```javascript
 var hourly = ins.getLoggedHourlyVariableValueStats(
-    Java.to(["ActivePower_kW"], "java.lang.String[]"),
+    ["ActivePower_kW"],
     startDate, endDate
 );
 ```

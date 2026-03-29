@@ -33,7 +33,7 @@ var tags = ins.getTrendTags(1);
 // Tag ölçek aralığını dinamik güncelle
 // Örn: alarm limitlerine göre ölçeği ayarla
 var stats = ins.getLoggedVariableValueStats(
-    Java.to(["ActivePower_kW"], "java.lang.String[]"),
+    ["ActivePower_kW"],
     ins.getDate(ins.now().getTime() - 3600000),
     ins.now()
 );

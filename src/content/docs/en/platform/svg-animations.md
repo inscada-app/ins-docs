@@ -102,7 +102,7 @@ Pre/post scripts can be assigned to each animation:
 var endMs = ins.now().getTime();
 var startMs = endMs - (60 * 60 * 1000);
 var logs = ins.getLoggedVariableValuesByPage(
-    Java.to(['ActivePower_kW'], 'java.lang.String[]'),
+    ['ActivePower_kW'],
     ins.getDate(startMs), ins.getDate(endMs), 0, 30
 );
 // Update chart in SVG...

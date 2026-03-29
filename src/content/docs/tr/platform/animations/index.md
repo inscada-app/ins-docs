@@ -259,7 +259,7 @@ if (__firstScan) {
     var end = ins.now();
     var start = ins.getDate(end.getTime() - 3600000);
     var logs = ins.getLoggedVariableValuesByPage(
-        Java.to(['ActivePower_kW'], 'java.lang.String[]'),
+        ['ActivePower_kW'],
         start, end, 0, 100
     );
     // Tabloya veya grafiğe ilk verileri yükle...

@@ -45,11 +45,11 @@ var endMs = ins.now().getTime();
 var startMs = endMs - (60 * 60 * 1000); // Son 1 saat
 
 var logs = ins.getLoggedVariableValuesByPage(
-    Java.to(['ActivePower_kW'], 'java.lang.String[]'),
+    ['ActivePower_kW'],
     ins.getDate(startMs), ins.getDate(endMs), 0, 30
 );
 var logs2 = ins.getLoggedVariableValuesByPage(
-    Java.to(['ReactivePower_kVAR'], 'java.lang.String[]'),
+    ['ReactivePower_kVAR'],
     ins.getDate(startMs), ins.getDate(endMs), 0, 30
 );
 

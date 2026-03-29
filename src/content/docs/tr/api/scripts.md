@@ -133,7 +133,7 @@ curl -b cookies.txt -X POST http://localhost:8081/api/scripts/runner \
   -d '{
     "projectId": 153,
     "name": "stats",
-    "code": "var end=ins.now(); var start=ins.getDate(end.getTime()-3600000); var stats=ins.getLoggedVariableValueStats(Java.to([\"ActivePower_kW\"],\"java.lang.String[]\"),start,end); ins.toJSONStr(stats);",
+    "code": "var end=ins.now(); var start=ins.getDate(end.getTime()-3600000); var stats=ins.getLoggedVariableValueStats([\"ActivePower_kW\"],start,end); ins.toJSONStr(stats);",
     "log": false,
     "compile": false
   }'
