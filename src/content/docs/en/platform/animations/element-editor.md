@@ -8,6 +8,8 @@ sidebar:
 
 Animation Element Editor, SVG ekran üzerinde görsel olarak obje seçip, seçilen objeye animation davranışı bağlamak için kullanılan düzenleyicidir. Kod yazmadan, görsel yapılandırma arayüzü ile hızlıca SCADA ekranları oluşturulur.
 
+![Animation Element Editor](../../../../../assets/docs/animations.png)
+
 ## Editöre Erişim
 
 **Menü:** Development → Animations → Animation Dev → sağ üst köşedeki **Element Editor** butonu
