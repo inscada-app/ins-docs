@@ -33,21 +33,50 @@ TYPE bölümünden **SWITCH** seçildiğinde değişken seçimi ve koşullu renk
 
 #### Koşul Tablosu (Condition / Value / Color)
 
-**Add** butonuyla satır ekleyerek değer → renk eşleşmeleri tanımlanır:
+**Add** butonuyla satır ekleyerek değer → renk eşleşmeleri tanımlanır. Her satır şu alanlardan oluşur:
 
-| Condition | Value | Color |
-|-----------|-------|-------|
-| `>` | `80` | 🔴 `#FF0000` (Kırmızı — Kritik) |
-| `>` | `60` | 🟠 `#FF8800` (Turuncu — Uyarı) |
-| `>` | `40` | 🟡 `#FFCC00` (Sarı — Dikkat) |
-| `<=` | `40` | 🟢 `#00CC00` (Yeşil — Normal) |
+| Alan | Açıklama |
+|------|----------|
+| **Condition** | Karşılaştırma operatörü: `>`, `>=`, `==`, `!=`, `<=`, `<` |
+| **Value** | Karşılaştırma değeri |
+| **Color** | Birincil renk (koşul sağlandığında uygulanacak) |
+| **Second Color** | İkincil renk (yanıp sönme veya gradient için, opsiyonel) |
+| **G** | **Gradient** — İşaretlenirse iki renk arasında gradient (renk geçişi) oluşturur |
+| **H** | **Horizontal** — Gradient yönü. İşaretlenirse yatay, değilse dikey gradient |
+
+Basit kullanım — yalnızca Condition, Value ve Color doldurulur:
+
+| Condition | Value | Color | Anlam |
+|-----------|-------|-------|-------|
+| `>` | `80` | 🔴 `#FF0000` | Kritik |
+| `>` | `60` | 🟠 `#FF8800` | Uyarı |
+| `>` | `40` | 🟡 `#FFCC00` | Dikkat |
+| `<=` | `40` | 🟢 `#00CC00` | Normal |
 
 Boolean değişkenler için:
 
-| Condition | Value | Color |
-|-----------|-------|-------|
-| `==` | `true` | 🟢 `#00CC00` (Çalışıyor) |
-| `==` | `false` | 🔴 `#FF0000` (Durdu) |
+| Condition | Value | Color | Anlam |
+|-----------|-------|-------|-------|
+| `==` | `true` | 🟢 `#00CC00` | Çalışıyor |
+| `==` | `false` | 🔴 `#FF0000` | Durdu |
+
+#### İkincil Renk, Gradient ve Yanıp Sönme
+
+Second Color alanı doldurulduğunda iki farklı davranış oluşur:
+
+| G Checkbox | Davranış |
+|-----------|---------|
+| **Kapalı** | İki renk arasında **yanıp sönme** efekti (Color ↔ Second Color) |
+| **Açık** | İki renk arasında **gradient** (yumuşak renk geçişi) |
+
+H checkbox yalnızca gradient aktifken geçerlidir:
+
+| H Checkbox | Gradient Yönü |
+|-----------|--------------|
+| **Kapalı** | Dikey gradient (üstten alta) |
+| **Açık** | Yatay gradient (soldan sağa) |
+
+Örnek: Sıcaklık 80°C üzerinde kırmızı↔beyaz yanıp sönme → Color: `#FF0000`, Second Color: `#FFFFFF`, G: kapalı
 
 #### Hata Durumu Renkleri
 
