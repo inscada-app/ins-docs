@@ -92,14 +92,6 @@ Claude Desktop'i yeniden baslatin.
 - Calisan bir inSCADA sunucusu (JDK11 surumu)
 - MCP destekleyen bir AI istemci (Claude Desktop, VS Code Copilot, Cursor vb.)
 
-## Ortam Degiskenleri
-
-| Degisken | Zorunlu | Aciklama |
-|----------|---------|----------|
-| `INSCADA_API_URL` | Hayir | inSCADA API adresi (varsayilan: `http://localhost:8081`) |
-| `INSCADA_USERNAME` | Evet | inSCADA kullanici adi |
-| `INSCADA_PASSWORD` | Evet | inSCADA sifresi |
-
 ## Arac Kategorileri
 
 MCP Server 37 arac icerir. Her arac belirli bir SCADA islemini gerceklestirir.
