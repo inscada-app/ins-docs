@@ -92,165 +92,22 @@ Claude Desktop'i yeniden baslatin.
 - Calisan bir inSCADA sunucusu (JDK11 surumu)
 - MCP destekleyen bir AI istemci (Claude Desktop, VS Code Copilot, Cursor vb.)
 
-## Arac Kategorileri
+## Araclar
 
-MCP Server 37 arac icerir. Her arac belirli bir SCADA islemini gerceklestirir.
+MCP Server 37 arac icerir. 8 kategoride gruplanmistir:
 
-### Space Yonetimi
+- **Space & Veri** (9) — Space, proje, degisken, script, baglanti yonetimi
+- **Animasyon** (2) — Animasyon listeleme ve detaylari
+- **SCADA Operasyonlari** (10) — Canli deger, alarm, baglanti durumu, tarihsel veri
+- **Grafikler** (5) — Cizgi, cubuk, gauge, coklu seri, tahmin grafikleri
+- **Custom Menu** (6) — Menu CRUD islemleri (sablonlu olusturma destegi)
+- **Genel API** (3) — 625+ endpoint kesfi ve cagrisi
+- **Disa Aktarma** (1) — Excel dosyasi olusturma
+- **Kilavuz** (1) — Script kurallari, animasyon tipleri, en iyi pratikler
 
-| Arac | Tur | Aciklama |
-|------|-----|----------|
-| `set_space` | Okuma | Aktif space degistirme |
+Detayli parametre ve kullanim bilgileri icin: [Arac Referansi](/docs/tr/ai/tools-reference/)
 
-### Veri Araclari
-
-| Arac | Tur | Aciklama |
-|------|-----|----------|
-| `list_spaces` | Okuma | Space listesi |
-| `list_projects` | Okuma | Proje listesi |
-| `list_variables` | Okuma | Degisken (tag) listesi |
-| `list_scripts` | Okuma | Script listesi |
-| `get_script` | Okuma | Script kodu ve detaylari |
-| `update_script` | Yazma | Script guncelleme |
-| `list_connections` | Okuma | Baglanti listesi |
-| `search_in_scripts` | Okuma | Scriptlerde metin arama |
-
-### Animasyon
-
-| Arac | Tur | Aciklama |
-|------|-----|----------|
-| `list_animations` | Okuma | Animasyon listesi |
-| `get_animation` | Okuma | Animasyon detaylari ve elemanlari |
-
-### SCADA Operasyonlari
-
-| Arac | Tur | Aciklama |
-|------|-----|----------|
-| `inscada_get_live_value` | Okuma | Tek degiskenin canli degerini oku |
-| `inscada_get_live_values` | Okuma | Birden fazla degiskenin canli degerlerini oku |
-| `inscada_set_value` | Yazma | Degiskene deger yaz (gercek ekipman!) |
-| `inscada_get_fired_alarms` | Okuma | Aktif alarmlari listele |
-| `inscada_connection_status` | Okuma | Baglanti durumu (Connected/Disconnected) |
-| `inscada_project_status` | Okuma | Proje calisma durumu |
-| `inscada_run_script` | Yazma | Script calistir |
-| `inscada_script_status` | Okuma | Script calisma durumu |
-| `inscada_logged_values` | Okuma | Tarihsel log verileri |
-| `inscada_logged_stats` | Okuma | istatistikler (min, max, avg, sum) |
-
-### Genel API
-
-| Arac | Tur | Aciklama |
-|------|-----|----------|
-| `inscada_api_endpoints` | Okuma | 625+ API endpoint'i arasinda arama |
-| `inscada_api_schema` | Okuma | Endpoint parametre semasi |
-| `inscada_api` | Yazma | Herhangi bir API endpoint'ini cagir |
-
-### Grafikler
-
-| Arac | Tur | Aciklama |
-|------|-----|----------|
-| `chart_line` | Okuma | Zaman serisi cizgi grafik |
-| `chart_bar` | Okuma | Cubuk grafik (karsilastirma) |
-| `chart_gauge` | Okuma | Canli gosterge (2sn yenileme) |
-| `chart_multi` | Okuma | Coklu seri grafik |
-| `chart_forecast` | Okuma | Tarihsel + tahmin grafigi |
-
-### Custom Menu
-
-| Arac | Tur | Aciklama |
-|------|-----|----------|
-| `list_custom_menus` | Okuma | Menu listesi |
-| `get_custom_menu` | Okuma | Menu detaylari |
-| `get_custom_menu_by_name` | Okuma | isme gore menu arama |
-| `create_custom_menu` | Yazma | Menu olusturma (sablonlu) |
-| `update_custom_menu` | Yazma | Menu guncelleme |
-| `delete_custom_menu` | Yazma | Menu silme |
-
-### Disa Aktarma
-
-| Arac | Tur | Aciklama |
-|------|-----|----------|
-| `export_excel` | Yazma | Excel (.xlsx) dosyasi olusturma |
-
-### Kilavuz
-
-| Arac | Tur | Aciklama |
-|------|-----|----------|
-| `inscada_guide` | Okuma | Kullanim kurallari, script API referansi, en iyi pratikler |
-
-> Tum araclarin detayli parametreleri ve kullanim ornekleri icin [Arac Referansi](/docs/tr/ai/tools-reference/) sayfasina bakin.
-
-## Kullanim Senaryolari
-
-### Canli Deger Okuma
-
-```
-"AN01_Active_Power degiskeninin guncel degeri nedir?"
-```
-
-Claude, `list_projects` ile projeyi bulur, ardindan `inscada_get_live_value` ile canli degeri okur ve sonucu gosterir.
-
-### Tarihsel Veri Analizi
-
-```
-"Son 24 saatlik sicaklik trendini goster ve gelecek 6 saati tahmin et"
-```
-
-Claude, `inscada_logged_values` ile tarihsel veriyi ceker, analiz eder, tahmin degerleri uretir ve `chart_forecast` ile birlestirmis grafigi olusturur.
-
-### Script Yazma
-
-```
-"Kazan sicakligi 90 dereceyi astiginda e-posta uyarisi gonderen bir script yaz"
-```
-
-Claude, `inscada_guide` ile script kurallarini (Nashorn ES5) yukler, kurallara uygun scripti yazar ve `update_script` ile kaydeder (onay gerekir).
-
-### Dashboard Olusturma
-
-```
-"AN01_Active_Power icin canli gosterge ve cizgi grafik iceren bir dashboard olustur"
-```
-
-Claude, `create_custom_menu` aracini `gauge_and_chart` sablonuyla cagirir. inSCADA'da 2 saniyede bir yenilenen gauge ve tarihsel grafik iceren yeni bir menu sayfasi olusturulur.
-
-### Veriyi Excel'e Aktarma
-
-```
-"Tum projelerin script listesini Excel dosyasina aktar"
-```
-
-Claude, projeleri ve scriptleri toplar, `export_excel` ile her proje icin ayri sayfa iceren bir Excel dosyasi olusturur.
-
-### Alarm izleme
-
-```
-"Aktif alarmlar var mi? Varsa detaylarini goster"
-```
-
-Claude, `inscada_get_fired_alarms` ile aktif alarmlari listeler, alarm adi, durumu, tetiklenme zamani ve aciklamasini gosterir.
-
-## Compact ve Verbose Yanit Modu
-
-Token kullanimi optimize etmek icin bazi araclar iki modda calisir:
-
-### Compact Mod (Varsayilan)
-Sadece gerekli alanlari dondurur. Ornegin `inscada_get_live_value` sadece deger, isim, birim ve tarih dondurur.
-
-### Verbose Mod
-`verbose: true` parametresi ile tum API yanitini dondurur. Detayli bilgi gerektiginde kullanin.
-
-```
-"AN01_Active_Power'in tum detaylarini goster" → verbose mod
-"AN01_Active_Power degeri nedir?" → compact mod (varsayilan)
-```
-
-**Compact modu destekleyen araclar:**
-- `inscada_get_live_value` — Compact: value, name, unit, date
-- `inscada_get_live_values` — Compact: {degisken: {value, date}} haritasi
-- `list_variables` — Compact: id, name, type, unit, dsc
-
-Bu optimizasyon, tipik kullaninda %60-80 arasi cikis token tasarrufu saglar.
+Kullanim senaryolari, prompt ornekleri ve token optimizasyonu icin: [Kullanim Rehberi](/docs/tr/ai/mcp-usage-guide/)
 
 ## Guvenlik
 
