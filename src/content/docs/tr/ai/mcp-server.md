@@ -34,6 +34,8 @@ En kolay kurulum yontemi. Claude Desktop icin ozel olarak hazirlanmis extension 
    - **Password**: inSCADA sifresi
 4. Tamam! Extension, Claude Desktop'ta ikon ve aciklamasiyla gorunur.
 
+![Claude Desktop — inSCADA MCP Extension ayarlari](../../../../assets/docs/mcp-extension-settings.png)
+
 **Avantajlari:**
 - Tek tikla kurulum, JSON dosyasi duzenlemeye gerek yok
 - Claude Desktop icinde ikon, aciklama ve ayar paneli gorunur
