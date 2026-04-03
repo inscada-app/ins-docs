@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-inSCADA MCP Server, AI asistanlarini (Claude, VS Code Copilot, Cursor vb.) dogrudan inSCADA SCADA sisteminize baglayan bir koprudur. [Model Context Protocol (MCP)](https://modelcontextprotocol.io) uzerinden 37 arac ile canli deger okuma, alarm izleme, script yazma, tarihsel veri analizi, grafik olusturma ve daha fazlasini yapabilirsiniz.
+inSCADA MCP Server, AI asistanlarini (Claude, VS Code Copilot, Cursor vb.) dogrudan inSCADA SCADA sisteminize baglayan bir koprudur. [Model Context Protocol (MCP)](https://modelcontextprotocol.io) uzerinden 38 arac ile canli deger okuma, alarm izleme, script yazma, tarihsel veri analizi, grafik olusturma ve daha fazlasini yapabilirsiniz.
 
 > **Not:** Bu MCP sunucusu **inSCADA JDK11** surumu icin tasarlanmistir.
 
@@ -96,9 +96,9 @@ Claude Desktop'i yeniden baslatin.
 
 ## Araclar
 
-MCP Server 37 arac icerir. 8 kategoride gruplanmistir:
+MCP Server 38 arac icerir. 8 kategoride gruplanmistir:
 
-- **Space & Veri** (9) — Space, proje, degisken, script, baglanti yonetimi
+- **Space & Veri** (10) — Space, proje, degisken, degisken arama, script, baglanti yonetimi
 - **Animasyon** (2) — Animasyon listeleme ve detaylari
 - **SCADA Operasyonlari** (10) — Canli deger, alarm, baglanti durumu, tarihsel veri
 - **Grafikler** (5) — Cizgi, cubuk, gauge, coklu seri, tahmin grafikleri

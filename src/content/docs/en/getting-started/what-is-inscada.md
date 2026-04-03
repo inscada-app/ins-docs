@@ -54,7 +54,7 @@ Programmatic access to all platform functions via 1100+ endpoints. Variable read
 
 ### AI-Powered Development
 
-Query your inSCADA data in natural language, write scripts, analyse alarms and generate charts using the AI Assistant (desktop app) or MCP Server (Claude Desktop extension). Access platform functions through AI with 37 tools.
+Query your inSCADA data in natural language, write scripts, analyse alarms and generate charts using the AI Assistant (desktop app) or MCP Server (Claude Desktop extension). Access platform functions through AI with 38 tools.
 
 ## Platform Architecture
 

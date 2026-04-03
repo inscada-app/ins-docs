@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-inSCADA MCP Server bridges AI assistants (Claude, VS Code Copilot, Cursor, etc.) directly to your inSCADA SCADA system. Via [Model Context Protocol (MCP)](https://modelcontextprotocol.io), 37 tools enable live value reading, alarm monitoring, script writing, historical data analysis, chart generation, and more.
+inSCADA MCP Server bridges AI assistants (Claude, VS Code Copilot, Cursor, etc.) directly to your inSCADA SCADA system. Via [Model Context Protocol (MCP)](https://modelcontextprotocol.io), 38 tools enable live value reading, alarm monitoring, script writing, historical data analysis, chart generation, and more.
 
 > **Note:** This MCP server is designed for **inSCADA JDK11** edition.
 
@@ -96,9 +96,9 @@ Restart Claude Desktop.
 
 ## Tools
 
-MCP Server includes 37 tools grouped into 8 categories:
+MCP Server includes 38 tools grouped into 8 categories:
 
-- **Space & Data** (9) — Space, project, variable, script, connection management
+- **Space & Data** (10) — Space, project, variable, variable search, script, connection management
 - **Animation** (2) — Animation listing and details
 - **SCADA Operations** (10) — Live values, alarms, connection status, historical data
 - **Charts** (5) — Line, bar, gauge, multi-series, forecast charts

@@ -54,7 +54,7 @@ Değişken değerleri yapılandırılabilir aralıklarla loglanır. Trend grafik
 
 ### AI Destekli Geliştirme
 
-AI Asistan (masaüstü uygulaması) veya MCP Server (Claude Desktop extension) ile doğal dilde inSCADA verilerinizi sorgulayın, script yazın, alarm analizi yapın ve grafik oluşturun. 37 araç ile platform fonksiyonlarına AI üzerinden erişin.
+AI Asistan (masaüstü uygulaması) veya MCP Server (Claude Desktop extension) ile doğal dilde inSCADA verilerinizi sorgulayın, script yazın, alarm analizi yapın ve grafik oluşturun. 38 araç ile platform fonksiyonlarına AI üzerinden erişin.
 
 ## Platform Mimarisi
 
