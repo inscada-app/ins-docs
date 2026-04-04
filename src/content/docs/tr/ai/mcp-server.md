@@ -107,8 +107,6 @@ MCP Server 38 arac icerir. 8 kategoride gruplanmistir:
 - **Disa Aktarma** (1) — Excel dosyasi olusturma
 - **Kilavuz** (1) — Script kurallari, animasyon tipleri, en iyi pratikler
 
-Detayli parametre ve kullanim bilgileri icin: [Arac Referansi](/docs/tr/ai/tools-reference/)
-
 Kullanim senaryolari, prompt ornekleri ve token optimizasyonu icin: [Kullanim Rehberi](/docs/tr/ai/mcp-usage-guide/)
 
 ## Guvenlik

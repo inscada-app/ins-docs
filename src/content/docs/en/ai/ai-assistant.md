@@ -43,8 +43,6 @@ inSCADA offers two solutions that connect AI assistants directly to your SCADA s
 | Export | 1 | Excel file generation |
 | Guide | 1 | Script rules, animation types, best practices |
 
-For detailed parameters and usage: [Tools Reference](/docs/en/ai/tools-reference/)
-
 ## AI Assistant — Desktop Application
 
 Standalone Windows application. Choose your own AI provider, run fully local with Ollama — your data never leaves your computer.

@@ -43,8 +43,6 @@ inSCADA, yapay zeka asistanlarini dogrudan SCADA sisteminize baglayan iki farkli
 | Disa Aktarma | 1 | Excel dosyasi olusturma |
 | Kilavuz | 1 | Script kurallari, animasyon tipleri, en iyi pratikler |
 
-Detayli parametre ve kullanim bilgileri icin: [Arac Referansi](/docs/tr/ai/tools-reference/)
-
 ## AI Asistan — Masaustu Uygulama
 
 Bagimsiz Windows uygulamasi. Kendi AI saglayicinizi secin, Ollama ile tamamen lokal calisin — verileriniz bilgisayarinizdan cikmaz.

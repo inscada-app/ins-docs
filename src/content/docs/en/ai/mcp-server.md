@@ -107,8 +107,6 @@ MCP Server includes 38 tools grouped into 8 categories:
 - **Export** (1) — Excel file generation
 - **Guide** (1) — Script rules, animation types, best practices
 
-For detailed parameters and usage: [Tools Reference](/docs/en/ai/tools-reference/)
-
 For usage scenarios, prompt examples, and token optimization: [Usage Guide](/docs/en/ai/mcp-usage-guide/)
 
 ## Security
