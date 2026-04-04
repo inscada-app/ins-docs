@@ -97,42 +97,6 @@ Uygulama ilk acildiginda ayarlar sayfasindan yapilandirma yapmaniz gerekir:
 
 ![Degisken listesi ve arac cagri sonuclari](../../../../assets/docs/ai-assistant-variable-list.png)
 
-### Mimari
-
-```
-┌──────────────────────────────────────────────┐
-│  Electron (Masaustu Uygulamasi)              │
-│  ├─ Pencere yonetimi (ana, ayarlar, hakkinda)│
-│  ├─ Lisans dogrulama                         │
-│  └─ IPC handler'lar                          │
-├──────────────────────────────────────────────┤
-│  Express Server (localhost:3000)             │
-│  ├─ POST /api/chat — Sohbet endpoint'i      │
-│  ├─ LLM Adapter (Claude/Ollama/Gemini)      │
-│  ├─ Tool cagri dongusu                       │
-│  └─ Tehlikeli tool onay mekanizmasi          │
-├──────────────────────────────────────────────┤
-│  Tool Handlers (38 arac)                     │
-│  ├─ inSCADA REST API istemcisi               │
-│  ├─ Grafik motoru (Chart.js)                 │
-│  ├─ Excel disa aktarma (SheetJS)             │
-│  └─ OpenAPI indeks (625+ endpoint)           │
-├──────────────────────────────────────────────┤
-│  Frontend (Chat UI)                          │
-│  ├─ Sohbet arayuzu                           │
-│  ├─ Grafik render (Chart.js)                 │
-│  └─ Dosya indirme & onay kutulari            │
-└──────────────────────────────────────────────┘
-         │
-         ▼
-┌──────────────────────────────────────────────┐
-│  inSCADA REST API (http://localhost:8081)     │
-│  └─ 625+ endpoint, Swagger dokumantasyonu    │
-└──────────────────────────────────────────────┘
-```
-
-Uygulama Electron ile paketlenir ve `127.0.0.1`'e bind olur. Frontend ile backend ayni surec icinde calisir, ag uzerinden erisim engellenir.
-
 ## Guvenlik
 
 ### Tehlikeli Araclar

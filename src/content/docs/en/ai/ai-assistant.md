@@ -97,42 +97,6 @@ Configure the application from the settings page on first launch:
 
 ![Variable list and tool call results](../../../../assets/docs/ai-assistant-variable-list.png)
 
-### Architecture
-
-```
-┌──────────────────────────────────────────────┐
-│  Electron (Desktop Application)              │
-│  ├─ Window management (main, settings, about)│
-│  ├─ License validation                       │
-│  └─ IPC handlers                             │
-├──────────────────────────────────────────────┤
-│  Express Server (localhost:3000)             │
-│  ├─ POST /api/chat — Chat endpoint          │
-│  ├─ LLM Adapter (Claude/Ollama/Gemini)      │
-│  ├─ Tool call loop                           │
-│  └─ Dangerous tool confirmation mechanism    │
-├──────────────────────────────────────────────┤
-│  Tool Handlers (38 tools)                    │
-│  ├─ inSCADA REST API client                  │
-│  ├─ Chart engine (Chart.js)                  │
-│  ├─ Excel export (SheetJS)                   │
-│  └─ OpenAPI index (625+ endpoints)           │
-├──────────────────────────────────────────────┤
-│  Frontend (Chat UI)                          │
-│  ├─ Chat interface                           │
-│  ├─ Chart rendering (Chart.js)               │
-│  └─ File download & confirmation dialogs     │
-└──────────────────────────────────────────────┘
-         │
-         ▼
-┌──────────────────────────────────────────────┐
-│  inSCADA REST API (http://localhost:8081)     │
-│  └─ 625+ endpoints, Swagger documentation   │
-└──────────────────────────────────────────────┘
-```
-
-The application is packaged with Electron and binds to `127.0.0.1`. Frontend and backend run in the same process, with no network access from outside.
-
 ## Security
 
 ### Dangerous Tools
