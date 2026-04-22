@@ -1,46 +1,97 @@
 ---
 title: "Trend API"
-description: "Trend tanımları ve tag yönetimi"
+description: "Trend definitions, tags, and dynamic tag-scale updates"
 sidebar:
   order: 4
 ---
 
-Trend API, trend tanımlarına ve tag'lerine erişim sağlar. Trend grafikleri, değişkenlerin zaman içindeki değişimini görselleştirmek için kullanılır.
+Trend API lists the trend definitions and their tags (each tag = one variable / line on the trend) and lets scripts change a tag's Y-axis scale at runtime.
 
-## Fonksiyonlar
+## `ins.getTrends()`
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| **ins.getTrends()** | Tüm trend tanımlarını listele |
-| **ins.getTrendTags(trendId)** | Trend tag'lerini listele |
-| **ins.setTrendTagMinMaxScale(trendName, tagName, min, max)** | Tag ölçek aralığını güncelle |
-
-### Örnekler
+Returns every trend definition in the project — `Collection<TrendResponseDto>`.
 
 ```javascript
-// Tüm trend tanımlarını listele
 var trends = ins.getTrends();
-// → [] (tanımlı trend yoksa boş dizi)
+trends.forEach(function(t) {
+    ins.consoleLog(t.getName() + " period=" + t.getPeriod() + "ms");
+});
 ```
 
+### `TrendResponseDto` Fields
+
+| Method | Type | Description |
+| --- | --- | --- |
+| `getName()` | `String` | Trend name |
+| `getDsc()` | `String` | Description |
+| `getPeriod()` | `Integer` | Sampling period (ms) |
+| `getOrder()` | `Integer` | Order in the UI list |
+| `getConfigs()` | `String` | Serialized display configuration (JSON string) |
+| `getProjectId()` | `String` | Project ID |
+
+## `ins.getTrendTags(trendId)`
+
+Returns every tag attached to the given trend — `Collection<TrendTagResponseDto>`.
+
 ```javascript
-// Trend tag'lerini listele
-var tags = ins.getTrendTags(1);
-// Her tag, bir değişkenin trend grafiğindeki görünüm ayarlarını içerir
+// Look up the trend id by name
+var trends = ins.getTrends();
+var target = null;
+trends.forEach(function(t) {
+    if (t.getName() == "Power Trend") target = t;
+});
+
+if (target) {
+    var tags = ins.getTrendTags(target.getBaseId());
+    tags.forEach(function(tag) {
+        ins.consoleLog(tag.getVariableName() + " [" + tag.getMinScale() + ", " + tag.getMaxScale() + "]");
+    });
+}
 ```
 
-```javascript
-// Tag ölçek aralığını dinamik güncelle
-// Örn: alarm limitlerine göre ölçeği ayarla
-var stats = ins.getLoggedVariableValueStats(
-    ["ActivePower_kW"],
-    ins.getDate(ins.now().getTime() - 3600000),
-    ins.now()
-);
-var min = stats.ActivePower_kW.minValue;
-var max = stats.ActivePower_kW.maxValue;
-var margin = (max - min) * 0.1;
+### `TrendTagResponseDto` Fields
 
-ins.setTrendTagMinMaxScale("Power Trend", "ActivePower_kW",
-    min - margin, max + margin);
+| Method | Type | Description |
+| --- | --- | --- |
+| `getName()` | `String` | Tag name |
+| `getDsc()` | `String` | Description |
+| `getStatus()` | `Boolean` | Whether the tag is active |
+| `getOrder()` | `Integer` | Order inside the trend |
+| `getVariableName()` / `getVariableUnit()` | `String` | Bound variable name and unit |
+| `getVariableId()` / `getTrendId()` | `String` | Reference IDs |
+| `getMinScale()` / `getMaxScale()` | `Double` | Y-axis lower/upper bounds |
+| `getColor()` | `String` | Line color (hex) |
+| `getThickness()` | `Integer` | Line thickness |
+| `getGridThickness()` | `Double` | Grid thickness |
+| `getHideValueAxe()` | `Boolean` | Whether to hide the value axis |
+
+## `ins.setTrendTagMinMaxScale(trendName, tagName, minScale, maxScale)`
+
+Sets a trend tag's Y-axis bounds. The trend uses the new range from the next render onward.
+
+```javascript
+ins.setTrendTagMinMaxScale("Power Trend", "ActivePower_kW", 0.0, 500.0);
+```
+
+## Example: Auto-scale From the Last Hour
+
+Dynamically adjust the trend's Y-axis range based on the last hour of real data, with 10 % margin.
+
+```javascript
+function main() {
+    var end = ins.now();
+    var start = ins.getDate(end.getTime() - 3600000);
+
+    var stats = ins.getLoggedVariableValueStats(["ActivePower_kW"], start, end);
+    var s = stats.ActivePower_kW;
+    if (!s) return;
+
+    var margin = (s.getMaxValue() - s.getMinValue()) * 0.1;
+    ins.setTrendTagMinMaxScale(
+        "Power Trend", "ActivePower_kW",
+        s.getMinValue() - margin,
+        s.getMaxValue() + margin
+    );
+}
+main();
 ```
