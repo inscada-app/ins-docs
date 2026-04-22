@@ -1,102 +1,124 @@
 ---
 title: "Notification API"
-description: "E-posta, SMS ve web bildirim gönderme"
+description: "Web notifications, email (plain + HTML multipart) and SMS delivery"
 sidebar:
   order: 6
 ---
 
-Notification API, script'ler içinden e-posta, SMS ve web bildirimi gönderme sağlar.
+Notification API sends **web notifications**, **email** and **SMS** to platform users from scripts. All three are addressed by platform usernames (`username[]`) — the actual email address / phone number comes from the user's profile.
 
-## Fonksiyonlar
+## Web Notifications
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| **ins.sendMail(users, subject, content)** | E-posta gönder |
-| **ins.sendMail(users, subject, content, html)** | HTML e-posta gönder |
-| **ins.sendSMS(users, message)** | SMS gönder |
-| **ins.sendSMS(users, message, provider)** | Belirli sağlayıcı ile SMS |
-| **ins.notify(type, title, message)** | Web bildirimi gönder |
+### `ins.notify(type, title, message)`
 
-## Web Bildirimi
-
-### ins.notify(type, title, message)
-
-Tüm bağlı istemcilere anlık web bildirimi gönderir. Bildirim kullanıcı arayüzünde popup olarak görünür.
+Pushes a web notification to every connected UI client (webix clients); it appears as a popup in the interface.
 
 ```javascript
-ins.notify("info", "Bilgi", "Vardiya değişimi tamamlandı");
-// → OK
+ins.notify("info", "Shift", "Shift change complete");
 ```
 
-| type | Açıklama |
-|------|----------|
-| **info** | Bilgilendirme (mavi) |
-| **success** | Başarılı işlem (yeşil) |
-| **warning** | Uyarı (sarı) |
-| **error** | Hata (kırmızı) |
+| `type` | Appearance |
+| --- | --- |
+| `"info"` | Info (blue) |
+| `"success"` | Success (green) |
+| `"warning"` | Warning (yellow) |
+| `"error"` | Error (red) |
 
 ```javascript
-// Alarm eşiği aşıldığında uyarı gönder
 var temp = ins.getVariableValue("Temperature_C").value;
 if (temp > 60) {
-    ins.notify("warning", "Sıcaklık Uyarısı",
-        "Panel sıcaklığı " + temp + "°C — limit 60°C");
+    ins.notify("warning", "Temperature warning",
+        "Panel temperature " + temp + "°C — limit 60°C");
 }
 ```
 
-## E-posta
+## Email
 
-### ins.sendMail(users, subject, content)
+### `ins.sendMail(usernames[], subject, content)`
 
-Platform üzerinde tanımlı kullanıcılara e-posta gönderir. `users` parametresi kullanıcı adı dizisidir.
+Sends a **plain text** email to the given platform users.
 
 ```javascript
 ins.sendMail(
     ["operator1", "supervisor"],
-    "Günlük Rapor",
-    "Bugünkü toplam üretim: 1250 kWh"
+    "Daily report",
+    "Today's total production: 1250 kWh"
 );
 ```
 
-:::note
-E-posta göndermek için **Settings → Email Settings** bölümünden SMTP sunucu yapılandırması yapılmış olmalıdır.
-:::
+### `ins.sendMail(usernames[], subject, content, htmlContent)`
 
-### ins.sendMail(users, subject, content, html)
-
-HTML formatında e-posta gönderir. `html` parametresi `true` olduğunda `content` HTML olarak yorumlanır.
+Sends a **multipart/alternative** email — both the plain text body (`content`) and the HTML body (`htmlContent`) travel in the same message; the email client shows whichever it supports.
 
 ```javascript
 var power = ins.getVariableValue("ActivePower_kW").value;
 var voltage = ins.getVariableValue("Voltage_V").value;
 
-var htmlBody = "<h2>Enerji Raporu</h2>"
-    + "<table border='1'>"
-    + "<tr><td>Aktif Güç</td><td>" + power + " kW</td></tr>"
-    + "<tr><td>Gerilim</td><td>" + voltage + " V</td></tr>"
+var textBody = "Energy Report\n"
+    + "Active Power: " + power + " kW\n"
+    + "Voltage: " + voltage + " V\n";
+
+var htmlBody = "<h2>Energy Report</h2>"
+    + "<table border='1' cellpadding='6'>"
+    + "<tr><td>Active Power</td><td>" + power + " kW</td></tr>"
+    + "<tr><td>Voltage</td><td>" + voltage + " V</td></tr>"
     + "</table>";
 
-ins.sendMail(["manager"], "Enerji Raporu", htmlBody, true);
-```
-
-## SMS
-
-### ins.sendSMS(users, message)
-
-Platform kullanıcılarına SMS gönderir.
-
-```javascript
-ins.sendSMS(["oncall_engineer"], "ALARM: Trafo sıcaklığı kritik seviyede!");
-```
-
-### ins.sendSMS(users, message, provider)
-
-Belirli bir SMS sağlayıcısı üzerinden gönderir.
-
-```javascript
-ins.sendSMS(["operator"], "Sistem bakım hatırlatması", "ileti_merkezi");
+ins.sendMail(["manager"], "Energy Report", textBody, htmlBody);
 ```
 
 :::note
-SMS göndermek için **Settings → SMS Settings** bölümünden SMS sağlayıcı yapılandırması yapılmış olmalıdır.
+`htmlContent` is a **String** parameter (not a boolean flag). Passing `null` for it sends plain-text only; when both carry content, the client may render the HTML alternative.
 :::
+
+:::caution
+Email requires an SMTP configuration under **Settings → Email Settings**. Every recipient user must have a valid email address on their profile — otherwise they are skipped.
+:::
+
+## SMS
+
+### `ins.sendSMS(usernames[], message)`
+
+Sends an SMS through the platform's **default** SMS provider.
+
+```javascript
+ins.sendSMS(["oncall_engineer"], "ALARM: Transformer temperature critical!");
+```
+
+### `ins.sendSMS(usernames[], message, provider)`
+
+Sends via a specific SMS provider (if multiple are configured).
+
+```javascript
+ins.sendSMS(["operator"], "Maintenance reminder", "NetGSM");
+```
+
+:::caution
+SMS requires an SMS provider configured under **Settings → SMS Settings**, and each user profile must have a valid phone number.
+:::
+
+## Example: Multi-Channel Critical Alarm
+
+```javascript
+function main() {
+    var temp = ins.getVariableValue("TransformerTemp_C").value;
+    if (temp < 85) return;
+
+    var msg = "Transformer temperature: " + temp + "°C — limit 85°C";
+
+    // 1) Instant UI notification for everyone
+    ins.notify("error", "Critical temperature", msg);
+
+    // 2) SMS to on-call staff
+    ins.sendSMS(["oncall_engineer", "shift_supervisor"], msg);
+
+    // 3) Rich email to management
+    var html = "<h3 style='color:#c0392b'>Critical Temperature</h3>"
+        + "<p>" + msg + "</p>"
+        + "<p>Time: " + ins.now() + "</p>";
+    ins.sendMail(["plant_manager"], "[CRITICAL] Transformer Temperature", msg, html);
+
+    ins.writeLog("ERROR", "TempWatch", msg);
+}
+main();
+```

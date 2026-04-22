@@ -1,42 +1,30 @@
 ---
 title: "Notification API"
-description: "E-posta, SMS ve web bildirim gönderme"
+description: "Web bildirim, e-posta (plain + HTML multipart) ve SMS gönderimi"
 sidebar:
   order: 6
 ---
 
-Notification API, script'ler içinden e-posta, SMS ve web bildirimi gönderme sağlar.
+Notification API; script'lerden platform kullanıcılarına **web bildirim**, **e-posta** ve **SMS** iletileri gönderir. Her üçü de platform kullanıcı adları (`username[]`) üzerinden adreslenir — gerçek e-posta adresi / telefon numarası kullanıcı profilinden alınır.
 
-## Fonksiyonlar
+## Web Bildirim
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| **ins.sendMail(users, subject, content)** | E-posta gönder |
-| **ins.sendMail(users, subject, content, html)** | HTML e-posta gönder |
-| **ins.sendSMS(users, message)** | SMS gönder |
-| **ins.sendSMS(users, message, provider)** | Belirli sağlayıcı ile SMS |
-| **ins.notify(type, title, message)** | Web bildirimi gönder |
+### `ins.notify(type, title, message)`
 
-## Web Bildirimi
-
-### ins.notify(type, title, message)
-
-Tüm bağlı istemcilere anlık web bildirimi gönderir. Bildirim kullanıcı arayüzünde popup olarak görünür.
+Tüm bağlı UI istemcilerine (webix clients) anlık web bildirim gönderir; kullanıcı arayüzünde popup olarak görünür.
 
 ```javascript
-ins.notify("info", "Bilgi", "Vardiya değişimi tamamlandı");
-// → OK
+ins.notify("info", "Vardiya", "Vardiya değişimi tamamlandı");
 ```
 
-| type | Açıklama |
-|------|----------|
-| **info** | Bilgilendirme (mavi) |
-| **success** | Başarılı işlem (yeşil) |
-| **warning** | Uyarı (sarı) |
-| **error** | Hata (kırmızı) |
+| `type` | Görünüm |
+| --- | --- |
+| `"info"` | Bilgi (mavi) |
+| `"success"` | Başarılı (yeşil) |
+| `"warning"` | Uyarı (sarı) |
+| `"error"` | Hata (kırmızı) |
 
 ```javascript
-// Alarm eşiği aşıldığında uyarı gönder
 var temp = ins.getVariableValue("Temperature_C").value;
 if (temp > 60) {
     ins.notify("warning", "Sıcaklık Uyarısı",
@@ -46,9 +34,9 @@ if (temp > 60) {
 
 ## E-posta
 
-### ins.sendMail(users, subject, content)
+### `ins.sendMail(usernames[], subject, content)`
 
-Platform üzerinde tanımlı kullanıcılara e-posta gönderir. `users` parametresi kullanıcı adı dizisidir.
+Verilen platform kullanıcılarına **plain text** e-posta gönderir.
 
 ```javascript
 ins.sendMail(
@@ -58,45 +46,79 @@ ins.sendMail(
 );
 ```
 
-:::note
-E-posta göndermek için **Settings → Email Settings** bölümünden SMTP sunucu yapılandırması yapılmış olmalıdır.
-:::
+### `ins.sendMail(usernames[], subject, content, htmlContent)`
 
-### ins.sendMail(users, subject, content, html)
-
-HTML formatında e-posta gönderir. `html` parametresi `true` olduğunda `content` HTML olarak yorumlanır.
+**Multipart/alternative** e-posta gönderir — hem düz metin (`content`) hem HTML (`htmlContent`) gövdesi aynı mesajda yer alır; e-posta istemcisi hangisini destekliyorsa onu gösterir.
 
 ```javascript
 var power = ins.getVariableValue("ActivePower_kW").value;
 var voltage = ins.getVariableValue("Voltage_V").value;
 
+var textBody = "Enerji Raporu\n"
+    + "Aktif Güç: " + power + " kW\n"
+    + "Gerilim: " + voltage + " V\n";
+
 var htmlBody = "<h2>Enerji Raporu</h2>"
-    + "<table border='1'>"
+    + "<table border='1' cellpadding='6'>"
     + "<tr><td>Aktif Güç</td><td>" + power + " kW</td></tr>"
     + "<tr><td>Gerilim</td><td>" + voltage + " V</td></tr>"
     + "</table>";
 
-ins.sendMail(["manager"], "Enerji Raporu", htmlBody, true);
+ins.sendMail(["manager"], "Enerji Raporu", textBody, htmlBody);
 ```
+
+:::note
+`htmlContent` bir **String** parametresidir (boolean bayrak değil). `null` verirsen yalnızca plain-text sürüm gider; iki sürüm de içerik taşıyorsa istemci HTML'e geçer.
+:::
+
+:::caution
+E-posta göndermek için **Settings → Email Settings** bölümünde SMTP yapılandırması tanımlı olmalıdır. Her kullanıcının profilinde geçerli bir e-posta adresi bulunması gerekir — aksi halde o kullanıcıya mail atlanır.
+:::
 
 ## SMS
 
-### ins.sendSMS(users, message)
+### `ins.sendSMS(usernames[], message)`
 
-Platform kullanıcılarına SMS gönderir.
+Platformda tanımlı **varsayılan** SMS sağlayıcısı üzerinden SMS gönderir.
 
 ```javascript
 ins.sendSMS(["oncall_engineer"], "ALARM: Trafo sıcaklığı kritik seviyede!");
 ```
 
-### ins.sendSMS(users, message, provider)
+### `ins.sendSMS(usernames[], message, provider)`
 
-Belirli bir SMS sağlayıcısı üzerinden gönderir.
+Belirtilen SMS sağlayıcısı üzerinden gönderir (çoklu sağlayıcı kurulu ise).
 
 ```javascript
-ins.sendSMS(["operator"], "Sistem bakım hatırlatması", "ileti_merkezi");
+ins.sendSMS(["operator"], "Sistem bakım hatırlatması", "NetGSM");
 ```
 
-:::note
-SMS göndermek için **Settings → SMS Settings** bölümünden SMS sağlayıcı yapılandırması yapılmış olmalıdır.
+:::caution
+SMS göndermek için **Settings → SMS Settings** bölümünde SMS sağlayıcı yapılandırılmış ve her kullanıcı profilinde geçerli bir telefon numarası bulunuyor olmalıdır.
 :::
+
+## Örnek: Çok Kanallı Kritik Alarm
+
+```javascript
+function main() {
+    var temp = ins.getVariableValue("TransformerTemp_C").value;
+    if (temp < 85) return;
+
+    var msg = "Trafo sıcaklığı: " + temp + "°C — limit 85°C";
+
+    // 1) Tüm UI'lere anlık uyarı
+    ins.notify("error", "Kritik Sıcaklık", msg);
+
+    // 2) Sorumlulara SMS
+    ins.sendSMS(["oncall_engineer", "shift_supervisor"], msg);
+
+    // 3) Yönetim için zengin e-posta
+    var html = "<h3 style='color:#c0392b'>Kritik Sıcaklık</h3>"
+        + "<p>" + msg + "</p>"
+        + "<p>Zaman: " + ins.now() + "</p>";
+    ins.sendMail(["plant_manager"], "[KRITIK] Trafo Sıcaklığı", msg, html);
+
+    ins.writeLog("ERROR", "TempWatch", msg);
+}
+main();
+```
