@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightOpenAPI, { openAPISidebarGroups } from 'starlight-openapi';
 
 function versionSidebar(v) {
 	return [
@@ -66,6 +67,14 @@ function versionSidebar(v) {
 			translations: { en: 'REST API' },
 			autogenerate: { directory: `${v}/api` },
 		},
+		...(v === 'jdk21'
+			? [{
+				label: 'REST API Reference',
+				translations: { en: 'REST API Reference' },
+				collapsed: true,
+				items: openAPISidebarGroups,
+			}]
+			: []),
 		{
 			label: 'AI Araçları',
 			translations: { en: 'AI Tools' },
@@ -92,6 +101,16 @@ export default defineConfig({
 	},
 	integrations: [
 		starlight({
+			plugins: [
+				starlightOpenAPI([
+					{
+						base: 'jdk21/api/reference',
+						schema: './src/content/openapi/inscada-jdk21.json',
+						label: 'inSCADA REST API',
+						collapsed: true,
+					},
+				]),
+			],
 			title: 'inSCADA Docs',
 			logo: {
 				src: './src/assets/logo.png',
