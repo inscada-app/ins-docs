@@ -1,238 +1,130 @@
 ---
 title: "REST API Overview"
-description: "inSCADA REST API — authentication, endpoint structure, and usage"
+description: "inSCADA REST API — authentication, common headers and response format"
 sidebar:
   order: 1
 ---
 
-inSCADA has a fully RESTful architecture. Every operation on the platform — reading/writing variables, project management, alarm queries, connection control — can be performed through the REST API.
+inSCADA is a fully RESTful platform. Reading/writing variables, managing projects, querying alarms, controlling connections — every operation is available over REST.
 
-## API Access
+:::tip[Full Endpoint Reference]
+This page covers authentication and common conventions. For interactive, parameter-level documentation of every controller and every endpoint, see **[REST API Reference](/docs/jdk21/api/reference/)** — auto-generated from the platform's OpenAPI spec.
+:::
 
-**Base URL:**
+## Base URL
+
 ```
 https://<inscada-ip>:8082/api/
 ```
 
-All endpoints start with the `/api/` prefix. The API accepts and returns data in JSON format.
+All endpoints prefixed with `/api/` accept and return JSON. The three public auth endpoints — `/login`, `/validate`, `/refresh`, `/logout` — live at the root, without the `/api/` prefix.
 
 ## Authentication
 
-The inSCADA REST API uses form-based login and JWT token authentication.
+inSCADA uses a hybrid Bearer token + optional cookie model. Browser sessions work via cookies; API clients (Postman, curl, SDKs) should prefer the `Authorization: Bearer` header.
 
 ### 1. Login
 
-```
+```http
 POST /login
-Content-Type: multipart/form-data
+Content-Type: application/x-www-form-urlencoded
 
 username=admin&password=admin
 ```
 
-A successful response sets `ins_access_token` and `ins_refresh_token` cookies.
+Successful response:
 
-### 2. API Requests
-
-Cookies obtained after login are automatically sent with subsequent requests. Alternatively, the token can also be sent via a header:
-
+```json
+{
+  "access_token": "eyJhbG...",
+  "refresh_token": "eyJhbG...",
+  "expire-seconds": 300,
+  "activeSpace": "default_space",
+  "spaces": ["default_space", "production"]
+}
 ```
+
+If OTP is enabled the response differs:
+
+```json
+{ "otp_required": true, "otp_type": "MAIL", "username": "admin" }
+```
+
+Call `POST /validate` with the returned `username` and the OTP code; on success the normal token pair is returned.
+
+### 2. Using the Token
+
+Subsequent requests carry the token as:
+
+```http
 GET /api/projects
-Cookie: ins_access_token=<token>; ins_refresh_token=<token>
+Authorization: Bearer <access_token>
 X-Space: default_space
 ```
 
-### 3. Space Header
+### 3. Refreshing Tokens
 
-In the multi-workspace (multi-tenant) architecture, the `X-Space` header is used to specify which space the request operates in:
+```http
+POST /refresh
+Content-Type: application/json
 
+{ "refresh_token": "eyJhbG..." }
 ```
+
+Returns a new token pair.
+
+### 4. Logout
+
+```http
+POST /logout
+Authorization: Bearer <access_token>
+```
+
+## X-Space Header
+
+In multi-space (multi-tenant) installations, **every API request** must include the `X-Space` header to identify the working space:
+
+```http
 X-Space: default_space
 ```
 
-## Endpoint Categories
+Valid space IDs are returned in the `spaces` field of the login response. In single-space installations the default is used when the header is omitted.
 
-The inSCADA REST API contains 91 controllers and 1100+ endpoints. Below are the main categories and key endpoints:
+## Response Format
 
-### Authentication and User
+All responses are JSON.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/login` | User login |
-| GET | `/api/auth/currentUser` | Current logged-in user info |
-| GET | `/api/auth/loggedInUsers` | Active session list |
-| GET | `/api/users` | User list |
-| POST | `/api/users` | Create a new user |
-| PUT | `/api/users/{id}` | Update a user |
-| DELETE | `/api/users/{id}` | Delete a user |
-| GET | `/api/users/{id}/roles` | User roles |
+```json
+// Success
+{ "id": 1, "name": "Temperature", "value": 25.4 }
 
-### Space (Workspace)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/spaces` | Space list |
-| GET | `/api/spaces/{id}` | Space details |
-| POST | `/api/spaces` | Create a new space |
-| PUT | `/api/spaces/{id}` | Update a space |
-| DELETE | `/api/spaces/{id}` | Delete a space |
-
-### Project
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/projects` | Project list |
-| GET | `/api/projects/{id}` | Project details |
-| GET | `/api/projects/{id}/status` | Project status |
-| POST | `/api/projects` | Create a new project |
-| PUT | `/api/projects/{id}` | Update a project |
-| DELETE | `/api/projects/{id}` | Delete a project |
-| POST | `/api/projects/clone` | Clone a project |
-
-### Connection
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/connections/{id}/start` | Start a connection |
-| POST | `/api/connections/{id}/stop` | Stop a connection |
-| GET | `/api/connections/{id}/status` | Connection status |
-| GET | `/api/connections/{id}/browse` | Device discovery (OPC UA, OPC DA) |
-
-Each protocol has its own CRUD endpoints:
-- `/api/modbus/connections`, `/api/dnp3/connections`, `/api/iec104/connections` ...
-- `/api/modbus/variables`, `/api/dnp3/variables` ...
-
-### Variable Values
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/variables/{id}/value` | Single variable live value |
-| GET | `/api/variables/values?projectId=X&names=a,b` | Bulk live values |
-| POST | `/api/variables/{id}/value` | Write a value to a variable |
-| GET | `/api/variables/loggedValues` | Query historical data |
-| GET | `/api/variables/loggedValues/stats` | Statistics (avg, min, max) |
-| GET | `/api/variables/loggedValues/stats/hourly` | Hourly statistics |
-
-### Alarm
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/alarms/fired-alarms` | Active alarms |
-| GET | `/api/alarms/fired-alarms/all` | Full alarm history |
-| POST | `/api/alarms/fired-alarms/acknowledge` | Acknowledge an alarm |
-| POST | `/api/alarms/fired-alarms/force-off` | Force-close an alarm |
-
-### Script
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/scripts` | Script list |
-| GET | `/api/scripts/{id}` | Script details |
-| POST | `/api/scripts` | Create a new script |
-| PUT | `/api/scripts/{id}` | Update a script |
-| DELETE | `/api/scripts/{id}` | Delete a script |
-| GET | `/api/scripts/{id}/status` | Script execution status |
-| POST | `/api/scripts/runner` | Run script code (ad-hoc) |
-
-### Animation (SVG Screens)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/animations` | Animation list |
-| GET | `/api/animations/{id}` | Animation details |
-| POST | `/api/animations` | Create a new animation |
-| PUT | `/api/animations/{id}` | Update an animation |
-| PUT | `/api/animations/{id}/svg` | Update SVG content |
-| POST | `/api/animations/{id}/clone` | Clone an animation |
-
-### Trend
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/trends` | Trend list |
-| POST | `/api/trends` | Create a new trend |
-| GET | `/api/trends/{id}/tags` | Trend tags |
-| POST | `/api/trends/{id}/tags` | Add a tag |
-
-### Custom Menu
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/custom-menus` | Menu list |
-| POST | `/api/custom-menus` | Create a new menu |
-| PUT | `/api/custom-menus/{id}` | Update a menu |
-| DELETE | `/api/custom-menus/{id}` | Delete a menu |
-
-### Report
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/reports` | Report list |
-| POST | `/api/reports/{id}/run` | Run a report |
-| GET | `/api/reports/{id}/export/pdf` | Export as PDF |
-| GET | `/api/reports/{id}/export/excel` | Export as Excel |
-
-### System
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/version` | Platform version |
-| GET | `/api/license` | License information |
-| GET | `/api/cluster/leader` | Cluster leader node |
-| GET | `/api/system/status` | System status |
-
-### Example: Version Query
-
-```bash
-curl -b cookies.txt http://localhost:8081/api/version -H "X-Space: default_space"
+// Error
+{ "status": 400, "error": "Bad Request", "message": "Variable not found: invalid_name" }
 ```
 
-```
-20260311-1-jdk11
-```
+### HTTP Status Codes
 
-## Swagger / API Documentation
+| Code | Meaning |
+|------|---------|
+| **200** | OK |
+| **201** | Created |
+| **400** | Bad request |
+| **401** | Not authenticated / token invalid |
+| **403** | Forbidden |
+| **404** | Not found |
+| **429** | Rate limit exceeded |
+| **500** | Server error |
 
-inSCADA provides interactive API documentation with a built-in **Swagger UI**. It is activated in development mode (`dev` profile):
+## Rate Limiting
+
+API requests are rate-limited. Exceeding the limit returns `429 Too Many Requests`. Limits are configurable at system level.
+
+## Swagger UI
+
+Interactive Swagger UI shipped with the platform in the `dev` profile:
 
 ```
 https://<inscada-ip>:8082/swagger-ui/
 ```
 
-Through Swagger UI, you can discover all endpoints, view parameter descriptions, and send test requests directly.
-
-## Response Format
-
-All responses are in JSON format:
-
-```json
-// Successful response
-{
-    "id": 1,
-    "name": "Temperature",
-    "value": 25.4,
-    ...
-}
-
-// Error response
-{
-    "status": 400,
-    "error": "Bad Request",
-    "message": "Variable not found: invalid_name"
-}
-```
-
-### HTTP Status Codes
-
-| Code | Description |
-|------|-------------|
-| **200** | Success |
-| **201** | Created |
-| **400** | Bad request |
-| **401** | Authentication required |
-| **403** | Unauthorized access |
-| **404** | Not found |
-| **500** | Server error |
-
-## Rate Limiting
-
-API requests are protected by rate limiting. In case of excessive requests, a `429 Too Many Requests` response is returned. Limit values can be adjusted from the system configuration.
+For production deployments, the same spec is served on this site under [REST API Reference](/docs/jdk21/api/reference/).

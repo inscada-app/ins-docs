@@ -62,19 +62,20 @@ function versionSidebar(v) {
 				{ slug: `${v}/protocols/knx` },
 			],
 		},
-		{
-			label: 'REST API',
-			translations: { en: 'REST API' },
-			autogenerate: { directory: `${v}/api` },
-		},
-		...(v === 'jdk21'
-			? [{
-				label: 'REST API Reference',
-				translations: { en: 'REST API Reference' },
-				collapsed: true,
-				items: openAPISidebarGroups,
-			}]
-			: []),
+		v === 'jdk21'
+			? {
+				label: 'REST API',
+				translations: { en: 'REST API' },
+				items: [
+					{ slug: `${v}/api/overview` },
+					...openAPISidebarGroups,
+				],
+			}
+			: {
+				label: 'REST API',
+				translations: { en: 'REST API' },
+				autogenerate: { directory: `${v}/api` },
+			},
 		{
 			label: 'AI Araçları',
 			translations: { en: 'AI Tools' },
