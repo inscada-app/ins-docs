@@ -5,106 +5,141 @@ sidebar:
   order: 3
 ---
 
-![Device List](../../../../../assets/docs/dev-devices.png)
+![Device list](../../../../../assets/docs/dev-devices.png)
 
 ## Device
 
-A device represents a physical or logical unit on a connection. There can be multiple devices under a single connection.
+A device represents a physical or logical unit over a connection. A single connection can host many devices — for example, multiple slaves on a Modbus TCP link.
 
-### Creating a Device
+### Device Fields
 
-**Menu:** Runtime → Connections → Select Connection → Devices → New Device
+Common fields:
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| **Name** | Yes | Device name |
-| **Description** | No | Description |
-| **Scan Time** | Yes | Read period (ms) |
-| **Scan Type** | Yes | Read type (Periodic, OnDemand) |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **name** | String (≤100) | Yes | Device name (unique within the connection) |
+| **dsc** | String (≤255) | No | Description |
+| **protocol** | `Protocol` | Auto | Inherited from the parent connection |
+| **connectionId** | String | Yes | Owning connection ID |
+| **config** | Map | Protocol-dependent | Protocol-specific settings (JSONB) |
 
-### Device Structure (Example)
+Fields that appear at the top level of the device JSON come from `config` — inSCADA flattens the DTO. For Modbus the device-level fields are:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **scanTime** | Integer (≥100) | Read cycle (ms) |
+| **scanType** | `DeviceScanType` | `Periodic` or `Fixed Delay` |
+| **stationAddress** | Integer (≥0) | Modbus slave address |
+
+### Scan Type
+
+The `DeviceScanType` enum has two values:
+
+| Value | Behavior |
+|-------|----------|
+| **Periodic** | Fixed-rate scheduling — the period between cycle starts stays at `scanTime` |
+| **Fixed Delay** | Fixed-delay scheduling — `scanTime` is inserted *after* each cycle ends |
+
+### Device JSON (Modbus example)
 
 ```json
 {
-  "id": 453,
-  "name": "Energy-Device",
-  "connectionId": 153,
-  "dsc": "Energy monitoring simulated device",
+  "id": "abc123",
+  "connectionId": "conn-153",
+  "protocol": "Modbus TCP",
+  "name": "slave-1",
+  "dsc": "Energy meter",
   "scanTime": 2000,
-  "scanType": "Periodic"
+  "scanType": "Periodic",
+  "stationAddress": 1
 }
 ```
 
-| Field | Description |
-|-------|-------------|
-| **scanTime** | Read period in milliseconds. `2000` = reads every 2 seconds |
-| **scanType** | `Periodic` = continuous reading, `OnDemand` = reads only when requested |
-
 ### Scan Time Recommendations
 
-| Scenario | Recommended Scan Time |
-|----------|----------------------|
-| Fast-changing data (power, current) | 1000 - 2000 ms |
-| Medium-speed data (temperature, pressure) | 3000 - 5000 ms |
-| Slow-changing data (energy meter) | 5000 - 10000 ms |
-| Status information (on/off) | 1000 - 3000 ms |
+| Scenario | Suggested scanTime |
+|---------|-------------------|
+| Fast-changing data (power, current) | 1000 – 2000 ms |
+| Medium-rate data (temperature, pressure) | 3000 – 5000 ms |
+| Slow-changing data (energy meter) | 5000 – 10000 ms |
+| Status bits (on/off) | 1000 – 3000 ms |
 
 :::tip
-The shorter the scan time, the more network traffic increases. Optimize according to your requirements.
+Shorter scanTime means more network traffic. Tune per use case. Each protocol has its own floor (100 ms for Modbus).
+:::
+
+:::note
+For other protocols (DNP3, IEC-104, OPC UA, S7, …) the device config fields differ. See the protocol-specific docs: [Protocols →](/docs/en/jdk21/protocols/)
 :::
 
 ---
 
-## Frame (Data Frame)
+## Frame
 
-A frame is a data block read from a device. Each frame defines a specific address range. Variables reside within frames.
+A frame is a block of data read from a device. Each frame defines an address range. Variables live inside frames.
 
-### Creating a Frame
+### Frame Fields
 
-**Menu:** Runtime → Connections → Connection → Device → Frames → New Frame
+Common fields:
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| **Name** | Yes | Frame name |
-| **Description** | No | Description |
-| **Readable** | Yes | Is this frame readable |
-| **Writable** | Yes | Can variables in this frame be written to |
-| **Scan Time Factor** | No | Device scan time multiplier |
-| **Minutes Offset** | No | Timing offset (minutes) |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **name** | String (≤100) | Yes | Frame name |
+| **dsc** | String (≤255) | No | Description |
+| **deviceId** | String | Yes | Owning device ID |
+| **protocol** | `Protocol` | Auto | Inherited from the device |
+| **isReadable** | Boolean | Yes | Whether the frame is polled |
+| **isWritable** | Boolean | Yes | Whether variables in this frame can be written |
+| **scanTimeFactor** | Integer | No | Multiplier on device scanTime (null or 1 → same period) |
+| **minutesOffset** | Integer | No | Schedule offset in minutes (e.g. on-the-hour alignment) |
+| **config** | Map | Protocol-dependent | Protocol-specific fields (JSONB) |
 
-### Frame Structure (Example)
+For Modbus the frame config fields are:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **type** | `ModbusFrameType` | Frame type (Coil, DiscreteInput, HoldingRegister, InputRegister) |
+| **startAddress** | Integer (0-65535) | First address to read |
+| **quantity** | Integer (1-1024) | Number of registers/coils to read |
+| **interFrameDelay** | Integer | Delay between frames (ms) |
+
+### Frame JSON (Modbus example)
 
 ```json
 {
-  "id": 703,
-  "name": "Energy-Frame",
-  "deviceId": 453,
-  "dsc": "Energy monitoring frame",
+  "id": "frame-703",
+  "deviceId": "dev-453",
+  "protocol": "Modbus TCP",
+  "name": "holding-block",
+  "dsc": "Holding registers 0-49",
   "isReadable": true,
   "isWritable": true,
   "scanTimeFactor": null,
-  "minutesOffset": null
+  "minutesOffset": null,
+  "type": "HoldingRegister",
+  "startAddress": 0,
+  "quantity": 50
 }
 ```
 
 ### Readable / Writable
 
-| Setting | Description |
-|---------|-------------|
-| **Readable = true** | Frame is read periodically (monitoring) |
-| **Writable = true** | Values can be written to variables in this frame (control) |
-| **Both = true** | Both read and write (most common) |
-| **Readable = false** | Write-only frame (setpoint sending) |
+| Setting | Meaning |
+|---------|---------|
+| **isReadable = true** | Frame is polled (monitoring) |
+| **isWritable = true** | Variables in the frame accept writes (control) |
+| Both `true` | Read + write — the most common case |
+| **isReadable = false** | Write-only frame (setpoint dispatch) |
 
 ### Scan Time Factor
 
-Sets the frame's read period as a multiple of the device scan time:
+Sets the frame's read period as a multiple of the device scanTime:
 
-- Device scan time = 2000ms, Frame scan time factor = 3 → Frame is read every 6000ms
-- `null` or `1` → Read at the same period as the device scan time
+- Device scanTime = 2000 ms, frame scanTimeFactor = 3 → frame is polled every 6000 ms
+- `null` or `1` → same period as the device
 
 :::tip
-You can reduce unnecessary network traffic by using scan time factor for frames with slow-changing data.
+Use scanTimeFactor on slow-changing blocks to cut unnecessary network traffic.
 :::
 
 ---
@@ -113,7 +148,7 @@ You can reduce unnecessary network traffic by using scan time factor for frames 
 
 ```
 Connection: LOCAL-Energy (LOCAL, 127.0.0.1)
-└── Device: Energy-Device (scanTime: 2000ms, Periodic)
+└── Device: Energy-Device (scanTime: 2000 ms, Periodic)
     └── Frame: Energy-Frame (readable + writable)
         ├── ActivePower_kW (Float, kW)
         ├── ReactivePower_kVAR (Float, kVAR)
@@ -127,4 +162,6 @@ Connection: LOCAL-Energy (LOCAL, 127.0.0.1)
         └── GridStatus (Boolean)
 ```
 
-This structure is the same for a MODBUS connection — the only difference is that protocol-specific parameters (slave ID, start address, register count, etc.) are added.
+The shape is identical on a Modbus TCP link — the only change is that device- and frame-level protocol-specific fields (stationAddress, type, startAddress, quantity, …) are added.
+
+Reading and updating devices / frames from scripts: [Connection API →](/docs/en/jdk21/platform/scripts/server/connection-api/)
