@@ -20,7 +20,23 @@ function filterTree(entries, v) {
 		.map((e) => (e.type === 'group' ? { ...e, entries: filterTree(e.entries, v) } : e));
 }
 
-const filtered = filterTree(sidebar, activeVersion);
+function flattenOpenApiWrapper(entries) {
+	return entries.flatMap((e) => {
+		if (e.type !== 'group') return [e];
+		const flatChildren = flattenOpenApiWrapper(e.entries);
+		const isRestApiRoot = e.label === 'REST API';
+		if (!isRestApiRoot) return [{ ...e, entries: flatChildren }];
+		const unwrapped = flatChildren.flatMap((child) => {
+			if (child.type === 'group' && child.entries.some((c) => c.type === 'group')) {
+				return child.entries;
+			}
+			return [child];
+		});
+		return [{ ...e, entries: unwrapped }];
+	});
+}
+
+const filtered = flattenOpenApiWrapper(filterTree(sidebar, activeVersion));
 ---
 
 <VersionSwitcher activeVersion={activeVersion} />
