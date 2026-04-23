@@ -5,146 +5,163 @@ sidebar:
   order: 0
 ---
 
-inSCADA is a SCADA platform designed to collect, process, visualize, and automate data from field devices. It runs as a single application — all components are bundled in a single file.
+inSCADA is a SCADA platform designed to collect, process, visualize, and automate data from field devices. It runs as a single Spring Boot application — all components live in one process.
 
 ## Data Hierarchy
 
-All data in inSCADA is organized in the following hierarchical structure:
+All data in inSCADA is organized at two levels: **Space** and **Project**. Some components are shared across all projects in a space; others belong to a single project.
 
 ```
-Space
+Space (Workspace)
 │
-├── [Space-Level Components]
+├── [Space-level — shared across projects]
 │   ├── Custom Menu
 │   ├── Dashboard
-│   ├── Expression (Shared Formulas)
-│   └── Symbol (SVG Symbol Library)
+│   ├── Expression
+│   └── Symbol (SVG symbol library)
 │
 └── Project
     │
     ├── [Communication]
     │   └── Connection
     │       └── Device
-    │           └── Frame (Data Frame)
+    │           └── Frame
     │               └── Variable
     │
     ├── [Monitoring & Alarm]
     │   ├── Alarm Group
-    │   │   └── Alarm Definition
-    │   └── Trend (Trend Chart)
+    │   │   ├── Analog Alarm
+    │   │   ├── Digital Alarm
+    │   │   └── Custom Alarm
+    │   └── Trend
     │       └── Trend Tag
     │
     ├── [Automation]
-    │   ├── Script (Automation Script)
+    │   ├── Script
     │   └── Data Transfer
     │
     ├── [Visualization]
-    │   ├── Animation (SVG Screen)
-    │   └── Faceplate (Reusable Component)
+    │   ├── Animation (SVG screen)
+    │   └── Faceplate (reusable SVG component)
     │
     └── [Reporting]
-        └── Report
+        └── Report (classic + Jasper)
 ```
 
 :::note[Space vs. Project]
-**Custom Menu**, **Dashboard**, **Expression**, and **Symbol** are defined at the space level — they can be shared across all projects. All other components are bound to a project.
+**Custom Menu**, **Dashboard**, **Expression** and **Symbol** are defined at the space level — shared by all projects in the same space. Everything else belongs to a project.
 :::
 
 ### Space
 
-Space is the top-level isolation unit. Each space has its own set of projects, users, and configurations. Different spaces are completely independent of each other.
+A space is the top-level isolation unit. Each space has its own projects, users, and configuration. Different spaces are fully independent of one another.
 
-Use cases:
-- **Customer isolation** — a separate space for each customer
-- **Environment separation** — development, testing, production
-- **Department separation** — energy, water, building automation
+Typical uses:
+- **Customer isolation** — one space per customer
+- **Environment separation** — dev, test, production
+- **Departmental split** — energy, water, building automation
 
 ### Project
 
-A project represents a facility, site, or logical unit. There can be multiple projects under a space. All components within a project (connections, alarms, scripts, screens, etc.) operate within the project scope.
+A project represents a facility, site, or logical unit. A space can contain many projects. Every component of a project (connections, alarms, scripts, screens, etc.) runs within the project's scope.
 
 Example projects:
-- "Ankara Factory" — a manufacturing facility
-- "SPP-01" — a solar power plant
-- "Building-A HVAC" — a building's HVAC system
+- "Ankara Factory" — a production plant
+- "GES-01" — a solar power plant
+- "Building-A HVAC" — the HVAC system of a building
 
-Each project can optionally have **latitude/longitude** coordinates and can be visualized on the map screen.
+Projects can carry optional latitude/longitude coordinates and be shown on the map view.
 
 ### Connection
 
-A connection is the communication channel to a field device or system. Each connection uses a protocol.
+A connection is a communication channel to a field device or system. Each connection uses one protocol.
 
-Supported protocols:
+**Supported protocols:**
 
-| Group | Protocols |
-|-------|-----------|
-| **Industrial** | MODBUS TCP/UDP/RTU, S7, EtherNet/IP, Fatek |
-| **Energy** | DNP3, IEC 60870-5-104, IEC 61850 |
-| **Open Standard** | OPC UA, OPC DA, OPC XML, MQTT |
-| **Local** | LOCAL (simulation / internal calculation) |
+| Group | Protocol | Client | Server / Slave |
+|------|------------|--------|----------------|
+| **Industrial** | Modbus TCP / UDP / RTU Over TCP | ✓ | ✓ (per transport) |
+| | S7 | ✓ | — |
+| | EtherNet/IP | ✓ | — |
+| | Fatek TCP / UDP | ✓ | — |
+| **Power / Utility** | DNP3 | ✓ | ✓ |
+| | IEC 60870-5-104 | ✓ | ✓ |
+| | IEC 61850 | ✓ | ✓ |
+| **Open Standard** | OPC UA | ✓ | ✓ |
+| | OPC DA | ✓ | — |
+| | OPC XML | ✓ | — |
+| | MQTT | ✓ | — |
+| **Internal** | LOCAL (simulation / internal computation) | — | — |
 
-Each connection can be started and stopped independently, and its status can be monitored (Connected, Disconnected, Error).
+Every connection can be started and stopped independently. Status values: **Connected**, **Disconnected**.
+
+:::note[Sidecar protocols]
+**BACnet** and **KNX** are not bundled into the inSCADA platform — they run as separate Node.js gateways and integrate with inSCADA over REST/WebSocket. See [BACnet](/docs/en/jdk21/protocols/bacnet/), [KNX](/docs/en/jdk21/protocols/knx/).
+:::
 
 ### Device
 
-A device represents a physical or logical unit on a connection. For example, there can be multiple slave devices on a single MODBUS connection.
+A device represents a physical or logical unit over a connection. A Modbus TCP connection, for example, may address several slave devices.
 
-### Frame (Data Frame)
+### Frame
 
-A frame is a data block read from a device. Each frame defines a specific address range and read period.
+A frame is a block of data read from a device. Each frame defines an address range and a read period.
 
 | Parameter | Description |
 |-----------|-------------|
-| **Start Address** | The first address to read |
-| **Quantity** | Number of registers/points to read |
-| **Period** | Read frequency (ms) |
+| **Start address** | First address to read |
+| **Quantity** | Number of registers / points to read |
+| **Period** | Read interval (ms) |
 
 :::tip
-Frame is critical for performance optimization. Grouping consecutive addresses into a single frame is much more efficient than reading them individually.
+Frames are critical for performance. Packing consecutive addresses into one frame is far cheaper than reading them one at a time.
 :::
 
 ### Variable
 
-A variable is the most fundamental data unit in the platform. A temperature measurement, a motor status, a counter value — each one is a variable.
+The variable is the core data unit on the platform. A temperature reading, a motor status, a meter value — each one is a variable.
 
-Key properties of each variable:
+Core fields:
 
-| Property | Description |
-|----------|-------------|
-| **Name** | Unique name (within the project) |
+| Field | Description |
+|---------|-------------|
+| **Name** | Unique within the project |
 | **Type** | Float, Integer, Boolean, String |
-| **Unit** | Engineering unit (°C, kW, bar, V, A...) |
-| **Scaling** | Raw → Engineering conversion (engZeroScale, engFullScale) |
-| **Logging** | Historical data recording type and period |
-| **Expression** | Custom value calculation formula |
+| **Unit** | Engineering unit (°C, kW, bar, V, A, …) |
+| **Scaling** | Raw → engineering conversion (engZeroScale, engFullScale) |
+| **Logging** | Historical logging mode |
+| **Expression** | Optional computed-value formula |
 
 #### Scaling
 
-The raw value is linearly converted to the engineering value:
+Raw value is linearly converted to engineering value:
 
 ```
 Engineering = engZeroScale + (raw - rawZeroScale) ×
               (engFullScale - engZeroScale) / (rawFullScale - rawZeroScale)
 ```
 
-Example: 4-20mA sensor → 0-100°C scaling:
-- Raw: 4mA → 0°C, 20mA → 100°C
+Example: 4-20 mA sensor → 0-100 °C:
+- Raw: 4 mA → 0 °C, 20 mA → 100 °C
 - engZeroScale=0, engFullScale=100, rawZeroScale=4, rawFullScale=20
 
 #### Logging Types
 
 | Type | Description |
-|------|-------------|
-| **Periodically** | Records at fixed intervals (logPeriod seconds) |
-| **When Changed** | Records when the value changes |
-| **None** | No recording |
+|-----|-------------|
+| **No Log** | Not logged |
+| **When Changed** | Log on value change |
+| **Periodically** | Log at fixed interval (logPeriod seconds) |
+| **Threshold** | Log when a threshold is crossed |
+| **Expression** | Log decision driven by a user expression |
+| **Custom** | Script-driven custom logic |
 
 #### Value Expression
 
-A custom calculation formula can be assigned to a variable. This formula runs on every read cycle, and its result becomes the variable's value:
+A variable can carry a per-variable compute formula. On every read cycle the formula runs and its result becomes the variable value:
 
 ```javascript
-// Example: Sine wave simulation
+// Sine-wave simulation
 var t = new Date().getTime() / 1000;
 return (Math.sin(t / 60) * 150 + 450).toFixed(2) * 1;
 ```
@@ -155,197 +172,200 @@ return (Math.sin(t / 60) * 150 + 450).toFixed(2) * 1;
 
 ### Alarm Group
 
-Alarms are organized in groups. Each alarm group belongs to a project and can be enabled/disabled as a whole.
+Alarms are organized into groups. Every alarm group belongs to a project and can be enabled/disabled together.
 
 ```
 Project
-└── Alarm Group (e.g., "Temperature Alarms")
-    ├── Alarm: Temperature_C > 60°C (High Temperature)
-    ├── Alarm: Temperature_C > 80°C (Critical Temperature)
-    └── Alarm: Temperature_C < 10°C (Low Temperature)
+└── Alarm Group (e.g. "Temperature Alarms")
+    ├── Analog Alarm: Temperature_C > 60 °C (High)
+    ├── Analog Alarm: Temperature_C > 80 °C (Critical)
+    └── Analog Alarm: Temperature_C < 10 °C (Low)
 ```
 
 ### Alarm Types
 
 | Type | Description | Parameters |
-|------|-------------|------------|
-| **Analog** | Numeric value threshold check | High, High-High, Low, Low-Low |
-| **Digital** | Boolean state check | ON → Alarm, OFF → Normal |
-| **Custom** | Script-based custom condition | JavaScript expression |
+|-----|-------------|-------------|
+| **Analog** | Numeric threshold | setPoint, highHigh, high, low, lowLow |
+| **Digital** | Boolean state | ON → alarm, OFF → normal |
+| **Custom** | Script-based condition | JavaScript expression |
 
-### Alarm Lifecycle
+### Alarm Status (FiredAlarm)
+
+Each triggered alarm is stored as a `FiredAlarm` record. The actual status is two-valued:
 
 ```
-Normal → Fired → Acknowledged → Off
+ON (fired) → OFF (cleared)
 ```
 
-Every alarm event is recorded historically: fire time, off time, acknowledging user, duration.
+Acknowledge and comment are **not** part of the status — `acknowledgeTime`, `acknowledgedBy`, `commentTime`, `comment` are separate fields that capture user interaction but do not change the alarm state.
+
+Every alarm event is stored historically: fire time, clear time, who acknowledged, duration.
 
 ---
 
 ## Script Engine
 
-Scripts are the platform's automation engine. They run server-side and can access all platform data.
+Scripts are the platform's automation engine. They run server-side on GraalJS (Nashorn compatibility mode) and access all platform data through the `ins.*` API.
 
-### Script Use Cases
+### Typical Script Use Cases
 
 | Area | Description | Example |
 |------|-------------|---------|
-| **Scheduled task** | Periodic or timed execution | Energy calculation every 10 seconds |
-| **Variable formula** | Value transformation | Deriving a third variable from two others |
-| **Alarm condition** | Custom alarm logic | Condition dependent on multiple variables |
-| **Data integration** | REST API call | Fetching data from a weather API |
-| **Reporting** | Automated report | Sending a PDF report by email every morning |
-| **Notification** | Event-based notification | Sending an SMS when an alarm fires |
+| **Scheduled task** | Periodic or timed execution | Energy calc every 10 s |
+| **Variable formula** | Value derivation | Derive a 3rd variable from two others |
+| **Alarm condition** | Custom alarm logic | Condition across multiple variables |
+| **Data integration** | REST calls | Pulling weather data from an API |
+| **Reporting** | Automatic reports | Emailing a daily PDF report |
+| **Notification** | Event-driven messaging | Sending an SMS on alarm fire |
 
 ### Schedule Types
 
-| Type | Usage |
-|------|-------|
+| Type | Behavior |
+|-----|----------|
 | **Periodic** | Runs every X milliseconds |
-| **Daily** | Runs at a specific time every day |
+| **Daily** | Runs once a day at a fixed time |
 | **Once** | Runs once and stops |
-| **None** | Triggered only manually or via API |
+| **None** | Manual / API trigger only |
 
-Details: [Script Engine →](/docs/tr/platform/scripts/)
+Details: [Script Engine →](/docs/en/jdk21/platform/scripts/)
 
 ---
 
 ## Visualization Components
 
-### Animation (SVG Screen) — Project Level
+### Animation (SVG screen) — Project-level
 
 ![SVG Animation — Energy Monitoring Dashboard](../../../../../assets/docs/variable-tracking.png)
 
-SVG-based interactive SCADA screens. Variable values are displayed in real time on the screen: color changes, motion, numeric display, on/off controls.
+SVG-based interactive SCADA screens. Variable values are rendered live: color changes, movement, numeric readouts, on/off controls.
 
-### Faceplate — Project Level
+### Faceplate — Project-level
 
-Reusable SVG components. Frequently used visual elements such as motors, valves, and pumps can be defined as faceplates and used across multiple animation screens.
+Reusable SVG components. A motor, valve, or pump that appears many times can be defined once as a faceplate and embedded in multiple animations.
 
-### Symbol (SVG Symbol Library) — Space Level
+### Symbol (SVG symbol library) — Space-level
 
-SVG symbol library shared across the space. Animations and faceplates in all projects can use these symbols.
+An SVG symbol library shared across the space. Animations and faceplates in any project can reference its symbols.
 
-### Dashboard — Space Level
+### Dashboard — Space-level
 
-Used to combine data from different projects into a single dashboard. Since it is defined at the space level, cross-project data comparison is possible.
+Used to combine data from several projects into a single board. Defined at the space level so it can span projects.
 
-### Trend Chart — Project Level
+### Trend Chart — Project-level
 
-Charts showing the change of variables over time. Multiple variables can be shown on the same chart (Trend Tag). Used for historical data review and comparison.
+Time-series charts of one or more variables (Trend Tag). Used for historical inspection and comparison.
 
-### Custom Menu — Space Level
+### Custom Menu — Space-level
 
-Used to create custom menu structures for users. Defined at the space level — different menus can be assigned to different roles. An operator sees only monitoring screens, a manager sees reports, and an engineer sees configuration pages.
+Builds a per-role navigation menu. Different menus can be assigned to different roles: operator sees only monitoring screens, manager sees reports, engineer sees configuration.
 
-### Report — Project Level
+### Report — Project-level
 
-The reporting system produces output in PDF and Excel formats. Reports can be scheduled, sent by email, or saved to file.
+Produces PDF and Excel output. Two report flavors:
+- **Classic Report** — inSCADA's built-in table/template format
+- **Jasper Report** — JasperReports files (.jrxml / .jasper) for rich layouts
 
-### Expression (Shared Formula) — Space Level
+Both can be scheduled, emailed, or written to disk.
 
-Calculation formulas shared across the space. Can be used by multiple variables or alarms. Enables centralized management of repeated formulas.
+### Expression (shared formula) — Space-level
+
+Shared compute formulas used by many variables or alarms. Centralizes repeated formulas so they can be maintained in one place.
 
 ### Project Map
 
 ![Project Map](../../../../../assets/docs/rt-project-map.png)
 
-Displays the geographic locations of projects on a GIS map. At each project point, real-time values, alarm status, and connection status are shown as a popup.
+A GIS view with project locations. Each project marker shows live values, alarm status, and connection health in a popup.
 
 ---
 
-## Database Structure
+## Database Layers
 
-inSCADA uses three different database layers. Each is optimized for a different data type:
+inSCADA uses three data tiers, each tuned for a different data shape:
 
-### Configuration Database
+### PostgreSQL — Configuration Database
 
-Project definitions, variable settings, users, roles, alarm definitions, script code — all platform configuration data is stored here.
+Project definitions, variable settings, users, roles, alarm definitions, script code — all platform configuration data lives here. This data changes rarely, is relational, and prioritizes consistency.
 
-This data rarely changes, has a relational structure, and consistency is the priority.
+Schema migrations are managed by Flyway; the default schema name is `inscada`.
 
-### Time Series Database
+### InfluxDB — Time-Series Database
 
-Variable historical values, alarm history, event logs, login attempts — all time-stamped data is stored here.
+Variable history, alarm history, event logs, login attempts — everything with a timestamp lives here. This data is write-heavy, rarely updated, and queried by time range.
 
-This data is continuously written, rarely updated, and queried by time range. Old data can be automatically cleaned up with retention policies.
+Each measurement (variable value, alarm, event log) can have its own retention policy; retention durations are configured at the InfluxDB layer — inSCADA does not hard-code a default.
 
-| Data Type | Default Retention |
-|-----------|-------------------|
-| Variable values | 365 days |
-| Alarm history | 365 days |
-| Event logs | 14 days |
-| Login attempts | 365 days |
+### Redis — Live-Value Cache
 
-### Real-Time Value Cache
+The **latest value** of every variable is held in Redis. `ins.getVariableValue()` and the REST API read from the cache — they do not touch InfluxDB.
 
-The **latest current values** of all variables are kept in memory (cache). When a value is read via `ins.getVariableValue()` or the REST API, it returns from the cache — no database query is needed.
+Benefits:
+- Sub-millisecond live-value reads
+- Thousands of variables can be read concurrently
+- Web UI and scripts see the same current value
 
-This provides:
-- Real-time value read < 1ms
-- Thousands of variables can be read simultaneously
-- Web interface and scripts access the same up-to-date data
+Redis also backs script global objects, session tokens, and rate-limit counters.
 
 ---
 
 ## Data Flow
 
-The path data follows from a field device to the web screen:
+From field device to web screen:
 
 ```
 ┌─────────┐    ┌──────────┐    ┌─────────┐    ┌────────┐    ┌────────┐
-│  Field   │───▶│Connection│───▶│  Frame   │───▶│  Raw   │───▶│Scaling │
-│ Device   │    │(Protocol)│    │ (Read)   │    │ Value  │    │        │
+│  Field  │───▶│Connection│───▶│  Frame  │───▶│  Raw   │───▶│ Scale  │
+│  Device │    │(Protocol)│    │  (Read) │    │  Value │    │        │
 └─────────┘    └──────────┘    └─────────┘    └────────┘    └───┬────┘
                                                                 │
                     ┌───────────────────────────────────────────┘
                     │
                     ▼
               ┌──────────┐    ┌──────────┐    ┌──────────┐
-              │  Cache   │───▶│ Logging  │    │  Alarm   │
-              │(Real-time)│   │(History) │    │  Check   │
+              │  Redis   │───▶│ InfluxDB │    │  Alarm   │
+              │ (Cache)  │    │(History) │    │  Checks  │
               └────┬─────┘    └──────────┘    └──────────┘
                    │
           ┌────────┼────────┐
           ▼        ▼        ▼
      ┌────────┐┌────────┐┌────────┐
      │  Web   ││ Script ││  REST  │
-     │  UI    ││ Engine ││  API   │
+     │   UI   ││ Engine ││   API  │
      └────────┘└────────┘└────────┘
 ```
 
-1. **Field Device** — PLC, RTU, sensor, meter, etc.
-2. **Connection** — Connects to the device using the specified protocol
-3. **Frame Read** — Reads the address block at the defined period
-4. **Raw Value** — Raw data received from the device
-5. **Scaling** — Raw → Engineering conversion (if applicable)
-6. **Cache** — Current value is written to the in-memory cache
-7. **Logging** — Records to the time series database based on logging type
-8. **Alarm Check** — Threshold check based on alarm definitions
-9. **Consumption** — Web UI (WebSocket), Script Engine, REST API all read from the same cache
+1. **Field device** — PLC, RTU, sensor, meter, etc.
+2. **Connection** — attaches to the device using the configured protocol
+3. **Frame read** — the address block is polled at the frame period
+4. **Raw value** — the data returned by the device
+5. **Scaling** — raw → engineering conversion (if configured)
+6. **Cache (Redis)** — the current value is written to Redis
+7. **Logging (InfluxDB)** — based on the logging type, a history point is written
+8. **Alarm checks** — alarm definitions are evaluated
+9. **Consumption** — Web UI (WebSocket/SSE), Script Engine, and REST API all read from the same cache
 
-### Write Flow (Sending Commands)
+### Write Flow (command dispatch)
 
 ```
-UI / Script / API → Cache Update → Connection → Protocol Write → Field Device
+UI / Script / API → cache update → Connection → protocol write → Field device
 ```
 
-When a value is written via `ins.setVariableValue()` or the UI, the command is sent to the field device through the connection.
+When `ins.setVariableValue()` (or the UI) writes a value, the command is forwarded over the connection to the field device.
 
 ---
 
-## Multi-Tenant (Multiple Workspaces)
+## Multi-Space (Multi-Tenant)
 
 ```
 inSCADA Instance
 ├── Space: "energy"
-│   ├── Project: "SPP-01"
-│   ├── Project: "SPP-02"
-│   └── Project: "WPP-01"
+│   ├── Project: "GES-01"
+│   ├── Project: "GES-02"
+│   └── Project: "RES-01"
 │
-├── Space: "building"
-│   ├── Project: "Head Office"
+├── Space: "buildings"
+│   ├── Project: "HQ"
 │   └── Project: "Warehouse"
 │
 └── Space: "water"
@@ -353,22 +373,34 @@ inSCADA Instance
     └── Project: "Pump Stations"
 ```
 
-Each space has:
-- Its own set of projects
-- Its own user permissions
-- Data independent from other spaces
+Each space:
+- Has its own set of projects
+- Has its own user permissions
+- Is data-isolated from other spaces
 
-Users can access multiple spaces and switch between spaces during a session.
+Users can have access to multiple spaces and switch between them mid-session. REST calls pass the target space via the `X-Space` header.
+
+---
+
+## Cluster Mode (optional)
+
+Activating the `cluster` Spring profile runs inSCADA in multi-node (active-follower) mode. Entity replication, InfluxDB sync, and file-system replication ride RabbitMQ; leader election is done over JGroups. A single-node setup does not require the cluster profile.
 
 ---
 
 ## Access and Ports
 
-| Port | Usage |
-|------|-------|
-| **8081** | HTTP — Web interface and REST API |
-| **8082** | HTTPS — Web interface and REST API (encrypted) |
+Default configuration:
 
-The web interface is accessible from any modern browser. It also works responsively on mobile devices (tablets, phones). No additional client software installation is required.
+| Port | Use |
+|------|-----|
+| **8082** | HTTPS — Web UI and REST API (main endpoint) |
+| **8083** | HTTPS — Sandbox (isolated origin for custom-HTML widget iframes) |
 
-Configuration details: [Configuration →](/docs/tr/deployment/configuration/)
+The application serves over HTTPS only by default; the TLS bundle is configured via `server.ssl.bundle`. No plain-HTTP port is opened by default.
+
+The `follower` profile uses 9082/9083 to separate node01 from node02 locally.
+
+The web UI works in any modern browser, including tablets and phones (responsive). No desktop client install required.
+
+Configuration details: [Configuration →](/docs/en/jdk21/deployment/configuration/)

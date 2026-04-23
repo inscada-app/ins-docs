@@ -5,49 +5,51 @@ sidebar:
   order: 0
 ---
 
-inSCADA, saha cihazlarından veri toplamak, işlemek, görselleştirmek ve otomasyon kurmak için tasarlanmış bir SCADA platformudur. Tek bir uygulama olarak çalışır — tüm bileşenler tek dosyada birleşiktir.
+inSCADA, saha cihazlarından veri toplamak, işlemek, görselleştirmek ve otomasyon kurmak için tasarlanmış bir SCADA platformudur. Tek bir Spring Boot uygulaması olarak çalışır — tüm bileşenler tek bir süreçte birleşiktir.
 
 ## Veri Hiyerarşisi
 
-inSCADA'daki tüm veriler aşağıdaki hiyerarşik yapıda organize edilir:
+inSCADA'daki tüm veriler iki seviyede organize edilir: **Space** (çalışma alanı) ve **Project** (proje). Bazı bileşenler space genelinde paylaşılırken, bazıları bir projeye bağlıdır.
 
 ```
 Space (Çalışma Alanı)
 │
-├── [Space Seviyesi Bileşenler]
-│   ├── Custom Menu (Özel Menü)
-│   ├── Dashboard (Pano)
-│   ├── Expression (Paylaşımlı Formüller)
-│   └── Symbol (SVG Sembol Kütüphanesi)
+├── [Space Seviyesi — Projeler arası paylaşılan]
+│   ├── Custom Menu
+│   ├── Dashboard
+│   ├── Expression
+│   └── Symbol (SVG sembol kütüphanesi)
 │
 └── Project (Proje)
     │
     ├── [Haberleşme]
-    │   └── Connection (Bağlantı)
-    │       └── Device (Cihaz)
-    │           └── Frame (Veri Çerçevesi)
-    │               └── Variable (Değişken)
+    │   └── Connection
+    │       └── Device
+    │           └── Frame
+    │               └── Variable
     │
     ├── [İzleme & Alarm]
-    │   ├── Alarm Group (Alarm Grubu)
-    │   │   └── Alarm Definition (Alarm Tanımı)
-    │   └── Trend (Trend Grafiği)
+    │   ├── Alarm Group
+    │   │   ├── Analog Alarm
+    │   │   ├── Digital Alarm
+    │   │   └── Custom Alarm
+    │   └── Trend
     │       └── Trend Tag
     │
     ├── [Otomasyon]
-    │   ├── Script (Otomasyon Scripti)
-    │   └── Data Transfer (Veri Aktarımı)
+    │   ├── Script
+    │   └── Data Transfer
     │
     ├── [Görselleştirme]
-    │   ├── Animation (SVG Ekran)
-    │   └── Faceplate (Tekrar Kullanılabilir Bileşen)
+    │   ├── Animation (SVG ekran)
+    │   └── Faceplate (yeniden kullanılabilir SVG bileşeni)
     │
     └── [Raporlama]
-        └── Report (Rapor)
+        └── Report (klasik + Jasper)
 ```
 
 :::note[Space vs. Project]
-**Custom Menu**, **Dashboard**, **Expression** ve **Symbol** space seviyesinde tanımlanır — tüm projeler tarafından ortaklaşa kullanılabilir. Diğer tüm bileşenler bir projeye bağlıdır.
+**Custom Menu**, **Dashboard**, **Expression** ve **Symbol** space seviyesinde tanımlanır — aynı space içindeki tüm projeler tarafından paylaşılır. Diğer tüm bileşenler bir projeye bağlıdır.
 :::
 
 ### Space (Çalışma Alanı)
@@ -68,26 +70,38 @@ Proje, bir tesis, saha veya mantıksal birim temsil eder. Bir space altında bir
 - "GES-01" — bir güneş enerji santrali
 - "Bina-A HVAC" — bir binanın iklimlendirme sistemi
 
-Her projenin opsiyonel olarak **enlem/boylam** koordinatları olabilir ve harita ekranında görselleştirilebilir.
+Her projenin opsiyonel olarak enlem/boylam koordinatları olabilir ve harita ekranında görselleştirilebilir.
 
 ### Connection (Bağlantı)
 
 Bağlantı, bir saha cihazına veya sisteme olan haberleşme kanalıdır. Her bağlantı bir protokol kullanır.
 
-Desteklenen protokoller:
+**Desteklenen protokoller:**
 
-| Grup | Protokoller |
-|------|------------|
-| **Endüstriyel** | MODBUS TCP/UDP/RTU, S7, EtherNet/IP, Fatek |
-| **Enerji** | DNP3, IEC 60870-5-104, IEC 61850 |
-| **Açık Standart** | OPC UA, OPC DA, OPC XML, MQTT |
-| **Yerel** | LOCAL (simülasyon / dahili hesaplama) |
+| Grup | Protokoller | Client | Server / Slave |
+|------|------------|--------|----------------|
+| **Endüstriyel** | Modbus TCP / UDP / RTU Over TCP | ✓ | ✓ (her transport için) |
+| | S7 | ✓ | — |
+| | EtherNet/IP | ✓ | — |
+| | Fatek TCP / UDP | ✓ | — |
+| **Enerji** | DNP3 | ✓ | ✓ |
+| | IEC 60870-5-104 | ✓ | ✓ |
+| | IEC 61850 | ✓ | ✓ |
+| **Açık Standart** | OPC UA | ✓ | ✓ |
+| | OPC DA | ✓ | — |
+| | OPC XML | ✓ | — |
+| | MQTT | ✓ | — |
+| **Yerel** | LOCAL (simülasyon / dahili hesaplama) | — | — |
 
-Her bağlantı bağımsız olarak başlatılıp durdurulabilir ve durumu izlenebilir (Connected, Disconnected, Error).
+Her bağlantı bağımsız olarak başlatılıp durdurulabilir. Durum değerleri: **Connected**, **Disconnected**.
+
+:::note[Sidecar Protokoller]
+**BACnet** ve **KNX** inSCADA platformuna doğrudan entegre değildir — ayrı Node.js gateway'leri olarak çalışır ve REST/WebSocket üzerinden inSCADA ile entegre olur. Ayrıntı: [BACnet](/docs/tr/jdk21/protocols/bacnet/), [KNX](/docs/tr/jdk21/protocols/knx/).
+:::
 
 ### Device (Cihaz)
 
-Cihaz, bir bağlantı üzerindeki fiziksel veya mantıksal birimi temsil eder. Örneğin bir MODBUS bağlantısı üzerinde birden fazla slave cihaz olabilir.
+Cihaz, bir bağlantı üzerindeki fiziksel veya mantıksal birimi temsil eder. Örneğin bir Modbus bağlantısı üzerinde birden fazla slave cihaz olabilir.
 
 ### Frame (Veri Çerçevesi)
 
@@ -115,7 +129,7 @@ Her değişkenin temel özellikleri:
 | **Type** | Float, Integer, Boolean, String |
 | **Unit** | Mühendislik birimi (°C, kW, bar, V, A...) |
 | **Ölçekleme** | Raw → Engineering dönüşümü (engZeroScale, engFullScale) |
-| **Loglama** | Tarihsel veri kayıt tipi ve periyodu |
+| **Loglama** | Tarihsel veri kayıt tipi |
 | **Expression** | Özel değer hesaplama formülü |
 
 #### Ölçekleme (Scaling)
@@ -135,9 +149,12 @@ Engineering = engZeroScale + (raw - rawZeroScale) ×
 
 | Tip | Açıklama |
 |-----|----------|
-| **Periodically** | Sabit aralıkla kayıt (logPeriod saniye) |
+| **No Log** | Kayıt yok |
 | **When Changed** | Değer değiştiğinde kayıt |
-| **None** | Kayıt yok |
+| **Periodically** | Sabit aralıkla kayıt (logPeriod saniye) |
+| **Threshold** | Eşik aşıldığında kayıt |
+| **Expression** | Kullanıcı tanımlı formül ile kayıt kararı |
+| **Custom** | Özel logic (script tabanlı) |
 
 #### Value Expression
 
@@ -160,24 +177,28 @@ Alarmlar grup halinde organize edilir. Her alarm grubu bir proje altındadır ve
 ```
 Project
 └── Alarm Group (örn: "Sıcaklık Alarmları")
-    ├── Alarm: Temperature_C > 60°C (Yüksek Sıcaklık)
-    ├── Alarm: Temperature_C > 80°C (Kritik Sıcaklık)
-    └── Alarm: Temperature_C < 10°C (Düşük Sıcaklık)
+    ├── Analog Alarm: Temperature_C > 60°C (Yüksek Sıcaklık)
+    ├── Analog Alarm: Temperature_C > 80°C (Kritik Sıcaklık)
+    └── Analog Alarm: Temperature_C < 10°C (Düşük Sıcaklık)
 ```
 
 ### Alarm Tipleri
 
 | Tip | Açıklama | Parametreler |
 |-----|----------|-------------|
-| **Analog** | Sayısal değer eşik kontrolü | High, High-High, Low, Low-Low |
+| **Analog** | Sayısal değer eşik kontrolü | setPoint, highHigh, high, low, lowLow |
 | **Digital** | Boolean durum kontrolü | ON → Alarm, OFF → Normal |
 | **Custom** | Script tabanlı özel koşul | JavaScript expression |
 
-### Alarm Yaşam Döngüsü
+### Alarm Durumu (FiredAlarm)
+
+Her tetiklenen alarm `FiredAlarm` kaydı olarak saklanır. Gerçek durum iki değerlidir:
 
 ```
-Normal → Fired (tetiklendi) → Acknowledged (onaylandı) → Off (kapandı)
+ON (tetiklendi) → OFF (kapandı)
 ```
+
+Onay (acknowledge) ve yorum (comment) durumun bir parçası **değildir** — `acknowledgeTime`, `acknowledgedBy`, `commentTime`, `comment` alanları ayrı olarak işlenir ve kullanıcı müdahalesini kaydeder ama alarm durumunu değiştirmez.
 
 Her alarm olayı tarihsel olarak kaydedilir: tetiklenme zamanı, kapanma zamanı, onaylayan kullanıcı, süre.
 
@@ -185,7 +206,7 @@ Her alarm olayı tarihsel olarak kaydedilir: tetiklenme zamanı, kapanma zamanı
 
 ## Script Engine
 
-Script'ler platformun otomasyon motorudur. Sunucu tarafında çalışır ve tüm platform verilerine erişebilir.
+Script'ler platformun otomasyon motorudur. Sunucu tarafında GraalJS (Nashorn uyumluluk modu) ile çalışır ve `ins.*` API üzerinden tüm platform verilerine erişir.
 
 ### Script Kullanım Alanları
 
@@ -207,7 +228,7 @@ Script'ler platformun otomasyon motorudur. Sunucu tarafında çalışır ve tüm
 | **Once** | Bir kez çalışıp durur |
 | **None** | Yalnızca manuel veya API ile tetiklenir |
 
-Detaylı bilgi: [Script Engine →](/docs/tr/platform/scripts/)
+Detaylı bilgi: [Script Engine →](/docs/tr/jdk21/platform/scripts/)
 
 ---
 
@@ -241,7 +262,11 @@ Kullanıcıya özel menü yapısı oluşturmak için kullanılır. Space seviyes
 
 ### Report (Rapor) — Proje Seviyesi
 
-Rapor sistemi, PDF ve Excel formatında çıktı üretir. Zamanlanabilir, e-posta ile gönderilebilir, dosyaya kaydedilebilir.
+Rapor sistemi PDF ve Excel formatında çıktı üretir. İki tip rapor vardır:
+- **Klasik Rapor** — inSCADA'nın kendi tablo/şablon tasarımı
+- **Jasper Rapor** — JasperReports dosyaları (.jrxml / .jasper) ile zengin layout
+
+Her ikisi de zamanlanabilir, e-posta ile gönderilebilir, dosyaya kaydedilebilir.
 
 ### Expression (Paylaşımlı Formül) — Space Seviyesi
 
@@ -257,35 +282,30 @@ GIS harita üzerinde projelerin coğrafi konumlarını gösterir. Her proje nokt
 
 ## Veritabanı Yapısı
 
-inSCADA üç farklı veritabanı katmanı kullanır. Her biri farklı bir veri tipine optimize edilmiştir:
+inSCADA üç farklı veri katmanı kullanır. Her biri farklı bir veri tipine optimize edilmiştir:
 
-### Yapılandırma Veritabanı
+### PostgreSQL — Yapılandırma Veritabanı
 
-Proje tanımları, değişken ayarları, kullanıcılar, roller, alarm tanımları, script kodları — kısaca platformun tüm yapılandırma verileri burada tutulur.
+Proje tanımları, değişken ayarları, kullanıcılar, roller, alarm tanımları, script kodları — kısaca platformun tüm yapılandırma verileri burada tutulur. Bu veriler nadiren değişir, ilişkisel yapıdadır ve tutarlılık (consistency) önceliklidir.
 
-Bu veriler nadiren değişir, ilişkisel yapıdadır ve tutarlılık (consistency) önceliklidir.
+Şema geçişleri Flyway ile yönetilir; varsayılan şema adı `inscada`.
 
-### Zaman Serisi Veritabanı
+### InfluxDB — Zaman Serisi Veritabanı
 
-Değişken tarihsel değerleri, alarm geçmişi, olay logları, giriş denemeleri — zaman damgalı tüm veriler burada tutulur.
+Değişken tarihsel değerleri, alarm geçmişi, olay logları, giriş denemeleri — zaman damgalı tüm veriler burada tutulur. Bu veriler sürekli yazılır, nadiren güncellenir ve zaman aralığına göre sorgulanır.
 
-Bu veriler sürekli yazılır, nadiren güncellenir ve zaman aralığına göre sorgulanır. Saklama politikaları (retention policy) ile eski veriler otomatik temizlenebilir.
+Her ölçüm tipi (variable value, alarm, event log) için ayrı retention policy tanımlanır; saklama süreleri InfluxDB katmanında yapılandırılır — inSCADA'da sabit bir varsayılan yoktur.
 
-| Veri Tipi | Varsayılan Saklama |
-|-----------|-------------------|
-| Değişken değerleri | 365 gün |
-| Alarm geçmişi | 365 gün |
-| Olay logları | 14 gün |
-| Giriş denemeleri | 365 gün |
+### Redis — Anlık Değer Cache
 
-### Anlık Değer Cache
-
-Tüm değişkenlerin **son güncel değerleri** bellekte (cache) tutulur. `ins.getVariableValue()` veya REST API ile değer okunduğunda cache'ten döner — veritabanına gitmez.
+Tüm değişkenlerin **son güncel değerleri** Redis üzerinde tutulur. `ins.getVariableValue()` veya REST API ile değer okunduğunda cache'ten döner — InfluxDB'ye gitmez.
 
 Bu sayede:
 - Anlık değer okuma < 1ms
 - Binlerce değişken eşzamanlı okunabilir
 - Web arayüzü ve script'ler aynı güncel veriye erişir
+
+Redis ayrıca script global object'leri, oturum token'ları ve rate-limit sayaçları için de kullanılır.
 
 ---
 
@@ -303,8 +323,8 @@ Bir saha cihazından web ekranına kadar verinin izlediği yol:
                     │
                     ▼
               ┌──────────┐    ┌──────────┐    ┌──────────┐
-              │  Cache   │───▶│ Loglama  │    │  Alarm   │
-              │(Anlık)   │    │(Tarihsel)│    │ Kontrol  │
+              │  Redis   │───▶│ InfluxDB │    │  Alarm   │
+              │ (Cache)  │    │(Tarihsel)│    │ Kontrol  │
               └────┬─────┘    └──────────┘    └──────────┘
                    │
           ┌────────┼────────┐
@@ -320,10 +340,10 @@ Bir saha cihazından web ekranına kadar verinin izlediği yol:
 3. **Frame Okuma** — Tanımlı periyotta adres bloğunu okur
 4. **Ham Değer** — Cihazdan gelen raw veri
 5. **Ölçekleme** — Raw → Engineering dönüşümü (varsa)
-6. **Cache** — Güncel değer bellek cache'ine yazılır
-7. **Loglama** — Loglama tipine göre zaman serisi veritabanına kayıt
+6. **Cache (Redis)** — Güncel değer belleğe yazılır
+7. **Loglama (InfluxDB)** — Loglama tipine göre zaman serisine kayıt
 8. **Alarm Kontrol** — Alarm tanımlarına göre eşik kontrolü
-9. **Tüketim** — Web UI (WebSocket), Script Engine, REST API aynı cache'ten okur
+9. **Tüketim** — Web UI (WebSocket/SSE), Script Engine, REST API aynı cache'ten okur
 
 ### Yazma Akışı (Komut Gönderme)
 
@@ -358,17 +378,29 @@ Her space:
 - Kendi kullanıcı yetkileri
 - Birbirinden bağımsız veri
 
-Kullanıcılar birden fazla space'e erişebilir ve oturum sırasında space değiştirebilir.
+Kullanıcılar birden fazla space'e erişebilir ve oturum sırasında space değiştirebilir. REST API çağrılarında hangi space'in hedeflendiğini belirtmek için `X-Space` header'ı kullanılır.
+
+---
+
+## Cluster Modu (Opsiyonel)
+
+`cluster` profili aktifleştirildiğinde inSCADA çoklu-node (active-follower) modda çalışır. RabbitMQ üzerinden entity replikasyonu, InfluxDB senkronizasyonu ve dosya sistemi replikasyonu yapılır; liderlik JGroups üzerinden seçilir. Tek node setup için cluster profili gerekmez.
 
 ---
 
 ## Erişim ve Portlar
 
+Varsayılan yapılandırma:
+
 | Port | Kullanım |
 |------|----------|
-| **8081** | HTTP — Web arayüzü ve REST API |
-| **8082** | HTTPS — Web arayüzü ve REST API (şifreli) |
+| **8082** | HTTPS — Web arayüzü ve REST API (ana erişim) |
+| **8083** | HTTPS — Sandbox (custom HTML widget iframe'leri için izole edilmiş origin) |
 
-Web arayüzü herhangi bir modern tarayıcıdan erişilebilir. Mobil cihazlardan da (tablet, telefon) responsive olarak çalışır. Ek bir istemci yazılımı kurulumu gerekmez.
+Uygulama varsayılanda yalnızca HTTPS üzerinden hizmet verir; TLS bundle `server.ssl.bundle` ile yapılandırılır. HTTP (plain) port varsayılanda açık değildir.
 
-Yapılandırma detayları: [Yapılandırma →](/docs/tr/deployment/configuration/)
+Follower profili ile node01/node02 ayrımı için 9082/9083 portları kullanılır.
+
+Web arayüzü herhangi bir modern tarayıcıdan erişilebilir; mobil cihazlardan da responsive olarak çalışır. Ek bir istemci yazılımı kurulumu gerekmez.
+
+Yapılandırma detayları: [Yapılandırma →](/docs/tr/jdk21/deployment/configuration/)
